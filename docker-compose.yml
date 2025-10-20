@@ -1,36 +1,16 @@
+version: "3.9"
 
 services:
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: bazuyuu_db
-      MYSQL_USER: bazuyuu_user
-      MYSQL_PASSWORD: bazuyuu_password
-    ports:
-      - "3307:3306"
-    volumes:
-      - db-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD","mysqladmin","ping","-h","localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    depends_on:
-      mysql:
-        condition: service_healthy
     ports:
       - "8080:8080"
+    env_file:
+      - .env.local
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/bazuyuu_db
-      SPRING_DATASOURCE_USERNAME: bazuyuu_user
-      SPRING_DATASOURCE_PASSWORD: bazuyuu_password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
 
   frontend:
     build:
@@ -41,8 +21,4 @@ services:
     ports:
       - "3000:80"
     environment:
-      # if your React app reads this at build‐time:
       REACT_APP_API_URL: http://backend:8080
-
-volumes:
-  db-data:
