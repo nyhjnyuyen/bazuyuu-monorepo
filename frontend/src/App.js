@@ -13,7 +13,7 @@ import CustomerProfile from "./pages/CustomerProfile";
 import { CustomerProvider } from './components/CustomerContext';
 import ProtectedRoute from "./api/ProtectedRoute";
 import WishlistPage from './pages/WishlistPage';
-import ShopPage from './pages/Shop';
+import ShopPage from './pages/ShopPage';
 import ContactPage from './pages/Contact';
 import CheckoutPage from './pages/CheckoutPage';
 import SearchPage from './pages/SearchPage';
