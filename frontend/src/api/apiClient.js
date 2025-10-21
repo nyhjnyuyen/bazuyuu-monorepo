@@ -1,36 +1,61 @@
-// src/api/apiClient.js
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import { getApiBaseUrl } from './baseUrl';
 
 const apiClient = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    baseURL: getApiBaseUrl(),
+    withCredentials: false,
+    headers: { 'Content-Type': 'application/json' },
+    timeout: 15000,
 });
-// attach JWT to every request if present
-apiClient.interceptors.request.use(config => {
-    const token = localStorage.getItem('jwt');
-    if (token) config.headers['Authorization'] = `Bearer ${token}`;
+
+// Attach JWT if present (guard against SSR/build)
+apiClient.interceptors.request.use((config) => {
+    if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('jwt');
+        if (token) config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
 });
 
+// Refresh token once on 401, then retry original request
 apiClient.interceptors.response.use(
-    res => res,
+    (res) => res,
     async (err) => {
-        if (err.response.status === 401 && !err.config._retry) {
-            err.config._retry = true;
-            const res = await apiClient.post('/auth/refresh', {
-                refreshToken: localStorage.getItem('refreshToken')
-            });
-            localStorage.setItem('jwt', res.data.accessToken);
-            err.config.headers['Authorization'] = 'Bearer ' + res.data.accessToken;
-            return apiClient(err.config);
+        const resp = err?.response;
+        const cfg = err?.config || {};
+        const is401 = resp?.status === 401;
+        const alreadyRetried = cfg._retry;
+
+        if (is401 && !alreadyRetried && typeof window !== 'undefined') {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) return Promise.reject(err);
+
+            try {
+                cfg._retry = true;
+                const r = await axios.post(
+                    // call absolute URL for refresh to avoid intercept loop if baseURL changes
+                    `${getApiBaseUrl().replace(/\/$/, '')}/auth/refresh`,
+                    { refreshToken },
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+
+                const newAccess = r?.data?.accessToken;
+                if (!newAccess) return Promise.reject(err);
+
+                localStorage.setItem('jwt', newAccess);
+                cfg.headers = cfg.headers || {};
+                cfg.headers.Authorization = `Bearer ${newAccess}`;
+                return apiClient(cfg);
+            } catch (e) {
+                // wipe tokens on refresh failure
+                localStorage.removeItem('jwt');
+                localStorage.removeItem('refreshToken');
+                return Promise.reject(e);
+            }
         }
+
         return Promise.reject(err);
     }
 );
-
 
 export default apiClient;
