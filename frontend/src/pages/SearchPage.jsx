@@ -1,11 +1,9 @@
 // src/pages/SearchPage.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { getApiBaseUrl } from '../api/baseUrl';
 
-const API_BASE =
-    import.meta?.env?.VITE_API_URL ||
-    process.env.REACT_APP_API_URL ||
-    'http://localhost:8080';
+const API_BASE = getApiBaseUrl();
 
 const PAGE_SIZE = 24;
 

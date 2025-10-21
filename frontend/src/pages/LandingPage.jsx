@@ -19,7 +19,6 @@ import banner3 from '../assets/banner-03.jpg';
 import category1 from '../assets/category1.jpg';
 import category2 from '../assets/category2.jpg';
 import category3 from '../assets/category3.png';
-import category4 from '../assets/category4.jpg';
 import octopus from '../assets/octopus.svg';
 import shoppingCart from '../assets/shopping-cart.svg';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +28,7 @@ import SloganGrid from "../components/SloganGrid";
 
 import Footer from '../components/Footer';
 import { CustomerContext } from '../components/CustomerContext';
-import useWishlist from '../hook/useWishlist'; // ✅ fix path
+import useWishlist from '../hook/useWishlist';
 import { getLandingNewArrivals } from '../api/productApi';
 
 const categories = [
@@ -44,15 +43,11 @@ const sloganItems = [
     { src: slogan3, label: "Label 3", desc: "Description for item 3..." },
     { src: slogan4, label: "Label 4", desc: "Description for item 4..." },
 ];
-const flashItem = {
-    src: flashmod,
-    label: "Flash Mob Activity",
-    desc: "Shenzhen Futian Tianhong Shopping Center. A pop-up brand performance with community engagement and product showcase.",
-};
+
 export default function LandingPage() {
     const { customer } = useContext(CustomerContext);
 
-    // ✅ Use shared hook for wishlist
+    //  Use shared hook for wishlist
     const { isInWishlist, toggleWishlist } = useWishlist(customer);
 
     const [newArrivals, setNewArrivals] = useState([]);
@@ -86,7 +81,7 @@ export default function LandingPage() {
         }
     };
 
-    // ✅ Fetch new arrivals (limit to 16)
+    //  Fetch new arrivals (limit to 16)
     useEffect(() => {
         getLandingNewArrivals()
             .then((res) => {
@@ -103,7 +98,7 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col min-h-screen bg-white text-center">
             <main className="flex-grow">
-                {/* ✅ Banner */}
+                {/*  Banner */}
                 <section className="relative bg-white">
                     <Swiper
                         modules={[Autoplay, Pagination]}
@@ -132,7 +127,7 @@ export default function LandingPage() {
                     />
                 </section>
 
-                {/* ✅ Categories & New Arrivals */}
+                {/* Categories & New Arrivals */}
                 <section className="relative z-20 pt-40 pb-20 bg-white-950/10 rounded-t-[60px]">
                     <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight -mt-24 mb-12 md:mb-16 lg:mb-16">
                         BAZUUYU'S  FAMILIES
@@ -175,7 +170,7 @@ export default function LandingPage() {
                         className="absolute top-[300px] left-0 w-full h-auto z-0 pointer-events-none"
                     />
 
-                    {/* ✅ Swiper for New Arrivals */}
+                    {/* Swiper for New Arrivals */}
                     <div className="relative z-20 max-w-7xl mx-auto px-4 pb-20">
                         {loading ? (
                             <p className="text-center">Loading new arrivals...</p>
@@ -276,7 +271,7 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* ✅ Slogan Section */}
+                {/* Slogan Section */}
                 <section className="py-20 bg-white">
                     <div className="mt-12">
                         <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight  mb-12 md:mb-16 lg:mb-8">
@@ -291,12 +286,12 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* ✅ Slogan Images */}
+                {/* Slogan Images */}
                 <section className="bg-white py-2">
                     <SloganGrid items={sloganItems} />
                 </section>
 
-                {/* ✅ Flashmod */}
+                {/* Flashmod */}
                 <section
                     className="relative h-[360px] bg-cover bg-center text-white"
                     style={{ backgroundImage: `url(${flashmod})` }}

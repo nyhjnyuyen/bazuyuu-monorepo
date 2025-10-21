@@ -63,26 +63,49 @@ export default function ShopPage() {
     }, [category, page]);
 
     useEffect(() => {
-        let cancelled = false;
+        const ac = new AbortController();
+
         (async () => {
             setLoading(true);
             try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const ct = res.headers.get('content-type') || '';
-                if (!ct.includes('application/json')) throw new Error(`Expected JSON, got ${ct}`);
-                const json = await res.json();
+                const res = await fetch(url, { signal: ac.signal });
 
-                if (cancelled) return;
+                if (!res.ok) {
+                    console.error('Shop fetch failed: HTTP', res.status);
+                    if (!ac.signal.aborted) {
+                        setError(`Could not load products (HTTP ${res.status}).`);
+                        if (page === 0) { setProducts([]); setTotalElements(0); setTotalPages(0); }
+                    }
+                    return;
+                }
+
+                const ct = res.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) {
+                    console.error('Shop fetch failed: Expected JSON, got', ct);
+                    if (!ac.signal.aborted) {
+                        setError('Could not load products (bad content type).');
+                        if (page === 0) { setProducts([]); setTotalElements(0); setTotalPages(0); }
+                    }
+                    return;
+                }
+
+                const json = await res.json();
+                if (ac.signal.aborted) return;
 
                 const newContent = json.content ?? [];
-                setTotalElements(json.totalElements ?? 0);
-                setTotalPages(json.totalPages ?? Math.ceil((json.totalElements ?? 0) / (json.size ?? PAGE_SIZE)));
+                const size = Number(json.size ?? PAGE_SIZE) || PAGE_SIZE;
+                const elements = Number(json.totalElements ?? 0);
+                const pages = Number.isFinite(json.totalPages)
+                    ? json.totalPages
+                    : Math.ceil(elements / size);
+
+                setTotalElements(elements);
+                setTotalPages(pages);
                 setProducts(prev => (page === 0 ? newContent : [...prev, ...newContent]));
                 setError('');
             } catch (e) {
                 console.error('Shop fetch failed:', e);
-                if (!cancelled) {
+                if (!ac.signal.aborted) {
                     setError('Could not load products.');
                     if (page === 0) {
                         setProducts([]);
@@ -91,11 +114,13 @@ export default function ShopPage() {
                     }
                 }
             } finally {
-                if (!cancelled) setLoading(false);
+                if (!ac.signal.aborted) setLoading(false);
             }
         })();
-        return () => { cancelled = true; };
-    }, [url, page]);
+
+        return () => ac.abort();
+    }, [url]); // <- only url; it already encodes category + page
+
 
     const onSelectCategory = (cat) => {
         if (cat === category) return;

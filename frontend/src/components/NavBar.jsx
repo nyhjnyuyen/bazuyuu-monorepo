@@ -1,5 +1,5 @@
 // src/components/NavBar.jsx
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { FiMenu, FiX, FiSearch } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo-11.png';
