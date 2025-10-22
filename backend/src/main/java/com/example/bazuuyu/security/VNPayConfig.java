@@ -1,129 +1,105 @@
 package com.example.bazuuyu.security;
 
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
+
 @Component
 public class VNPayConfig {
-    @Value("${vnpay.pay-url:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}")
-    public String vnp_PayUrl;
 
-    // absolute URL, e.g. https://app.example.com/vnpay-payment
+    @Value("${vnpay.pay-url:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}")
+    private String vnp_PayUrl;
+
     @Value("${vnpay.return-url}")
-    public String vnp_Returnurl;
+    private String vnp_Returnurl;
 
     @Value("${vnpay.tmn-code}")
-    public String vnp_TmnCode;
+    private String vnp_TmnCode;
+
     @Value("${vnpay.hash-secret}")
-    public String vnp_HashSecret;
+    private String vnp_HashSecret;
+
+    // getters if you need to read these elsewhere
+    public String getVnp_PayUrl()     { return vnp_PayUrl; }
+    public String getVnp_Returnurl()  { return vnp_Returnurl; }
+    public String getVnp_TmnCode()    { return vnp_TmnCode; }
+    public String getVnp_HashSecret() { return vnp_HashSecret; }
+
+    // --- utilities that don't need Spring fields can stay static ---
     public static String md5(String message) {
-        String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(message.getBytes("UTF-8"));
+            byte[] hash = md.digest(message.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder(2 * hash.length);
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-            digest = sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            digest = "";
-        } catch (NoSuchAlgorithmException ex) {
-            digest = "";
+            for (byte b : hash) sb.append(String.format("%02x", b & 0xff));
+            return sb.toString();
+        } catch (Exception ex) {
+            return "";
         }
-        return digest;
     }
 
-    public static String Sha256(String message) {
-        String digest = null;
+    public static String sha256(String message) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(message.getBytes("UTF-8"));
+            byte[] hash = md.digest(message.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder(2 * hash.length);
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-            digest = sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            digest = "";
-        } catch (NoSuchAlgorithmException ex) {
-            digest = "";
-        }
-        return digest;
-    }
-
-    //Util for VNPAY
-    public static String hashAllFields(Map fields) {
-        List fieldNames = new ArrayList(fields.keySet());
-        Collections.sort(fieldNames);
-        StringBuilder sb = new StringBuilder();
-        Iterator itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
-            String fieldValue = (String) fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                sb.append(fieldName);
-                sb.append("=");
-                sb.append(fieldValue);
-            }
-            if (itr.hasNext()) {
-                sb.append("&");
-            }
-        }
-        return hmacSHA512(vnp_HashSecret,sb.toString());
-    }
-
-    public static String hmacSHA512(final String key, final String data) {
-        try {
-
-            if (key == null || data == null) {
-                throw new NullPointerException();
-            }
-            final Mac hmac512 = Mac.getInstance("HmacSHA512");
-            byte[] hmacKeyBytes = key.getBytes();
-            final SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
-            hmac512.init(secretKey);
-            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-            byte[] result = hmac512.doFinal(dataBytes);
-            StringBuilder sb = new StringBuilder(2 * result.length);
-            for (byte b : result) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
+            for (byte b : hash) sb.append(String.format("%02x", b & 0xff));
             return sb.toString();
+        } catch (Exception ex) {
+            return "";
+        }
+    }
 
+    // ---- NON-STATIC: needs the injected secret ----
+    public String hashAllFields(Map<String, String> fields) {
+        List<String> fieldNames = new ArrayList<>(fields.keySet());
+        Collections.sort(fieldNames);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < fieldNames.size(); i++) {
+            String k = fieldNames.get(i);
+            String v = fields.get(k);
+            if (v != null && !v.isEmpty()) {
+                sb.append(k).append('=').append(v);
+                if (i < fieldNames.size() - 1) sb.append('&');
+            }
+        }
+        return hmacSHA512(vnp_HashSecret, sb.toString());
+    }
+
+    // can be static or not; leaving non-static is fine
+    public String hmacSHA512(final String key, final String data) {
+        try {
+            Mac hmac512 = Mac.getInstance("HmacSHA512");
+            hmac512.init(new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA512"));
+            byte[] result = hmac512.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(2 * result.length);
+            for (byte b : result) sb.append(String.format("%02x", b & 0xff));
+            return sb.toString();
         } catch (Exception ex) {
             return "";
         }
     }
 
     public static String getIpAddress(HttpServletRequest request) {
-        String ipAdress;
-        try {
-            ipAdress = request.getHeader("X-FORWARDED-FOR");
-            if (ipAdress == null) {
-                ipAdress = request.getLocalAddr();
-            }
-        } catch (Exception e) {
-            ipAdress = "Invalid IP:" + e.getMessage();
-        }
-        return ipAdress;
+        // Prefer X-Forwarded-For if behind proxy; fall back to remote addr
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        if (ip == null || ip.isBlank()) ip = request.getRemoteAddr();
+        return ip;
     }
 
     public static String getRandomNumber(int len) {
         Random rnd = new Random();
-        String chars = "0123456789";
+        String digits = "0123456789";
         StringBuilder sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append(chars.charAt(rnd.nextInt(chars.length())));
-        }
+        for (int i = 0; i < len; i++) sb.append(digits.charAt(rnd.nextInt(digits.length())));
         return sb.toString();
     }
 }

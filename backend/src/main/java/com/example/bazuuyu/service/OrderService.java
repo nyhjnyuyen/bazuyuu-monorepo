@@ -14,6 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
+import com.example.bazuuyu.order.events.OrderPlacedEvent;
+import com.example.bazuuyu.order.events.PaymentCapturedEvent;
+
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +27,18 @@ public class OrderService {
     private final CartItemService cartItemService;
     private final CartService cartService;
     private final CartRepository cartRepository;
+    private final ApplicationEventPublisher events;
 
+    public record OrderSummary(String orderNumber, String customerEmail, java.math.BigDecimal total){}
 
+    public OrderSummary getOrderSummary(Long orderId) {
+        // You can optimize with a custom projection/repository method.
+        var o = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        return new OrderSummary(o.getOrderCode(),
+                o.getCustomer().getEmail(),
+                o.getTotalAmount());
+    }
     // Checkout: Convert active cart into an order
     public Order placeOrder(Customer customer) {
         Cart cart = cartService.getActiveCart(customer)
@@ -71,8 +85,11 @@ public class OrderService {
         // Mark cart as CHECKED_OUT
         cartService.updateCartStatus(cart.getId(), "CHECKED_OUT");
         cartItemService.clearItemsByCart(cart);
+        Order saved = orderRepository.save(order);
 
-        return orderRepository.save(order);
+        events.publishEvent(new OrderPlacedEvent(saved.getId()));
+
+        return saved;
     }
     // OrderService.java (only the changed/added method shown)
     @Transactional
@@ -130,7 +147,11 @@ public class OrderService {
         cartService.updateCartStatus(cart.getId(), "CHECKED_OUT");
         cartItemService.clearItemsByCart(cart);
 
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+
+        events.publishEvent(new OrderPlacedEvent(saved.getId()));
+
+        return saved;
     }
 
     private String normalizeVNPhone(String phone) {
@@ -186,6 +207,8 @@ public class OrderService {
             o.setPaymentTxnId(vnpTxnNo);
             o.setStatus(Order.OrderStatus.PAID);
             orderRepository.save(o);
+            events.publishEvent(new PaymentCapturedEvent(o.getId()));
+
         }
     }
 
