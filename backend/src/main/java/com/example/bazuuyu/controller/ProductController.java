@@ -5,7 +5,6 @@ import com.example.bazuuyu.dto.response.ProductResponse;
 import com.example.bazuuyu.entity.Category;
 import com.example.bazuuyu.entity.Product;
 import com.example.bazuuyu.mapper.ProductMapper;
-import com.example.bazuuyu.service.CloudinaryService;
 import com.example.bazuuyu.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,6 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final CloudinaryService cloudinaryService;
 
     // tao san pham moi tu thong tin request
     @PostMapping

@@ -7,17 +7,16 @@ import com.example.bazuuyu.entity.Category;
 import com.example.bazuuyu.entity.ProductImage;
 import com.example.bazuuyu.mapper.ProductMapper;
 import com.example.bazuuyu.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Comparator;
 
 /**
  * xu ly cac nghiep vu lien quan den san pham
@@ -34,37 +33,31 @@ public class ProductService {
     }
 
     // tao san pham tu ProductRequest DTO, bao gom anh
-    public Product createProduct(ProductRequest request) {
-        Product product = new Product();
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setQuantity(request.getQuantity());
-        product.setCreatedAt(LocalDateTime.now());
-        product.setCategory(request.getCategory());
-        product.setBestSeller(request.isBestSeller());
-        product.setNewArrival(request.isNewArrival());
+    @Transactional
+    public Product createProduct(ProductRequest req) {
+        Product p = Product.builder()
+                .name(req.getName())
+                .description(req.getDescription())
+                .price(req.getPrice())
+                .quantity(req.getQuantity())
+                .category(req.getCategory())
+                .isBestSeller(req.isBestSeller())
+                .isNewArrival(req.isNewArrival())
+                .build();
 
-
-        // Sau khi lưu product lần 1
-        Product savedProduct = productRepository.save(product);
-
-        // Thêm ảnh vào list hiện tại
-        List<ProductImage> imageList = savedProduct.getProductImages();
-        if (imageList == null) {
-            imageList = new ArrayList<>();
-            savedProduct.setProductImages(imageList);
-        }
-        for (String url : request.getImageUrls()) {
-            ProductImage image = ProductImage.builder()
+        // images
+        List<String> urls = Optional.ofNullable(req.getImageUrls()).orElse(List.of());
+        int i = 0;
+        for (String url : urls) {
+            p.addImage(ProductImage.builder()
                     .imageUrl(url)
-                    .product(savedProduct)
-                    .build();
-            imageList.add(image);
+                    // .isPrimary(i == 0)        // if you added this field
+                    // .sortOrder(i)             // if you added this field
+                    .build());
+            i++;
         }
 
-        // Lưu lại product với image list đã cập nhật
-        return productRepository.save(savedProduct);
+        return productRepository.save(p); // One save is enough with cascade
     }
 
     // lay toan bo san pham (danh cho admin)
@@ -88,36 +81,6 @@ public class ProductService {
     //tim san pham theo ID
     public Optional<Product> findById(Long id) {
         return productRepository.findById(id);
-    }
-
-    // cap nhat thong tin san pham theo ID
-    public Product updateProduct(Long id, ProductRequest request) {
-        Product existing = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        existing.setName(request.getName());
-        existing.setDescription(request.getDescription());
-        existing.setPrice(request.getPrice());
-        existing.setQuantity(request.getQuantity());
-        existing.setCategory(request.getCategory());
-
-        // Xử lý ảnh: clear danh sách cũ và thêm mới
-        List<ProductImage> currentImages = existing.getProductImages();
-        if (currentImages == null) {
-            currentImages = new ArrayList<>();
-            existing.setProductImages(currentImages);
-        } else {
-            currentImages.clear();
-        }
-
-        for (String url : request.getImageUrls()) {
-            ProductImage image = new ProductImage();
-            image.setImageUrl(url);
-            image.setProduct(existing);
-            currentImages.add(image);
-        }
-
-        return productRepository.save(existing);
     }
 
     //for shop page
@@ -177,6 +140,35 @@ public class ProductService {
         return products.stream()
                 .map(ProductMapper::toResponse)
                 .toList();
+    }
+
+    @Transactional
+    public Product updateProduct(Long id, ProductRequest req) {
+        Product existing = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
+
+        existing.setName(req.getName());
+        existing.setDescription(req.getDescription());
+        existing.setPrice(req.getPrice());
+        existing.setQuantity(req.getQuantity());
+        existing.setCategory(req.getCategory());
+        existing.setBestSeller(req.isBestSeller());
+        existing.setNewArrival(req.isNewArrival());
+
+        // Replace images
+        existing.clearImages();
+        List<String> urls = Optional.ofNullable(req.getImageUrls()).orElse(List.of());
+        int i = 0;
+        for (String url : urls) {
+            existing.addImage(ProductImage.builder()
+                    .imageUrl(url)
+                    // .isPrimary(i == 0)
+                    // .sortOrder(i)
+                    .build());
+            i++;
+        }
+
+        return existing; // dirty checking will flush
     }
 
 

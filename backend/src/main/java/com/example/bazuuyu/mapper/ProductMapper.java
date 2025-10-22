@@ -7,7 +7,6 @@ import com.example.bazuuyu.entity.ProductImage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * chuyen doi giua product entity and cac dto lien quan
@@ -43,20 +42,23 @@ public class ProductMapper {
 
 
     // chuyen doi tu product entity sang ProductResponse DTO
-    public static ProductResponse toResponse(Product product) {
-        List<String> imageUrls = product.getProductImages().stream()
-                .map(ProductImage::getImageUrl)
-                .collect(Collectors.toList());
-
+    public static ProductResponse toResponse(Product p) {
+        List<String> imageUrls = p.getProductImages()
+                .stream().map(ProductImage::getImageUrl).toList();
 
         return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .quantity(product.getQuantity())
+                .id(p.getId())
+                .name(p.getName())
+                .description(p.getDescription())
+                .price(p.getPrice())
+                .quantity(p.getQuantity())
                 .imageUrls(imageUrls)
+                .isBestSeller(p.isBestSeller())
+                .isNewArrival(p.isNewArrival())
+                .category(p.getCategory())
+                .createdAt(p.getCreatedAt())
                 .build();
     }
+
 
 }
