@@ -47,7 +47,7 @@ export default function Footer() {
                         Sign up for joy delivered to your inbox
                     </h2>
                     <p className="max-w-3xl text-base md:text-lg font-heading mb-6">
-                        Sign up for our email newsletter to get the news in your inbox, including new character launches, events, and other exciting updates.
+                        Hãy đăng ký bản tin email của chúng tôi để nhận tin tức mới nhất, bao gồm các đợt ra mắt nhân vật mới, sự kiện và nhiều cập nhật thú vị khác.
                     </p>
                     <div className="flex items-stretch">
                         <input
@@ -70,7 +70,7 @@ export default function Footer() {
                 </div>
             </section>
 
-            {/* 🦶 Footer */}
+            {/* Footer */}
             <footer className="bg-violet-925 text-white py-12 px-4 mt-auto">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between md:items-start space-y-8 md:space-y-0">
 

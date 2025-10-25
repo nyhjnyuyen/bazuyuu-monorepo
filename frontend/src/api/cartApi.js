@@ -1,7 +1,7 @@
 // src/api/cartApi.js
 import apiClient from './apiClient';
 
-const API_BASE = 'http://localhost:8080/api/cart';
+const API_BASE = '/api/cart';
 
 /**
  * Fetch the *active* cart for a customer,
