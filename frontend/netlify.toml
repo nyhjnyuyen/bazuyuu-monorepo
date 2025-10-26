@@ -14,3 +14,5 @@ to   = "https://bazuyuu-backend-341765366739.asia-southeast1.run.app/api/:splat"
 status = 200
 force  = true
 
+[build.environment]
+CI = "false"
