@@ -3,18 +3,14 @@ base = "frontend"
 command = "npm ci && npm run build"
 publish = "build"
 
-# SPA fallback so refreshes don't 404
 [[redirects]]
 from = "/*"
-to = "/index.html"
+to   = "/index.html"
 status = 200
 
-# Proxy API calls to your PUBLIC backend
 [[redirects]]
 from = "/api/*"
-to = "https://bazuyuu-backend-341765366739.asia-southeast1.run.app/api/:splat"
+to   = "https://bazuyuu-backend-341765366739.asia-southeast1.run.app/api/:splat"
 status = 200
-force = true
+force  = true
 
-[build.environment]
-CI = "false"
