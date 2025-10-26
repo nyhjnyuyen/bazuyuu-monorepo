@@ -1,56 +1,64 @@
 // src/api/productApi.js
 import apiClient from './apiClient';
 
-// Get all products
-export const getAllProducts = () => {
-    return apiClient.get('/products');
+// Helper: unwrap Spring Page -> array
+const unwrap = (data) => (Array.isArray(data) ? data : (data?.content ?? []));
+
+// All products (paged)
+export const getAllProducts = (page = 0, size = 24, extra = {}) =>
+    apiClient.get('/api/products', { params: { page, size, ...extra }});
+
+// One product by ID
+export const getProductById = (id) =>
+    apiClient.get(`/api/products/${id}`);
+
+// New arrivals (paged or array depending on your backend)
+export const getNewArrivals = async (page = 0, size = 24) => {
+    const { data } = await apiClient.get('/api/products', {
+        params: { page, size, newArrival: true }
+    });
+    return unwrap(data);
 };
 
-// Get a single product by ID
-export const getProductById = (id) => {
-    return apiClient.get(`/products/${id}`);
+// Landing page new arrivals (want exactly N items)
+export const getLandingNewArrivals = async (size = 16) => {
+    // if you have a dedicated endpoint, keep it; otherwise reuse /api/products
+    const { data } = await apiClient.get('/api/products', {
+        params: { page: 0, size, newArrival: true }
+    });
+    return unwrap(data);
 };
 
-// Get new arrivals
-export const getNewArrivals = () => {
-    return apiClient.get('/products/new-arrivals');
-};
-export const getLandingNewArrivals = () => {
-    return apiClient.get('/products/landing-new-arrivals');
-};
-
-// Get best sellers
-export const getBestSellers = () => {
-    return apiClient.get('/products/best-sellers');
+// Best sellers
+export const getBestSellers = async (page = 0, size = 24) => {
+    const { data } = await apiClient.get('/api/products', {
+        params: { page, size, bestSeller: true }
+    });
+    return unwrap(data);
 };
 
-// Search products by keyword
-export const searchProducts = (keyword) => {
-    return apiClient.get(`/products/search?query=${encodeURIComponent(keyword)}`);
+// Search
+export const searchProducts = async (keyword, page = 0, size = 24) => {
+    const { data } = await apiClient.get('/api/products/search', {
+        params: { query: keyword, page, size }
+    });
+    return unwrap(data);
 };
 
-// Create a new product (admin only)
-export const createProduct = (productData) => {
-    return apiClient.post('/products', productData);
-};
+// Admin: create / update / delete
+export const createProduct = (productData) =>
+    apiClient.post('/api/products', productData);
 
-// Update an existing product by ID (admin only)
-export const updateProduct = (id, productData) => {
-    return apiClient.put(`/products/${id}`, productData);
-};
+export const updateProduct = (id, productData) =>
+    apiClient.put(`/api/products/${id}`, productData);
 
-// Delete a product by ID (admin only)
-export const deleteProduct = (id) => {
-    return apiClient.delete(`/products/${id}`);
-};
+export const deleteProduct = (id) =>
+    apiClient.delete(`/api/products/${id}`);
 
-export const getSortedProducts = (sortBy) => {
-    return apiClient.get(`/products/shop?sortBy=${sortBy}`);
+// Get products by category
+export const getProductsByCategory = async (category, page = 0, size = 24) => {
+    const { data } = await apiClient.get('/api/products', {
+        params: { category, page, size }
+    });
+    return unwrap(data);
 };
-// Get one product by id
-export const getProduct = (id) =>
-    apiClient.get(`/products/${id}`);
-
-// Get products by category (backend filter preferred)
-export const getProductsByCategory = (category) =>
-    apiClient.get('/products', { params: { category } });

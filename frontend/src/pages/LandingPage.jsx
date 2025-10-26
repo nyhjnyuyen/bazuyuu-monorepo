@@ -83,17 +83,19 @@ export default function LandingPage() {
 
     //  Fetch new arrivals (limit to 16)
     useEffect(() => {
-        getLandingNewArrivals()
-            .then((res) => {
-                const products = res?.data || [];
-                setNewArrivals(products.slice(0, 16));
-            })
-            .catch((err) => {
-                console.error('Failed to fetch new arrivals', err);
+        (async () => {
+            try {
+                const items = await getLandingNewArrivals(16); // already unwrapped
+                setNewArrivals(items);
+            } catch (e) {
+                console.error('Failed to fetch new arrivals', e);
                 setNewArrivals([]);
-            })
-            .finally(() => setLoading(false));
+            } finally {
+                setLoading(false);
+            }
+        })();
     }, []);
+
 
     return (
         <div className="flex flex-col min-h-screen bg-white text-center">
