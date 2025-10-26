@@ -1,12 +1,18 @@
 import axios from 'axios';
 import { getApiBaseUrl } from './baseUrl';
 
+// src/api/apiClient.js (or wherever this file is)
 const apiClient = axios.create({
     baseURL: getApiBaseUrl(),
     withCredentials: false,
     headers: { 'Content-Type': 'application/json' },
     timeout: 15000,
 });
+
+if (typeof window !== 'undefined') {
+    console.log('[API baseURL]', apiClient.defaults.baseURL);
+}
+
 
 // Attach JWT if present (guard against SSR/build)
 apiClient.interceptors.request.use((config) => {
