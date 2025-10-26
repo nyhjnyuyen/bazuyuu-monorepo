@@ -1,3 +1,4 @@
+// src/pages/RegisterPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/apiClient';
@@ -11,31 +12,33 @@ export default function RegisterPage() {
         firstName: '',
         lastName: '',
         phone: '',
-        address: '',
-        paymentInfo: ''
+        address: '',      // keep address as a single field (optional)
     });
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
     };
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setError('');
+
         if (form.password !== form.confirmPassword) {
-            return setError('Passwords do not match.');
+            setError('Passwords do not match.');
+            return;
         }
+
         try {
-            await apiClient.post('auth/customer/register', {
+            await apiClient.post('/api/auth/customer/register', {
                 username: form.username,
                 email: form.email,
                 password: form.password,
                 firstName: form.firstName,
                 lastName: form.lastName,
                 phone: form.phone,
-                address: form.address,
-                paymentInfo: form.paymentInfo
+                address: form.address || '',   // optional
             });
             navigate('/login');
         } catch (err) {
@@ -47,15 +50,15 @@ export default function RegisterPage() {
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
             <form
                 onSubmit={handleRegister}
-                className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-2xl space-y-6"
+                className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-2xl space-y-8"
             >
                 <h2 className="text-3xl text-center font-serif font-semibold text-gray-800">
                     Create Account
                 </h2>
 
                 {/* Account Information */}
-                <div className="border-b pb-4 space-y-4">
-                    <h3 className="text-xl font-medium">Account Information</h3>
+                <section className="space-y-4 border rounded-xl p-5">
+                    <h3 className="text-lg font-semibold text-gray-800">Account Information</h3>
 
                     <input
                         type="text"
@@ -87,7 +90,6 @@ export default function RegisterPage() {
                             onChange={handleChange}
                             required
                         />
-
                         <input
                             type="password"
                             name="confirmPassword"
@@ -98,11 +100,11 @@ export default function RegisterPage() {
                             required
                         />
                     </div>
-                </div>
+                </section>
 
                 {/* Personal Information */}
-                <div className="border-b pb-4 space-y-4">
-                    <h3 className="text-xl font-medium">Personal Information</h3>
+                <section className="space-y-4 border rounded-xl p-5">
+                    <h3 className="text-lg font-semibold text-gray-800">Personal Information</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
@@ -134,30 +136,22 @@ export default function RegisterPage() {
                         onChange={handleChange}
                         required
                     />
-                </div>
+                </section>
 
-                {/* Additional Information */}
-                <div className="space-y-4">
-                    <h3 className="text-xl font-medium">Additional Information (Optional)</h3>
-
+                {/* Address (single clean block) */}
+                <section className="space-y-3 border rounded-xl p-5">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                        Address <span className="text-gray-500 text-sm font-normal">(optional)</span>
+                    </h3>
                     <textarea
                         name="address"
-                        placeholder="Address"
-                        rows="3"
+                        placeholder="Street / Apartment, Ward, District, Province"
+                        rows={3}
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
                         value={form.address}
                         onChange={handleChange}
                     />
-
-                    <textarea
-                        name="paymentInfo"
-                        placeholder="Payment Information"
-                        rows="3"
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                        value={form.paymentInfo}
-                        onChange={handleChange}
-                    />
-                </div>
+                </section>
 
                 {/* Error & Submit */}
                 {error && <p className="text-red-600">{error}</p>}
