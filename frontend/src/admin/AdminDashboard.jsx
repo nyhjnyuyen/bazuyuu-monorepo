@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllAdmins, createAdmin, deleteAdmin } from '../api/apiAdmin';
 import { useNavigate } from 'react-router-dom';
-import jwtDecode from 'jwt-decode'; // npm i jwt-decode
+import { jwtDecode } from 'jwt-decode';
 
 export default function AdminDashboard() {
     const [admins, setAdmins] = useState([]);
@@ -14,20 +14,26 @@ export default function AdminDashboard() {
 
     const navigate = useNavigate();
 
-    // ⬇️ keep this key consistent with your login flow / AdminAuthProvider
-    const token = localStorage.getItem('admin_jwt');
-    const claims = token ? jwtDecode(token) : null;
-    const requesterId = claims?.id ?? claims?.userId ?? claims?.sub ?? null;
+    // Support either key; keep this consistent with your login code
+    const token =
+        localStorage.getItem('admin_token') || localStorage.getItem('admin_jwt');
+
+    const decoded = token ? jwtDecode(token) : null;
+
+    // pull possible shapes from your JWT
+    const requesterId =
+        decoded?.id ?? decoded?.userId ?? decoded?.adminId ?? decoded?.sub ?? null;
+
     const isSuperAdmin =
-        claims?.role === 'SUPER_ADMIN' ||
-        claims?.authorities?.includes('SUPER_ADMIN');
+        decoded?.role === 'SUPER_ADMIN' ||
+        (Array.isArray(decoded?.authorities) &&
+            decoded.authorities.includes('SUPER_ADMIN'));
 
     useEffect(() => {
         if (!token) {
             navigate('/admin/login');
             return;
         }
-        // handle the promise to please the linter and catch errors
         (async () => {
             try {
                 setLoading(true);
@@ -55,10 +61,14 @@ export default function AdminDashboard() {
         }
         try {
             setLoading(true);
-            await createAdmin({ username: newUsername.trim(), password: newPassword, role });
+            await createAdmin({
+                username: newUsername.trim(),
+                password: newPassword,
+                role,
+            });
             setNewUsername('');
             setNewPassword('');
-            await fetchAdmins(); // ✅ await the refresh
+            await fetchAdmins(); // ✅ refresh list
             alert('Admin created successfully');
         } catch (err) {
             console.error(err);
@@ -77,7 +87,7 @@ export default function AdminDashboard() {
         try {
             setLoading(true);
             await deleteAdmin(id, requesterId); // backend expects requesterId as query param
-            await fetchAdmins(); // ✅ await the refresh
+            await fetchAdmins(); // ✅ refresh list
         } catch (err) {
             console.error(err);
             alert('Failed to delete admin');
@@ -128,10 +138,8 @@ export default function AdminDashboard() {
                     </div>
                 )}
 
-                {/* Errors */}
                 {error && <p className="text-red-600 mb-4">{error}</p>}
 
-                {/* Admin List */}
                 <h2 className="text-xl font-semibold mb-4">Existing Admins</h2>
                 <table className="w-full text-left border-collapse">
                     <thead>
