@@ -5,8 +5,12 @@ import apiClient from './apiClient';
 const unwrap = (data) => (Array.isArray(data) ? data : (data?.content ?? []));
 
 // ---------- READ ----------
-export const getAllProducts = (page = 0, size = 24, extra = {}) =>
-    apiClient.get('/api/products', { params: { page, size, ...extra } });
+export const getAllProducts = async (page = 0, size = 24, extra = {}) => {
+    const { data } = await apiClient.get('/api/products', {
+        params: { page, size, ...extra }
+    });
+    return unwrap(data); // <-- returns an array of products
+};
 
 export const getProductById = (id) =>
     apiClient.get(`/api/products/${id}`);
@@ -61,9 +65,6 @@ export const deleteProduct = (id) =>
     apiClient.delete(`/api/products/${id}`);
 
 // by category
-export const getProductsByCategory = async (category, page = 0, size = 24) => {
-    const { data } = await apiClient.get('/api/products', {
-        params: { category, page, size }
-    });
-    return unwrap(data);
-};
+export const getProductsByCategory = (category, page = 0, size = 24) =>
+    getAllProducts(page, size, { category });
+
