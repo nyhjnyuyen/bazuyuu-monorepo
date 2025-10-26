@@ -1,38 +1,32 @@
-// src/App.jsx
+// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import LandingPage from './pages/LandingPage';
 import NewArrivalsPage from './pages/NewArrivalsPage';
 import AboutUsPage from './pages/AboutUsPage';
-import NavBar from './components/NavBar';
+import ContactPage from './pages/Contact';
 import LoginPage from './pages/LoginPage';
-import CartPage from './pages/CartPage';
 import RegisterPage from './pages/RegisterPage';
-import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import RequestResetPage from './pages/RequestResetPage';
-import CustomerProfile from "./pages/CustomerProfile";
-import { CustomerProvider } from './components/CustomerContext';
-import ProtectedRoute from "./api/ProtectedRoute";
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 import WishlistPage from './pages/WishlistPage';
 import ShopPage from './pages/ShopPage';
-import ContactPage from './pages/Contact';
-import CheckoutPage from './pages/CheckoutPage';
-import SearchPage from './pages/SearchPage';
 import ProductPage from './pages/ProductPage';
+import CustomerProfile from './pages/CustomerProfile';
 
-// ✅ import the named provider (not default)
+import NavBar from './components/NavBar';
+import ProtectedRoute from './api/ProtectedRoute';
+import { CustomerProvider } from './components/CustomerContext';
+
 import { AdminAuthProvider } from './admin/AdminAuthContext';
+import AdminLogin from './admin/AdminLoginPage';
+import AdminDashboard from './admin/AdminDashboard'; // <-- import it once
+import AdminOnlyRoute from './admin/AdminOnlyRoute';
 
-import AdminLoginPage from './admin/AdminLoginPage';
-import AdminDashboard from './admin/AdminDashboard';
-
-// (optional) your admin dashboard page
-function AdminDashboard() {
-    return <div className="p-8">Admin dashboard</div>;
-}
-
-export default function App() {
+function App() {
     return (
         <AdminAuthProvider>
             <CustomerProvider>
@@ -43,7 +37,6 @@ export default function App() {
                         </div>
 
                         <Routes>
-                            {/* public site */}
                             <Route path="/" element={<LandingPage />} />
                             <Route path="/new" element={<NewArrivalsPage />} />
                             <Route path="/about" element={<AboutUsPage />} />
@@ -51,15 +44,13 @@ export default function App() {
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/register" element={<RegisterPage />} />
                             <Route path="/reset-password" element={<ResetPasswordPage />} />
+                            <Route path="/forgot-password" element={<RequestResetPage />} />
                             <Route path="/cart" element={<CartPage />} />
                             <Route path="/checkout" element={<CheckoutPage />} />
-                            <Route path="/thank-you" element={<div className="p-8">Thank you! Your order has been placed.</div>} />
                             <Route path="/shop" element={<ShopPage />} />
                             <Route path="/product/:id" element={<ProductPage />} />
                             <Route path="/wishlist" element={<WishlistPage />} />
-                            <Route path="/admin/login" element={<AdminLoginPage />} />
-                            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                            <Route path="/forgot-password" element={<RequestResetPage />} />
+
                             <Route
                                 path="/profile"
                                 element={
@@ -69,18 +60,16 @@ export default function App() {
                                 }
                             />
 
-                            {/* admin auth */}
-                            <Route path="/admin/login" element={<AdminLoginPage />} />
+                            {/* Admin routes */}
+                            <Route path="/admin/login" element={<AdminLogin />} />
                             <Route
                                 path="/admin"
                                 element={
-                                    <AdminRoute>
+                                    <AdminOnlyRoute>
                                         <AdminDashboard />
-                                    </AdminRoute>
+                                    </AdminOnlyRoute>
                                 }
                             />
-                            {/* if you need a SUPER_ADMIN-only page: */}
-                            {/* <Route path="/admin/users" element={<AdminRoute requireSuper><UserAdmin /></AdminRoute>} /> */}
                         </Routes>
                     </div>
                 </Router>
@@ -88,3 +77,5 @@ export default function App() {
         </AdminAuthProvider>
     );
 }
+
+export default App;
