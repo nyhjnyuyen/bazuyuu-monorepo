@@ -1,16 +1,17 @@
-// src/api/baseUrl.js
+// src/api/baseUrl.js  (CRA only)
 export function getApiBaseUrl() {
-    const cra =
-        typeof process !== 'undefined' && process.env
-            ? process.env.REACT_APP_API_BASE_URL
-            : undefined;
+    // Lấy từ env của CRA (đặt trên Netlify)
+    const envUrl = (process.env.REACT_APP_API_BASE_URL || '')
+        .trim()
+        .replace(/\/+$/, '');
 
-    const envUrl = (vite || cra || '').replace(/\/+$/, '');
+    if (envUrl) return envUrl;          // dùng Cloud Run URL khi có env
 
-    // If an env var exists, use it
-    if (envUrl) return envUrl;
+    // Production không có env → dùng same-origin (cần proxy /api/* trên Netlify)
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        return '';                        // same-origin
+    }
 
-    // In production (Netlify, not localhost), use site-relative base.
-    // Then every request to /api/... is proxied by your netlify.toml.
-    return window?.location?.hostname !== 'localhost' ? '' : 'http://localhost:8080';
+    // Local dev
+    return 'http://localhost:8080';
 }
