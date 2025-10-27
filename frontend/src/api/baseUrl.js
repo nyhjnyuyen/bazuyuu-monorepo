@@ -17,10 +17,5 @@ export function getApiBaseUrl() {
 
     // In production (Netlify, not localhost), use site-relative base.
     // Then every request to /api/... is proxied by your netlify.toml.
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-        return '/';
-    }
-
-    // Local dev fallback
-    return 'http://localhost:8080';
+    return window?.location?.hostname !== 'localhost' ? '' : 'http://localhost:8080';
 }

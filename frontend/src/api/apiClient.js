@@ -40,7 +40,7 @@ apiClient.interceptors.response.use(
                 cfg._retry = true;
                 const r = await axios.post(
                     // call absolute URL for refresh to avoid intercept loop if baseURL changes
-                    `${getApiBaseUrl().replace(/\/$/, '')}/auth/refresh`,
+                    `${getApiBaseUrl().replace(/\/$/, '')}/api/auth/refresh`,
                     { refreshToken },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
