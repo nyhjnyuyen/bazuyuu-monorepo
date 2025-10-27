@@ -61,6 +61,9 @@ public class SecurityConfig {
                                 "/api/password/reset"
                         ).permitAll()
 
+                        .requestMatchers(HttpMethod.POST, "/api/auth/customer/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+
                         // 2) Allow everyone to GET product‐list and product‐detail:
                         .requestMatchers(HttpMethod.GET, "/api/products/**")
                         .permitAll()
@@ -147,17 +150,25 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // your React frontend
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // if you don't use cookies, keep this false (simpler CORS)
+        config.setAllowCredentials(false);
+
+        // ✅ allow your deploy origins
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "https://*.netlify.app",
+                "https://*.vercel.app",
+                "https://*.a.run.app"   // Cloud Run direct calls (if any)
+        ));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        // if you return JWT in headers later:
+        config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-
 
 }
 
