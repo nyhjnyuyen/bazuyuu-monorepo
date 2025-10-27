@@ -18,11 +18,10 @@ import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import static org.springframework.security.config.Customizer.withDefaults;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.core.Ordered;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
@@ -48,7 +47,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
@@ -148,47 +146,31 @@ public class SecurityConfig {
         return (web) -> web.httpFirewall(firewall);
     }
 
-    // cau hinh CORS cho phep frontend truy cap API
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public FilterRegistrationBean<CorsFilter> corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        // if you don't use cookies, keep this false (simpler CORS)
-        config.setAllowCredentials(false);
-
-        // ✅ allow your deploy origins
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "https://*.netlify.app",
-                "https://*.vercel.app",
-                "https://*.a.run.app"   // Cloud Run direct calls (if any)
+        config.setAllowCredentials(false); // không dùng cookie
+        // ✅ exact origins
+        config.setAllowedOrigins(List.of(
+                "https://bazuuyu.netlify.app",
+                "http://localhost:3000"
         ));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        // if you return JWT in headers later:
+        // ✅ cho phép mọi header/method để tránh lệch chữ hoa/thường
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        // (tuỳ chọn) nếu bạn cần đọc lại header này từ FE
         config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        return source;
+
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE); // chạy trước Security/JWT
+        return bean;
     }
-    @Bean
-    public WebMvcConfigurer webMvcCorsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOriginPatterns(
-                                "http://localhost:*",
-                                "https://*.netlify.app",
-                                "https://*.vercel.app",
-                                "https://*.a.run.app"
-                        )
-                        .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
-                        .allowedHeaders("*")
-                        .exposedHeaders("Authorization")
-                        .allowCredentials(false);
-            }
-        };
-    }
+
+
+
+
 }
 
