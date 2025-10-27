@@ -1,10 +1,5 @@
 // src/api/baseUrl.js
 export function getApiBaseUrl() {
-    const vite =
-        typeof import.meta !== 'undefined' && import.meta.env
-            ? import.meta.env.VITE_API_BASE_URL
-            : undefined;
-
     const cra =
         typeof process !== 'undefined' && process.env
             ? process.env.REACT_APP_API_BASE_URL
