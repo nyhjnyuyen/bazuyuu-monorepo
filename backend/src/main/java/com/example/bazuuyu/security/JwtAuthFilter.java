@@ -36,60 +36,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        // Only login and register are public
-        boolean isPublic =
-                request.getMethod().equalsIgnoreCase("POST") &&
-                        (path.equals("/api/customers/register")
-                                || path.equals("/api/customers/login")
-                                || path.equals("/api/admins/login"));
-
-        if (isPublic) {
-            System.out.println("Authentication in context: " + SecurityContextHolder.getContext().getAuthentication());
-
-            chain.doFilter(request, response);
-            return;
-        }
-
-
-        // Handle token
         String authHeader = request.getHeader("Authorization");
-
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             if (jwtUtils.validateToken(token)) {
                 String username = jwtUtils.getUsernameFromToken(token);
                 String role = jwtUtils.getRole(token);
-                System.out.println("DEBUG :: Parsed role = [" + role + "]");
-                System.out.println("DEBUG :: Authorities set = " + new SimpleGrantedAuthority(role));
 
-
-                // ✅ Set authority from token
                 if ("ROLE_ADMIN".equalsIgnoreCase(role) || "ROLE_SUPER_ADMIN".equalsIgnoreCase(role)) {
                     adminService.findByUsername(username).ifPresent(admin -> {
-                        AdminDetails adminDetails = new AdminDetails(admin);
-                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                                adminDetails, null,
+                        var auth = new UsernamePasswordAuthenticationToken(
+                                new AdminDetails(admin), null,
                                 Collections.singleton(new SimpleGrantedAuthority(role))
                         );
                         SecurityContextHolder.getContext().setAuthentication(auth);
-                        System.out.println("Token parsed for user: " + username);
-                        System.out.println("Raw role from token: " + role);
-                        System.out.println("GrantedAuthority set: " + new SimpleGrantedAuthority(role));
-
                     });
-                }
-                else if ("ROLE_CUSTOMER".equalsIgnoreCase(role)) {
+                } else if ("ROLE_CUSTOMER".equalsIgnoreCase(role)) {
                     customerService.findByUsername(username).ifPresent(customer -> {
-                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        var auth = new UsernamePasswordAuthenticationToken(
                                 customer, null,
                                 Collections.singleton(new SimpleGrantedAuthority(role))
-                                );
+                        );
                         SecurityContextHolder.getContext().setAuthentication(auth);
                     });
                 }
@@ -98,4 +68,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        final String path = request.getRequestURI();
+        final String method = request.getMethod();
+
+        // ✅ Never process CORS preflight through JWT parsing
+        if ("OPTIONS".equalsIgnoreCase(method)) return true;
+
+        // ✅ Skip ALL auth endpoints (register/login/refresh)
+        if (path.startsWith("/api/auth/")) return true;
+
+        // (Optional) skip static or public resources if you have any
+        // if (path.startsWith("/public/") || path.startsWith("/assets/")) return true;
+
+        return false;
+    }
+
 }
