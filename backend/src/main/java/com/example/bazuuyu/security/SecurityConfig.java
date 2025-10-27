@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import static org.springframework.security.config.Customizer.withDefaults;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class SecurityConfig {
                                 "/api/password/send-reset-token",
                                 "/api/password/reset"
                         ).permitAll()
-
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/customer/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
@@ -169,6 +171,24 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
+    @Bean
+    public WebMvcConfigurer webMvcCorsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOriginPatterns(
+                                "http://localhost:*",
+                                "https://*.netlify.app",
+                                "https://*.vercel.app",
+                                "https://*.a.run.app"
+                        )
+                        .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                        .allowedHeaders("*")
+                        .exposedHeaders("Authorization")
+                        .allowCredentials(false);
+            }
+        };
+    }
 }
 
