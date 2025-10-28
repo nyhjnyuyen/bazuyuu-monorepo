@@ -108,20 +108,25 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowCredentials(false); // không dùng cookie
+        cfg.setAllowCredentials(false); // không xài cookie
+        // vừa exact, vừa pattern cho mọi preview
         cfg.setAllowedOrigins(List.of(
-                "https://690001d688d2cb592e8e4e43--bazuuyu.netlify.app", // preview
-                "https://bazuuyu.netlify.app",                           // prod (nếu có)
-                "http://localhost:3000"                                  // dev
+                "https://690001d688d2cb592e8e4e43--bazuuyu.netlify.app",
+                "https://bazuuyu.netlify.app",
+                "http://localhost:3000"
         ));
-        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setAllowedOriginPatterns(List.of(
+                "https://*.netlify.app"
+        ));
+        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS","HEAD"));
+        cfg.addAllowedHeader("*");
         cfg.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
+
 
 
 }
