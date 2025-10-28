@@ -1,0 +1,2 @@
+/api/*  https://bazuyuu-backend-4uz2zgyutq-as.a.run.app/api/:splat  200!
+/*      /index.html                                              200
