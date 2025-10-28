@@ -3,7 +3,7 @@ import axios from 'axios';
 import { getApiBaseUrl } from './baseUrl';
 
 const apiClient = axios.create({
-    baseURL: getApiBaseUrl(),           // => '/api' trên Netlify, 'http://localhost:8080' khi dev
+    baseURL: '/api',           // => '/api' trên Netlify, 'http://localhost:8080' khi dev
     withCredentials: false,
     headers: { 'Content-Type': 'application/json' },
     timeout: 15000,
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
                 const refreshUrl = base ? `${base}/api/auth/refresh` : '/api/auth/refresh';
 
                 const r = await axios.post(
-                    refreshUrl,
+                    'api/auth/refresh',
                     { refreshToken },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
