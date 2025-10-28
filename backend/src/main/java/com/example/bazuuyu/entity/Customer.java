@@ -17,26 +17,23 @@ import org.springframework.security.core.GrantedAuthority;
  * dai dien cho khach hang trong he thong
  * implement UserDetails de ho tro Spring Security
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
-public class Customer  implements UserDetails {
+@Table(name = "customer")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class Customer implements UserDetails {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false, length = 30)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)   // holds BCrypt safely
     private String password;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    // new required fields
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
@@ -46,56 +43,39 @@ public class Customer  implements UserDetails {
     @Column(nullable = false, length = 15)
     private String phone;
 
-    // optional
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "payment_info", columnDefinition = "TEXT")
     private String paymentInfo;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "customer")
-    private List<Order> orders; // danh sach don hang khach hang da dat
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+    }
 
     @OneToMany(mappedBy = "customer")
-    private List<Cart> carts; //danh sach gio hang cuar khach hang
+    @JsonIgnore
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnore
+    private List<Cart> carts;
 
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonBackReference
     private Wishlist wishlist;
 
-
-    // trien khai tu UserDetails de ho tro xac thuc
-    @Override
-    @JsonIgnore
+    // ---- UserDetails ----
+    @Override @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("CUSTOMER"));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
     }
-
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isEnabled() {
-        return true;
-    }
+    @Override @JsonIgnore public boolean isAccountNonExpired() { return true; }
+    @Override @JsonIgnore public boolean isAccountNonLocked() { return true; }
+    @Override @JsonIgnore public boolean isCredentialsNonExpired() { return true; }
+    @Override @JsonIgnore public boolean isEnabled() { return true; }
 }

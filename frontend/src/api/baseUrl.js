@@ -5,7 +5,7 @@ export function getApiBaseUrl() {
 
     // Prod (không set env) -> dùng same-origin proxy '/api'
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-        return '/api';
+        return '';
     }
     // Local dev
     return 'http://localhost:8080';
