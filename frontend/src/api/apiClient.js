@@ -2,76 +2,38 @@
 import axios from 'axios';
 import { getApiBaseUrl } from './baseUrl';
 
-// Resolve base once. In Netlify prod this should be "/api" (proxy).
-// In local dev, make getApiBaseUrl() return "http://localhost:8080".
-const BASE = (getApiBaseUrl() || '/api').replace(/\/+$/, '');
+const BASE = getApiBaseUrl();               // "/api" in prod, "http://localhost:8080" dev
 
 const apiClient = axios.create({
-    baseURL: BASE,               // "/api" or "http://localhost:8080"
-    withCredentials: false,
+    baseURL: BASE,
     headers: { 'Content-Type': 'application/json' },
     timeout: 15000,
 });
 
-if (typeof window !== 'undefined') {
-    console.log('[API baseURL]', apiClient.defaults.baseURL);
-}
-
-// Attach JWT
-apiClient.interceptors.request.use((config) => {
-    if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('jwt');
-        if (token) {
-            config.headers = config.headers || {};
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-    }
-    return config;
+apiClient.interceptors.request.use((cfg) => {
+    const t = typeof window !== 'undefined' ? localStorage.getItem('jwt') : null;
+    if (t) (cfg.headers ||= {}).Authorization = `Bearer ${t}`;
+    return cfg;
 });
 
-// One-time refresh on 401
 apiClient.interceptors.response.use(
     (res) => res,
     async (err) => {
-        const resp = err?.response;
-        const cfg  = err?.config || {};
-        const is401 = resp?.status === 401;
-
-        // avoid looping refresh requests themselves
-        const isRefreshCall = (cfg?.url || '').includes('/api/auth/refresh');
-        if (!is401 || cfg._retry || isRefreshCall || typeof window === 'undefined') {
+        const cfg = err.config || {};
+        if (err.response?.status !== 401 || cfg._retry || (cfg.url || '').includes('/api/auth/refresh')) {
             return Promise.reject(err);
         }
+        const rt = localStorage.getItem('refreshToken');
+        if (!rt) return Promise.reject(err);
 
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) return Promise.reject(err);
+        cfg._retry = true;
+        const { data } = await axios.post(`${BASE}/api/auth/refresh`, { refreshToken: rt });
+        const newAccess = data?.accessToken;
+        if (!newAccess) return Promise.reject(err);
 
-        try {
-            cfg._retry = true;
-
-            // Build correct absolute or relative refresh URL
-            const refreshUrl = `${BASE}/api/auth/refresh`.replace(/\/{2,}/g, '/').replace(':/', '://');
-
-            const r = await axios.post(
-                refreshUrl,
-                { refreshToken },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-
-            const newAccess = r?.data?.accessToken;
-            if (!newAccess) return Promise.reject(err);
-
-            localStorage.setItem('jwt', newAccess);
-
-            // replay the original request with new token
-            cfg.headers = cfg.headers || {};
-            cfg.headers.Authorization = `Bearer ${newAccess}`;
-            return apiClient(cfg);
-        } catch (e) {
-            localStorage.removeItem('jwt');
-            localStorage.removeItem('refreshToken');
-            return Promise.reject(e);
-        }
+        localStorage.setItem('jwt', newAccess);
+        (cfg.headers ||= {}).Authorization = `Bearer ${newAccess}`;
+        return apiClient(cfg);
     }
 );
 
