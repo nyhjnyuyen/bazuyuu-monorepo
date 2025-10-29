@@ -70,10 +70,12 @@ public class Customer implements UserDetails {
     private Wishlist wishlist;
 
     // ---- UserDetails ----
-    @Override @JsonIgnore
+    @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
     }
+
     @Override @JsonIgnore public boolean isAccountNonExpired() { return true; }
     @Override @JsonIgnore public boolean isAccountNonLocked() { return true; }
     @Override @JsonIgnore public boolean isCredentialsNonExpired() { return true; }

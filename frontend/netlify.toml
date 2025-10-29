@@ -5,15 +5,14 @@ publish = "build"
 # Proxy API to Cloud Run (FIRST)
 [[redirects]]
 from = "/api/*"
-to = "https://bazuyuu-backend-4uz2zgyutq-as.a.run.app/:splat"
+to   = "https://bazuyuu-backend-4uz2zgyutq-as.a.run.app/:splat"
 status = 200
-force = true
-headers = { X-Forwarded-Host = "bazuuyu.netlify.app" }
+force  = true   # keep; ensures proxy wins over any static path
 
 # SPA fallback (LAST)
 [[redirects]]
 from = "/*"
-to = "/index.html"
+to   = "/index.html"
 status = 200
 
 [build.environment]
