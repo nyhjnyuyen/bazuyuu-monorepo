@@ -27,7 +27,7 @@ apiClient.interceptors.response.use(
         if (!rt) return Promise.reject(err);
 
         cfg._retry = true;
-        const { data } = await axios.post(`${BASE}/api/auth/refresh`, { refreshToken: rt });
+        const { data } = await axios.post(`${BASE}/auth/refresh`, { refreshToken: rt });
         const newAccess = data?.accessToken;
         if (!newAccess) return Promise.reject(err);
 
