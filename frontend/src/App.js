@@ -38,7 +38,7 @@ function App() {
 
                         <Routes>
                             <Route path="/" element={<LandingPage />} />
-                            <Route path="/new" element={<NewArrivalsPage />} />
+                            <Route path="/new-arrivals" element={<NewArrivalsPage />} />
                             <Route path="/about" element={<AboutUsPage />} />
                             <Route path="/contact" element={<ContactPage />} />
                             <Route path="/login" element={<LoginPage />} />
