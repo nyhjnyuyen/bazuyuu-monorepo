@@ -39,7 +39,7 @@ export default function RegisterPage() {
 
         setLoading(true);
         try {
-            await apiClient.post('/auth/customer/register', {
+            await apiClient.post('/customers/register', {
                 username,
                 email,
                 password,
