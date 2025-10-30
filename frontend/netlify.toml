@@ -2,6 +2,12 @@
 command = "npm ci && npm run build"
 publish = "build"
 
+[[redirects]]
+from = "/api/customers/*"
+to   = "https://bazuyuu-backend-4uz2zgyutq-as.a.run.app/:splat"
+status = 200
+force = true
+
 # Proxy API to Cloud Run (FIRST)
 [[redirects]]
 from = "/api/*"

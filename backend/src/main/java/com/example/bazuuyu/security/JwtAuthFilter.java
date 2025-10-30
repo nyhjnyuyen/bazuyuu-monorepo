@@ -80,6 +80,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // ✅ Skip ALL auth endpoints (register/login/refresh)
         if (path.startsWith("/api/auth/")) return true;
 
+        if (path.equals("/api/customers/register") || path.equals("/api/customers/login")) return true;
         // (Optional) skip static or public resources if you have any
         // if (path.startsWith("/public/") || path.startsWith("/assets/")) return true;
 
