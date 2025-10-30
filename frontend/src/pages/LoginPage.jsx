@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/apiClient';
 import { CustomerContext } from '../components/CustomerContext';
+import { login as authLogin } from '../api/authApi';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('');
@@ -20,14 +21,7 @@ export default function LoginPage() {
         try {
             // 1) hit your CustomerController at POST /api/customers/login
             //    and get { accessToken, refreshToken }
-            const { data } = await apiClient.post('/customers/login', {
-                username,
-                password,
-            });
-
-            // 2) stash the token and tell axios to send it on all future calls
-            localStorage.setItem('jwt', data.accessToken);
-            apiClient.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+            await authLogin(username, password); // uses /auth/customer/login and stores tokens
 
             // 3) now that the header is set, fetch the user’s profile
             const profile = await apiClient.get('/customers/me');
