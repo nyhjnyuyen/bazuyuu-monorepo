@@ -55,8 +55,8 @@ export default function NewArrivalsPage() {
                         res = await getNewArrivals();
                 }
 
-                const list = Array.isArray(res) ? res : (res?.content ??[]);
-                setProducts(list);
+                setProducts(res);
+                console.log('new-arrivals length =', Array.isArray(res) ? res.length : -1);
                 setPage(1); // reset pagination when sort changes
             } catch (e) {
                 console.error('Failed to fetch products:', e);

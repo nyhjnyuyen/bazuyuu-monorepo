@@ -7,7 +7,7 @@ const BASE = getApiBaseUrl();               // "/api" in prod, "http://localhost
 const apiClient = axios.create({
     baseURL: BASE,
     headers: { 'Content-Type': 'application/json' },
-    timeout: 15000,
+    timeout: 30000,
 });
 
 apiClient.interceptors.request.use((cfg) => {
