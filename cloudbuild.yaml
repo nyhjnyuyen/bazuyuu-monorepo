@@ -1,7 +1,10 @@
 substitutions:
   _REGION: asia-southeast1
   _REPO: bazuuyu
-  _SERVICE: bazuyuu-backend   # <- use the SAME name you keep
+  _SERVICE: bazuyuu-backend
+
+options:
+  logging: CLOUD_LOGGING_ONLY   # <-- this satisfies the requirement
 
 steps:
   - name: gcr.io/cloud-builders/docker
