@@ -6,7 +6,6 @@ import com.example.bazuuyu.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.bazuuyu.security.JwtUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +20,15 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
 
     public Customer registerCustomer(RegisterCustomerRequest req) {
+        final String email = req.getEmail().trim();
+        final String username = req.getUsername().trim();
+
+        if (customerRepository.existsByEmail(email)) {
+            throw new DuplicateResourceException("Email already registered");
+        }
+        if (customerRepository.existsByUsername(username)) {
+            throw new DuplicateResourceException("Username already taken");
+        }
         Customer customer = Customer.builder()
                 .username(req.getUsername())
                 .email(req.getEmail())

@@ -1,40 +1,27 @@
-# cloudbuild.yaml
-options:
-  logging: CLOUD_LOGGING_ONLY   # avoids logs bucket requirement
-
 substitutions:
   _REGION: asia-southeast1
-  _REPO:   bazuuyu
-  _IMAGE:  bazuuyu-backend
+  _REPO: bazuuyu
+  _SERVICE: bazuyuu-backend   # <- use the SAME name you keep
 
 steps:
-  - id: Build
-    name: gcr.io/cloud-builders/docker
+  - name: gcr.io/cloud-builders/docker
     args:
       - build
+      - -t
+      - $_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_SERVICE:$COMMIT_SHA
       - -f
       - backend/Dockerfile
-      - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
       - backend
 
-  - id: Push
-    name: gcr.io/cloud-builders/docker
-    args:
-      - push
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
+  - name: gcr.io/cloud-builders/docker
+    args: ['push', '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_SERVICE:$COMMIT_SHA']
 
-  - id: Deploy
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
       - run
       - deploy
-      - bazuuyu-backend
-      - --image
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
-      - --region
-      - ${_REGION}
-      - --platform
-      - managed
+      - $_SERVICE
+      - --image=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_SERVICE:$COMMIT_SHA
+      - --region=$_REGION
       - --allow-unauthenticated
