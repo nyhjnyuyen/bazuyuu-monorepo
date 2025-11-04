@@ -4,6 +4,11 @@ substitutions:
   _REPO:   bazuuyu
   _IMAGE:  bazuuyu-backend
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+  # or:
+  # defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+
 steps:
   # 1) Build the image
   - name: gcr.io/cloud-builders/docker
