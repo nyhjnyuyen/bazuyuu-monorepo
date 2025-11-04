@@ -5,17 +5,30 @@ substitutions:
   _IMAGE:  bazuuyu-backend
 
 steps:
+  # 1) Build the image
   - name: gcr.io/cloud-builders/docker
-    args: ['build',
-           '-t','$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_IMAGE:$COMMIT_SHA',
-           '-f','backend/Dockerfile','backend']  # <— path to your Dockerfile and context
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
+      - -f
+      - backend/Dockerfile
+      - backend
 
-images:
-  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_IMAGE:$COMMIT_SHA'
-
-  # Optional: deploy automatically
+  # 2) (Optional) Deploy to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
-    args: ['run','deploy','bazuuyu-backend',
-           '--image','$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_IMAGE:$COMMIT_SHA',
-           '--region','$_REGION','--platform','managed','--allow-unauthenticated']
+    args:
+      - run
+      - deploy
+      - bazuuyu-backend
+      - --image
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
+      - --region
+      - ${_REGION}
+      - --platform
+      - managed
+      - --allow-unauthenticated
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
