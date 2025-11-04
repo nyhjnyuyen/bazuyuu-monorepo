@@ -1,27 +1,31 @@
 # cloudbuild.yaml
+options:
+  logging: CLOUD_LOGGING_ONLY   # avoids logs bucket requirement
+
 substitutions:
   _REGION: asia-southeast1
   _REPO:   bazuuyu
   _IMAGE:  bazuuyu-backend
 
-options:
-  logging: CLOUD_LOGGING_ONLY
-  # or:
-  # defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
-
 steps:
-  # 1) Build the image
-  - name: gcr.io/cloud-builders/docker
+  - id: Build
+    name: gcr.io/cloud-builders/docker
     args:
       - build
-      - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
       - -f
       - backend/Dockerfile
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
       - backend
 
-  # 2) (Optional) Deploy to Cloud Run
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  - id: Push
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
+
+  - id: Deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
       - run
@@ -34,6 +38,3 @@ steps:
       - --platform
       - managed
       - --allow-unauthenticated
-
-images:
-  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$COMMIT_SHA
