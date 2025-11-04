@@ -108,26 +108,33 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowCredentials(false); // không xài cookie
-        // vừa exact, vừa pattern cho mọi preview
-        cfg.setAllowedOrigins(List.of(
-                "https://690001d688d2cb592e8e4e43--bazuuyu.netlify.app",
-                "https://bazuuyu.netlify.app",
-                "http://localhost:3000"
-        ));
+
+        // ✅ Use setAllowCredentials(true) even if not using cookies - more permissive
+        cfg.setAllowCredentials(true);
+
+        // ✅ Use ONLY setAllowedOriginPatterns (don't mix with setAllowedOrigins)
         cfg.setAllowedOriginPatterns(List.of(
-                "https://*.netlify.app"
+                "https://*.netlify.app",           // Covers all Netlify preview URLs
+                "https://bazuuyu.netlify.app",     // Your production URL
+                "http://localhost:3000",            // Local development
+                "http://localhost:*"                // All local ports
         ));
-        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS","HEAD"));
-        cfg.addAllowedHeader("*");
-        cfg.setExposedHeaders(List.of("Authorization"));
+
+        // ✅ Explicitly allow all methods including OPTIONS
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"));
+
+        // ✅ Allow all headers
+        cfg.setAllowedHeaders(List.of("*"));
+
+        // ✅ Expose Authorization header for JWT
+        cfg.setExposedHeaders(List.of("Authorization", "Content-Type"));
+
+        // ✅ Cache preflight response for 1 hour
+        cfg.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
-
-
-
 }
 
