@@ -1,0 +1,21 @@
+# cloudbuild.yaml
+substitutions:
+  _REGION: asia-southeast1
+  _REPO:   bazuuyu
+  _IMAGE:  bazuuyu-backend
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build',
+           '-t','$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_IMAGE:$COMMIT_SHA',
+           '-f','backend/Dockerfile','backend']  # <— path to your Dockerfile and context
+
+images:
+  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_IMAGE:$COMMIT_SHA'
+
+  # Optional: deploy automatically
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args: ['run','deploy','bazuuyu-backend',
+           '--image','$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_IMAGE:$COMMIT_SHA',
+           '--region','$_REGION','--platform','managed','--allow-unauthenticated']

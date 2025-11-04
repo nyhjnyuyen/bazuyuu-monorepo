@@ -26,8 +26,8 @@ EXPOSE 8080
 ENTRYPOINT ["sh","-c","exec java \
  -Dserver.port=${PORT:-8080} \
  -Dserver.address=0.0.0.0 \
- -Dspring.datasource.url='${SPRING_DATASOURCE_URL}' \
- -Dspring.datasource.username='${SPRING_DATASOURCE_USERNAME}' \
- -Dspring.datasource.password='${SPRING_DATASOURCE_PASSWORD}' \
- -Dspring.jpa.hibernate.ddl-auto='${SPRING_JPA_HIBERNATE_DDL_AUTO:-none}' \
+ -Dspring.datasource.url=${SPRING_DATASOURCE_URL} \
+ -Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME} \
+ -Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD} \
+ -Dspring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:-none} \
  -jar /app/app.jar"]
