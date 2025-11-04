@@ -109,28 +109,37 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
 
-        // ✅ Use setAllowCredentials(true) even if not using cookies - more permissive
+        // ✅ CRITICAL: Set to true for credentials support
         cfg.setAllowCredentials(true);
 
-        // ✅ Use ONLY setAllowedOriginPatterns (don't mix with setAllowedOrigins)
+        // ✅ Allow your Netlify domains + Cloud Run direct access
         cfg.setAllowedOriginPatterns(List.of(
-                "https://*.netlify.app",           // Covers all Netlify preview URLs
-                "https://bazuuyu.netlify.app",     // Your production URL
-                "http://localhost:3000",            // Local development
-                "http://localhost:*"                // All local ports
+                "https://*.netlify.app",                                    // All Netlify previews
+                "https://bazuuyu.netlify.app",                             // Production Netlify
+                "https://bazuyuu-backend-4uz2zgyutq-as.a.run.app",        // Direct Cloud Run access
+                "http://localhost:*",                                      // Local development
+                "http://127.0.0.1:*"                                       // Local IP
         ));
 
-        // ✅ Explicitly allow all methods including OPTIONS
-        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"));
+        // ✅ Allow all standard HTTP methods
+        cfg.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"
+        ));
 
-        // ✅ Allow all headers
+        // ✅ Allow all headers (frontend can send any header)
         cfg.setAllowedHeaders(List.of("*"));
 
-        // ✅ Expose Authorization header for JWT
-        cfg.setExposedHeaders(List.of("Authorization", "Content-Type"));
+        // ✅ Expose headers that frontend needs to read
+        cfg.setExposedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "X-Total-Count",
+                "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Credentials"
+        ));
 
-        // ✅ Cache preflight response for 1 hour
-        cfg.setMaxAge(3600L);
+        // ✅ Cache preflight for 2 hours
+        cfg.setMaxAge(7200L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
