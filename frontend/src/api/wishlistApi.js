@@ -1,5 +1,5 @@
-// frontend/src/api/wishlistApi.js
 import axios from './axiosInstance';
+import { ensureFreshJwtOrLogout, isJwtValidNow } from './auth';
 import {
     toggleLocalWishlist,
     addToLocalWishlist,
@@ -7,56 +7,53 @@ import {
     getLocalWishlist,
 } from '../lib/localWishlist';
 
-/**
- * Prefer passing customerId when logged in (from context: customer?.id).
- * Falls back between /wishlist/toggle and your current /wishlist/add|remove routes.
- */
-export async function toggleWishlistApi(productId, customerId) {
-    const token = localStorage.getItem('jwt');
-    if (!token) { toggleLocalWishlist(productId); return { ok: true, source: 'local' }; }
-
-    try {
-        // If you later add a /wishlist/toggle (body: {productId}) this will work:
-        await axios.post('/wishlist/toggle', { productId });
-    } catch (e) {
-        // Fallback to current backend: try remove first, then add
-        try {
-            await axios.delete('/wishlist/remove', { params: { customerId, productId } });
-        } catch {
-            await axios.post('/wishlist/add', null, { params: { customerId, productId } });
-        }
-    }
-    window.dispatchEvent(new Event('wishlist-updated'));
-    return { ok: true, source: 'server' };
-}
-
 export async function addToWishlist(productId, customerId) {
-    const token = localStorage.getItem('jwt');
-    if (!token) { addToLocalWishlist(productId); return { ok: true, source: 'local' }; }
-    await axios.post('/wishlist/add', null, { params: { customerId, productId } });
-    window.dispatchEvent(new Event('wishlist-updated'));
-    return { ok: true, source: 'server' };
+    if (!isJwtValidNow()) { addToLocalWishlist(productId); return { ok: true, source: 'local' }; }
+    try {
+        await axios.post('/wishlist/add', null, { params: { customerId, productId } });
+        window.dispatchEvent(new Event('wishlist-updated'));
+        return { ok: true, source: 'server' };
+    } catch {
+        ensureFreshJwtOrLogout();
+        addToLocalWishlist(productId);
+        return { ok: true, source: 'local-fallback' };
+    }
 }
 
 export async function removeFromWishlist(productId, customerId) {
-    const token = localStorage.getItem('jwt');
-    if (!token) { removeFromLocalWishlist(productId); return { ok: true, source: 'local' }; }
-    // Try toggle endpoint first if you add it; otherwise use your current /remove
+    if (!isJwtValidNow()) { removeFromLocalWishlist(productId); return { ok: true, source: 'local' }; }
     try {
-        await axios.post('/wishlist/toggle', { productId });
-    } catch {
         await axios.delete('/wishlist/remove', { params: { customerId, productId } });
+        window.dispatchEvent(new Event('wishlist-updated'));
+        return { ok: true, source: 'server' };
+    } catch {
+        ensureFreshJwtOrLogout();
+        removeFromLocalWishlist(productId);
+        return { ok: true, source: 'local-fallback' };
     }
-    window.dispatchEvent(new Event('wishlist-updated'));
-    return { ok: true, source: 'server' };
+}
+
+export async function toggleWishlistApi(productId, customerId) {
+    // purely client toggle for guests; server = add/remove pair
+    if (!isJwtValidNow()) { toggleLocalWishlist(productId); return { ok: true, source: 'local' }; }
+    try {
+        // If you’ve NOT implemented /wishlist/toggle on backend, just try remove then add:
+        await removeFromWishlist(productId, customerId);
+    } catch {
+        await addToWishlist(productId, customerId);
+    }
+    return { ok: true };
 }
 
 export async function getWishlist(customerId) {
-    const token = localStorage.getItem('jwt');
-    if (!token) return getLocalWishlist(); // [productId]
-    // Match current backend route signature
-    const { data } = await axios.get(`/wishlist/${customerId}`);
-    return data;
+    if (!isJwtValidNow()) return getLocalWishlist();
+    try {
+        const { data } = await axios.get(`/wishlist/${customerId}`);
+        return data;
+    } catch {
+        ensureFreshJwtOrLogout();
+        return getLocalWishlist();
+    }
 }
 
 export async function mergeWishlist(productIds) {
