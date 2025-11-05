@@ -1,20 +1,20 @@
-// src/api/wishlistApi.js
-import apiClient from './apiClient';    // ← your axios.create() with the JWT interceptor
+import axios from './axiosInstance';
+import { toggleLocalWishlist, getLocalWishlist } from '../lib/localWishlist';
 
-const BASE = '/wishlist';
+export async function toggleWishlistApi(productId) {
+    const token = localStorage.getItem('customer_token');
+    if (!token) { toggleLocalWishlist(productId); return { ok: true, source: 'local' }; }
+    const { data } = await axios.post('/api/wishlist/toggle', { productId });
+    return { ok: true, source: 'server', data };
+}
 
-export const addToWishlist = (customerId, productId) =>
-    apiClient.post(
-        `${BASE}/add`,
-        null,
-        { params: { customerId, productId } }
-    );
+export async function getWishlist(customerId) {
+    const token = localStorage.getItem('customer_token');
+    if (!token) return getLocalWishlist(); // array of productIds
+    const { data } = await axios.get('/api/wishlist'); // your existing endpoint
+    return data;
+}
 
-export const removeFromWishlist = (customerId, productId) =>
-    apiClient.delete(
-        `${BASE}/remove`,
-        { params: { customerId, productId } }
-    );
-
-export const getWishlist = (customerId) =>
-    apiClient.get(`${BASE}/${customerId}`).then(res => res.data);
+export async function mergeWishlist(productIds) {
+    return axios.post('/api/wishlist/merge', { productIds });
+}

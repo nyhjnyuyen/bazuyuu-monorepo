@@ -10,6 +10,8 @@ import search from '../assets/search-normal.svg';
 import { CustomerContext } from './CustomerContext';
 import { getWishlist } from '../api/wishlistApi';
 import { getCartItems } from '../api/cartApi';
+import { localWishlistCount } from '../lib/localWishlist';
+import { localCartCount } from '../lib/localCart';
 
 export default function Navbar() {
     const containerRef = useRef(null);
@@ -44,23 +46,40 @@ export default function Navbar() {
     }, []);
 
     useEffect(() => {
-        if (customer) {
-            getWishlist(customer.id)
-                .then(wishlist => {
-                const uniqueProductIds = new Set(wishlist.map(item => item.product.id));
-                setWishlistCount(uniqueProductIds.size);
-            })
-                .catch(() => setWishlistCount(0));
+        function refreshCounts() {
+            if (customer) {
+                getWishlist(customer.id)
+                    .then(wl => {
+                        // if server returns product objects, map to unique productIds
+                        const ids = Array.isArray(wl) && typeof wl[0] === 'object'
+                            ? new Set(wl.map(i => i.product?.id ?? i.productId ?? i))
+                            : new Set(wl);
+                        setWishlistCount(ids.size);
+                    })
+                    .catch(() => setWishlistCount(0));
 
-            getCartItems(customer.id)
-                .then(items => {
-                    setCartCount(items.length);
-                })
-                .catch(() => setCartCount(0));
-        } else {
-            setWishlistCount(0);
-            setCartCount(0);
+                getCartItems(customer.id)
+                    .then(items => {
+                        // if server returns {productId, quantity}, count sum; else length
+                        const sum = Array.isArray(items)
+                            ? items.reduce((s,x)=> s + (x.quantity ?? 1), 0)
+                            : 0;
+                        setCartCount(sum);
+                    })
+                    .catch(() => setCartCount(0));
+            } else {
+                setWishlistCount(localWishlistCount());
+                setCartCount(localCartCount());
+            }
         }
+
+        refreshCounts();
+        window.addEventListener('wishlist-updated', refreshCounts);
+        window.addEventListener('cart-updated', refreshCounts);
+        return () => {
+            window.removeEventListener('wishlist-updated', refreshCounts);
+            window.removeEventListener('cart-updated', refreshCounts);
+        };
     }, [customer, wishlistUpdated]);
 
     const goSearch = () => {
@@ -70,13 +89,6 @@ export default function Navbar() {
         setIsOpen(false); // optional: close mobile menu after navigating
     };
 
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            goSearch();
-        }
-    };
 
     return (
         <div className="w-full z-50 relative bg-white shadow-md font-['Instrument_Serif']">

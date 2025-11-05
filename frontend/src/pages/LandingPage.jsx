@@ -60,22 +60,12 @@ export default function LandingPage() {
     const handleAddToCart = async (product) => {
         setAddingId(product.id);
         try {
-            await addToCart({ productId: product.id, quantity: 1 });
-            // mark as added locally
-            setInCartIds(prev => {
-                const next = new Set(prev);
-                next.add(product.id);
-                return next;
-            });
+            const res = await addToCart({ productId: product.id, quantity: 1 });
+            setInCartIds(prev => new Set(prev).add(product.id));
             alert(`🛒 ${product.name} added to cart!`);
         } catch (err) {
-            if (err.response?.status === 401) {
-                alert('Please log in to add items to your cart.');
-                navigate('/login');
-            } else {
-                console.error('Add to cart failed:', err);
-                alert('Failed to add to cart. Please try again.');
-            }
+            console.error('Add to cart failed:', err);
+            alert('Failed to add to cart. Please try again.');
         } finally {
             setAddingId(null);
         }

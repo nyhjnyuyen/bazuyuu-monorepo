@@ -82,4 +82,13 @@ public class WishlistService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void merge(Long customerId, List<Long> productIds) {
+        if (productIds == null || productIds.isEmpty()) return;
+        for (Long pid : productIds) {
+            if (pid == null) continue;
+            addProductToWishlist(customerId, pid); // already dedupes
+        }
+    }
+
 }

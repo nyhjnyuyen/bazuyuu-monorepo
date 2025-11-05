@@ -1,5 +1,6 @@
 package com.example.bazuuyu.controller;
 
+import com.example.bazuuyu.dto.request.CartMergeRequest;
 import com.example.bazuuyu.dto.request.CheckoutRequest;
 import com.example.bazuuyu.dto.request.CreateCartItemRequest;
 import com.example.bazuuyu.dto.response.CartResponse;
@@ -9,6 +10,7 @@ import com.example.bazuuyu.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,6 +87,16 @@ public class CartController {
                 "orderCode", order.getOrderCode(),
                 "totalAmount", order.getTotalAmount()
         ));
+    }
+
+    @PostMapping("/merge")
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
+    public ResponseEntity<Void> mergeCart(
+            @AuthenticationPrincipal(expression = "id") Long customerId,
+            @RequestBody @Valid CartMergeRequest body
+    ) {
+        cartService.merge(customerId, body.getItems());
+        return ResponseEntity.ok().build();
     }
 
 }
