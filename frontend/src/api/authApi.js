@@ -1,5 +1,5 @@
 // src/api/authApi.js
-import apiClient from './apiClient';
+import apiClient from '../api/axiosInstance';
 
 export async function login(username, password) {
     const { data } = await apiClient.post('/auth/customer/login', { username, password });

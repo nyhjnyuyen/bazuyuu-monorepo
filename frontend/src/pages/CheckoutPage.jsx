@@ -1,6 +1,6 @@
 // src/pages/CheckoutPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import apiClient from '../api/apiClient';
+import apiClient from '../api/axiosInstance';
 
 // Minimal demo data. In real app, load from /vn-locations.json (put in /public).
 const DEMO = {

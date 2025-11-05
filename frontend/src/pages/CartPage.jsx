@@ -1,7 +1,7 @@
 // src/pages/CartPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import Footer from '../components/Footer';
-import apiClient from '../api/apiClient';
+import apiClient from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 
 const VND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });

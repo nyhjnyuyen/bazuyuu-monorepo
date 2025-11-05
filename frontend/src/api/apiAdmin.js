@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from '../api/axiosInstance';
 
 // Admin login
 export const loginAdmin = (credentials) =>

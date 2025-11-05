@@ -1,7 +1,7 @@
 // src/pages/RegisterPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../api/apiClient';
+import apiClient from '../api/axiosInstance';
 
 export default function RegisterPage() {
     const [form, setForm] = useState({

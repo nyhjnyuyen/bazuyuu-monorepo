@@ -1,5 +1,5 @@
 // src/api/productApi.js
-import apiClient from './apiClient';
+import apiClient from '../api/axiosInstance';
 
 // helper: unwrap Spring Page -> array
 const unwrap = (data) => (Array.isArray(data) ? data : (data?.content ?? []));
