@@ -18,8 +18,7 @@ export default function useWishlist(customer) {
     };
 
     const toggleWishlist = async (productId) => {
-        await toggleWishlistApi(productId); // api switches local/server
+        await toggleWishlistApi(productId, customer?.id);
     };
-
     return { isInWishlist, toggleWishlist };
 }

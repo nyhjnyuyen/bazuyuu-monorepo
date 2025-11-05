@@ -1,3 +1,4 @@
+// frontend/src/lib/localWishlist.js
 const WL_KEY = 'guest_wishlist_v1';
 
 function read() { try { return JSON.parse(localStorage.getItem(WL_KEY)) ?? []; } catch { return []; } }
@@ -7,6 +8,16 @@ export function toggleLocalWishlist(productId) {
     const ids = new Set(read());
     if (ids.has(productId)) ids.delete(productId); else ids.add(productId);
     write([...ids]);
+    window.dispatchEvent(new Event('wishlist-updated'));
+}
+
+export function addToLocalWishlist(productId) {
+    const ids = new Set(read()); ids.add(productId); write([...ids]);
+    window.dispatchEvent(new Event('wishlist-updated'));
+}
+
+export function removeFromLocalWishlist(productId) {
+    const ids = new Set(read()); ids.delete(productId); write([...ids]);
     window.dispatchEvent(new Event('wishlist-updated'));
 }
 
