@@ -1,6 +1,11 @@
 // src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    useLocation,
+} from 'react-router-dom';
 
 import LandingPage from './pages/LandingPage';
 import NewArrivalsPage from './pages/NewArrivalsPage';
@@ -22,60 +27,79 @@ import ProtectedRoute from './api/ProtectedRoute';
 import { CustomerProvider } from './components/CustomerContext';
 
 import { AdminAuthProvider } from './admin/AdminAuthContext';
-import AdminLogin from './admin/AdminLoginPage';
-import AdminDashboard from './admin/AdminDashboard'; // <-- import it once
+import AdminLayout from './admin/AdminLayout';
 import AdminOnlyRoute from './admin/AdminOnlyRoute';
+import AdminLoginPage from './admin/AdminLoginPage';
+import OrdersPage from './admin/pages/OrdersPage';
+import ProductsPage from './admin/pages/ProductsPage';
+import AdminsPage from './admin/pages/AdminsPage';
 
-function App() {
+// Small shell so we can hide the customer NavBar on /admin/*
+function AppShell() {
+    const { pathname } = useLocation();
+    const inAdmin = pathname.startsWith('/admin');
+
+    return (
+        <div className="App relative font-serif">
+            {!inAdmin && (
+                <div className="relative z-10">
+                    <NavBar />
+                </div>
+            )}
+
+            <Routes>
+                {/* Customer site */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/new" element={<NewArrivalsPage />} />
+                <Route path="/about" element={<AboutUsPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/forgot-password" element={<RequestResetPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/shop" element={<ShopPage />} />
+                <Route path="/product/:id" element={<ProductPage />} />
+                <Route path="/wishlist" element={<WishlistPage />} />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <CustomerProfile />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Admin area */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route
+                    path="/admin"
+                    element={
+                        <AdminOnlyRoute>
+                            <AdminLayout />
+                        </AdminOnlyRoute>
+                    }
+                >
+                    {/* Default admin landing → Orders */}
+                    <Route index element={<OrdersPage />} />
+                    <Route path="orders" element={<OrdersPage />} />
+                    <Route path="products" element={<ProductsPage />} />
+                    <Route path="admins" element={<AdminsPage />} />
+                </Route>
+            </Routes>
+        </div>
+    );
+}
+
+export default function App() {
     return (
         <AdminAuthProvider>
             <CustomerProvider>
                 <Router>
-                    <div className="App relative font-serif">
-                        <div className="relative z-10">
-                            <NavBar />
-                        </div>
-
-                        <Routes>
-                            <Route path="/" element={<LandingPage />} />
-                            <Route path="/new" element={<NewArrivalsPage />} />
-                            <Route path="/about" element={<AboutUsPage />} />
-                            <Route path="/contact" element={<ContactPage />} />
-                            <Route path="/login" element={<LoginPage />} />
-                            <Route path="/register" element={<RegisterPage />} />
-                            <Route path="/reset-password" element={<ResetPasswordPage />} />
-                            <Route path="/forgot-password" element={<RequestResetPage />} />
-                            <Route path="/cart" element={<CartPage />} />
-                            <Route path="/checkout" element={<CheckoutPage />} />
-                            <Route path="/shop" element={<ShopPage />} />
-                            <Route path="/product/:id" element={<ProductPage />} />
-                            <Route path="/wishlist" element={<WishlistPage />} />
-
-                            <Route
-                                path="/profile"
-                                element={
-                                    <ProtectedRoute>
-                                        <CustomerProfile />
-                                    </ProtectedRoute>
-                                }
-                            />
-
-                            {/* Admin routes */}
-                            <Route path="/admin/login" element={<AdminLogin />} />
-                            <Route
-                                path="/admin"
-                                element={
-                                    <AdminOnlyRoute>
-                                        <AdminDashboard />
-                                    </AdminOnlyRoute>
-                                }
-                            />
-                        </Routes>
-                    </div>
+                    <AppShell />
                 </Router>
             </CustomerProvider>
         </AdminAuthProvider>
     );
 }
-
-export default App;
