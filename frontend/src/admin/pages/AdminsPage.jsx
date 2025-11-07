@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
 export default function AdminsPage() {
     return (
-        <div className="bg-white rounded-xl p-6 shadow">
-            <h1 className="text-xl font-semibold mb-4">Admins</h1>
-            <p>TODO: manage admin users (create/delete, roles).</p>
+        <div className="p-6">
+            <h1 className="text-2xl font-bold mb-4">Admins</h1>
+            <p>Manage admin users here.</p>
         </div>
     );
 }

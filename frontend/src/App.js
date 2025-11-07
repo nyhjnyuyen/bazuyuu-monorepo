@@ -5,6 +5,7 @@ import {
     Routes,
     Route,
     useLocation,
+    Navigate,
 } from 'react-router-dom';
 
 import LandingPage from './pages/LandingPage';
@@ -34,7 +35,7 @@ import OrdersPage from './admin/pages/OrdersPage';
 import ProductsControl from './admin/pages/ProductsControl';
 import AdminsPage from './admin/pages/AdminsPage';
 
-// Small shell so we can hide the customer NavBar on /admin/*
+// Shell to hide the customer NavBar inside /admin/*
 function AppShell() {
     const { pathname } = useLocation();
     const inAdmin = pathname.startsWith('/admin');
@@ -71,8 +72,16 @@ function AppShell() {
                     }
                 />
 
-                {/* Admin area */}
+                {/* Admin auth */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
+
+                {/* Legacy redirect if anything tries /admin/dashboard */}
+                <Route
+                    path="/admin/dashboard"
+                    element={<Navigate to="/admin/products" replace />}
+                />
+
+                {/* Admin area */}
                 <Route
                     path="/admin"
                     element={
@@ -81,12 +90,14 @@ function AppShell() {
                         </AdminOnlyRoute>
                     }
                 >
-                    {/* Default admin landing → Orders */}
                     <Route index element={<OrdersPage />} />
                     <Route path="orders" element={<OrdersPage />} />
                     <Route path="products" element={<ProductsControl />} />
                     <Route path="admins" element={<AdminsPage />} />
                 </Route>
+
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </div>
     );
