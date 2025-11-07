@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ProductsPage() {
+export default function ProductsControl() {
     return (
         <div className="bg-white rounded-xl p-6 shadow">
             <h1 className="text-xl font-semibold mb-4">Products</h1>

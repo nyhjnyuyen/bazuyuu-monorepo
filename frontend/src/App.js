@@ -31,7 +31,7 @@ import AdminLayout from './admin/AdminLayout';
 import AdminOnlyRoute from './admin/AdminOnlyRoute';
 import AdminLoginPage from './admin/AdminLoginPage';
 import OrdersPage from './admin/pages/OrdersPage';
-import ProductsPage from './admin/pages/ProductsPage';
+import ProductsControl from './admin/pages/ProductsControl';
 import AdminsPage from './admin/pages/AdminsPage';
 
 // Small shell so we can hide the customer NavBar on /admin/*
@@ -84,7 +84,7 @@ function AppShell() {
                     {/* Default admin landing → Orders */}
                     <Route index element={<OrdersPage />} />
                     <Route path="orders" element={<OrdersPage />} />
-                    <Route path="products" element={<ProductsPage />} />
+                    <Route path="products" element={<ProductsControl />} />
                     <Route path="admins" element={<AdminsPage />} />
                 </Route>
             </Routes>
