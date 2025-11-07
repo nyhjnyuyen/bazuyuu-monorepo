@@ -38,6 +38,7 @@ public class SecurityConfig {
     private final AdminDetailsService adminDetailsService;
     private final CustomerDetailsService customerDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final GuestIdFilter guestIdFilter;
 
     // cau hinh quyen truy cap theo tung endpoint
     @Bean
@@ -45,9 +46,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(c -> c.configurationSource(corsConfigurationSource()))   // <— use your bean
+                // SecurityConfig.java (after http.csrf().cors()...)
+                .addFilterBefore(guestIdFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/guest/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/newsletter/**",
                                 "/api/auth/refresh", "/api/admins/login",
                                 "/api/customers/login", "/api/customers/register",

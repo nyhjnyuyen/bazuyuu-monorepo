@@ -2,18 +2,22 @@ import axios from './axiosInstance';
 import { ensureFreshJwtOrLogout, isJwtValidNow } from './auth';
 import { addToLocalCart, getLocalCart } from '../lib/localCart';
 
+const USE_GUEST_SERVER = false;
+
 export async function addToCart({ productId, quantity = 1 }) {
     if (!isJwtValidNow()) {
         addToLocalCart(productId, quantity);
+        window.dispatchEvent(new Event('cart-updated'));
         return { ok: true, source: 'local' };
     }
     try {
         const { data } = await axios.post('/cart/items', { productId, quantity });
+        window.dispatchEvent(new Event('cart-updated'));
         return { ok: true, source: 'server', data };
-    } catch (e) {
-        // token might be invalid server-side – switch to guest
+    } catch {
         ensureFreshJwtOrLogout();
         addToLocalCart(productId, quantity);
+        window.dispatchEvent(new Event('cart-updated'));
         return { ok: true, source: 'local-fallback' };
     }
 }
@@ -30,6 +34,6 @@ export async function getCartItems() {
 }
 
 export async function mergeCart(items) {
-    // items: [{productId, quantity}]
-    return axios.post('/cart/merge', { items });
+    // server-only, used immediately after login
+    return axios.post('/cart/merge', { items }); // [{productId, quantity}]
 }

@@ -7,8 +7,15 @@ import {
     getLocalWishlist,
 } from '../lib/localWishlist';
 
+// stay on local for guests
+const USE_GUEST_SERVER = false;
+
 export async function addToWishlist(productId, customerId) {
-    if (!isJwtValidNow()) { addToLocalWishlist(productId); return { ok: true, source: 'local' }; }
+    if (!isJwtValidNow()) {
+        addToLocalWishlist(productId);
+        window.dispatchEvent(new Event('wishlist-updated'));
+        return { ok: true, source: 'local' };
+    }
     try {
         await axios.post('/wishlist/add', null, { params: { customerId, productId } });
         window.dispatchEvent(new Event('wishlist-updated'));
@@ -16,12 +23,17 @@ export async function addToWishlist(productId, customerId) {
     } catch {
         ensureFreshJwtOrLogout();
         addToLocalWishlist(productId);
+        window.dispatchEvent(new Event('wishlist-updated'));
         return { ok: true, source: 'local-fallback' };
     }
 }
 
 export async function removeFromWishlist(productId, customerId) {
-    if (!isJwtValidNow()) { removeFromLocalWishlist(productId); return { ok: true, source: 'local' }; }
+    if (!isJwtValidNow()) {
+        removeFromLocalWishlist(productId);
+        window.dispatchEvent(new Event('wishlist-updated'));
+        return { ok: true, source: 'local' };
+    }
     try {
         await axios.delete('/wishlist/remove', { params: { customerId, productId } });
         window.dispatchEvent(new Event('wishlist-updated'));
@@ -29,15 +41,19 @@ export async function removeFromWishlist(productId, customerId) {
     } catch {
         ensureFreshJwtOrLogout();
         removeFromLocalWishlist(productId);
+        window.dispatchEvent(new Event('wishlist-updated'));
         return { ok: true, source: 'local-fallback' };
     }
 }
 
 export async function toggleWishlistApi(productId, customerId) {
-    // purely client toggle for guests; server = add/remove pair
-    if (!isJwtValidNow()) { toggleLocalWishlist(productId); return { ok: true, source: 'local' }; }
+    if (!isJwtValidNow()) {
+        toggleLocalWishlist(productId);
+        window.dispatchEvent(new Event('wishlist-updated'));
+        return { ok: true, source: 'local' };
+    }
+    // emulate toggle on server with remove→add
     try {
-        // If you’ve NOT implemented /wishlist/toggle on backend, just try remove then add:
         await removeFromWishlist(productId, customerId);
     } catch {
         await addToWishlist(productId, customerId);
@@ -57,5 +73,6 @@ export async function getWishlist(customerId) {
 }
 
 export async function mergeWishlist(productIds) {
+    // called right after login; server-only
     return axios.post('/wishlist/merge', { productIds });
 }
