@@ -11,43 +11,29 @@ export default function WishlistPage() {
 
     const loadWishlist = useCallback(() => {
         setLoading(true);
-        // wrapper returns local list when no JWT
         getWishlist(customer?.id)
-            .then((res) => {
-                const list = Array.isArray(res) ? res : res?.wishlist;
-                setItems(Array.isArray(list) ? list : []);
-            })
+            .then((products) => setItems(Array.isArray(products) ? products : []))
             .catch(() => setItems([]))
             .finally(() => setLoading(false));
     }, [customer?.id]);
 
+    useEffect(() => { loadWishlist(); }, [loadWishlist]);
     useEffect(() => {
-        loadWishlist();
-    }, [loadWishlist]);
-
-    // refresh when local guest wishlist changes
-    useEffect(() => {
-        const handler = () => loadWishlist();
-        window.addEventListener('wishlist-updated', handler);
-        return () => window.removeEventListener('wishlist-updated', handler);
+        const h = () => loadWishlist();
+        window.addEventListener('wishlist-updated', h);
+        return () => window.removeEventListener('wishlist-updated', h);
     }, [loadWishlist]);
 
     const handleAddToCart = async (product) => {
-        try {
-            await addToCart({ productId: product.id, quantity: 1 }); // wrapper handles guest/server
-            console.log('Added to cart:', product.name);
-        } catch (e) {
-            console.error('Failed to add to cart:', e);
-        }
+        try { await addToCart({ productId: product.id, quantity: 1 }); }
+        catch (e) { console.error(e); }
     };
 
     const handleRemoveFromWishlist = async (product) => {
         try {
-            await removeFromWishlist(product.id, customer?.id); // (productId, customerId) wrapper
-            setItems((prev) => prev.filter((it) => (it?.product?.id ?? it?.id) !== product.id));
-        } catch (e) {
-            console.error('Failed to remove from wishlist:', e);
-        }
+            await removeFromWishlist(product.id, customer?.id);
+            setItems(prev => prev.filter(p => p.id !== product.id));
+        } catch (e) { console.error(e); }
     };
 
     if (loading) return <p className="p-4">Loading your wishlist...</p>;
@@ -55,23 +41,19 @@ export default function WishlistPage() {
     return (
         <div className="max-w-6xl mx-auto px-4 py-10">
             <h2 className="text-2xl font-bold mb-6">Your Wishlist</h2>
-
             {items.length === 0 ? (
                 <p>Your wishlist is empty.</p>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {items.map((it) => {
-                        const product = it?.product ?? it;
-                        return (
-                            <ProductCard
-                                key={product?.id}
-                                product={product}
-                                isInWishlist={true}
-                                onAddToCart={handleAddToCart}
-                                onToggleWishlist={() => handleRemoveFromWishlist(product)}
-                            />
-                        );
-                    })}
+                    {items.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            product={product}
+                            isInWishlist={true}
+                            onAddToCart={handleAddToCart}
+                            onToggleWishlist={() => handleRemoveFromWishlist(product)}
+                        />
+                    ))}
                 </div>
             )}
         </div>
