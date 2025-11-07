@@ -10,9 +10,9 @@ export default function WishlistPage() {
     const [loading, setLoading] = useState(true);
 
     const loadWishlist = useCallback(() => {
-        if (!customer?.id) return;
         setLoading(true);
-        getWishlist(customer.id)
+        // wrapper returns local list when no JWT
+        getWishlist(customer?.id)
             .then((res) => {
                 const list = Array.isArray(res) ? res : res?.wishlist;
                 setItems(Array.isArray(list) ? list : []);
@@ -25,10 +25,16 @@ export default function WishlistPage() {
         loadWishlist();
     }, [loadWishlist]);
 
+    // refresh when local guest wishlist changes
+    useEffect(() => {
+        const handler = () => loadWishlist();
+        window.addEventListener('wishlist-updated', handler);
+        return () => window.removeEventListener('wishlist-updated', handler);
+    }, [loadWishlist]);
+
     const handleAddToCart = async (product) => {
-        if (!customer?.id) return;
         try {
-            await addToCart(customer.id, product.id, 1);
+            await addToCart({ productId: product.id, quantity: 1 }); // wrapper handles guest/server
             console.log('Added to cart:', product.name);
         } catch (e) {
             console.error('Failed to add to cart:', e);
@@ -36,16 +42,14 @@ export default function WishlistPage() {
     };
 
     const handleRemoveFromWishlist = async (product) => {
-        if (!customer?.id) return;
         try {
-            await removeFromWishlist(customer.id, product.id);
-            setItems((prev) => prev.filter((it) => it?.product?.id !== product.id));
+            await removeFromWishlist(product.id, customer?.id); // (productId, customerId) wrapper
+            setItems((prev) => prev.filter((it) => (it?.product?.id ?? it?.id) !== product.id));
         } catch (e) {
             console.error('Failed to remove from wishlist:', e);
         }
     };
 
-    if (!customer) return <p className="p-4">Please login to view your wishlist.</p>;
     if (loading) return <p className="p-4">Loading your wishlist...</p>;
 
     return (
@@ -62,8 +66,8 @@ export default function WishlistPage() {
                             <ProductCard
                                 key={product?.id}
                                 product={product}
+                                isInWishlist={true}
                                 onAddToCart={handleAddToCart}
-                                isInWishlist={true} // 👈 now it forces blue background
                                 onToggleWishlist={() => handleRemoveFromWishlist(product)}
                             />
                         );
