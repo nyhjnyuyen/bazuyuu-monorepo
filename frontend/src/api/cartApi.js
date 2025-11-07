@@ -8,19 +8,23 @@ export async function addToCart({ productId, quantity = 1 }) {
     if (!isJwtValidNow()) {
         addToLocalCart(productId, quantity);
         window.dispatchEvent(new Event('cart-updated'));
+        window.dispatchEvent(new Event('open-cart-drawer'));   // 👈 add this
         return { ok: true, source: 'local' };
     }
     try {
         const { data } = await axios.post('/cart/items', { productId, quantity });
         window.dispatchEvent(new Event('cart-updated'));
+        window.dispatchEvent(new Event('open-cart-drawer'));   // 👈 add this
         return { ok: true, source: 'server', data };
-    } catch {
+    } catch (e) {
         ensureFreshJwtOrLogout();
         addToLocalCart(productId, quantity);
         window.dispatchEvent(new Event('cart-updated'));
+        window.dispatchEvent(new Event('open-cart-drawer'));   // 👈 add this
         return { ok: true, source: 'local-fallback' };
     }
 }
+
 
 export async function getCartItems() {
     if (!isJwtValidNow()) return getLocalCart();

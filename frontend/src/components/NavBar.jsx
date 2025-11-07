@@ -12,6 +12,8 @@ import { getWishlist } from '../api/wishlistApi';
 import { getCartItems } from '../api/cartApi';
 import { localWishlistCount } from '../lib/localWishlist';
 import { localCartCount } from '../lib/localCart';
+import CartDrawer from './CartDrawer';
+
 
 export default function Navbar() {
     const containerRef = useRef(null);
@@ -28,6 +30,8 @@ export default function Navbar() {
     const [wishlistCount, setWishlistCount] = useState(0);
     const [cartCount, setCartCount] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    const [drawerOpen, setDrawerOpen] = useState(false);
+
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -81,6 +85,25 @@ export default function Navbar() {
             window.removeEventListener('cart-updated', refreshCounts);
         };
     }, [customer, wishlistUpdated]);
+
+    // lock body scroll when drawer open (optional)
+    useEffect(() => {
+        document.body.style.overflow = drawerOpen ? 'hidden' : '';
+        return () => { document.body.style.overflow = ''; };
+    }, [drawerOpen]);
+
+
+    useEffect(() => {
+        const open = () => {
+            setDrawerOpen(true);
+        };
+        window.addEventListener('open-cart-drawer', open);
+        return () => window.removeEventListener('open-cart-drawer', open);
+    }, []);
+
+
+// mount the drawer at the bottom of Navbar's JSX (outside the header grid)
+    <CartDrawer open={drawerOpen} onClose={() => { setDrawerOpen(false); document.body.style.overflow=''; }} />
 
     const goSearch = () => {
         const kw = (searchTerm || '').trim();
@@ -179,7 +202,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Cart */}
-                    <div className="relative cursor-pointer" onClick={() => navigate('/cart')}>
+                    <div className="relative cursor-pointer" onClick={() => setDrawerOpen(true)}>
                         <img src={shoppingCart} alt="Cart" className="h-6 w-6" />
                         {cartCount > 0 && (
                             <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5">
@@ -211,6 +234,11 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
+            <CartDrawer
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+            />
+
         </div>
     );
 }
