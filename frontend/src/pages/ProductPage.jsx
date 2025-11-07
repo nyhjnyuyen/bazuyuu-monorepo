@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import { CustomerContext } from '../components/CustomerContext';
 import useWishlist from '../hook/useWishlist';
 
-export default function ProductPage() {
+export default function ProductsPage() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState(null);
