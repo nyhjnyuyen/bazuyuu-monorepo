@@ -6,6 +6,7 @@ import com.example.bazuuyu.dto.request.ProductRequest;
 import com.example.bazuuyu.dto.response.*;
 import com.example.bazuuyu.entity.Admin;
 import com.example.bazuuyu.entity.Product;
+import com.example.bazuuyu.entity.ProductImage;
 import com.example.bazuuyu.entity.Role;
 import com.example.bazuuyu.mapper.AdminMapper;
 import com.example.bazuuyu.mapper.OrderItemMapper;
@@ -157,16 +158,34 @@ public class AdminController {
         Product existing = productService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+        // basic fields
         existing.setName(request.getName());
+        existing.setDescription(request.getDescription());
         existing.setPrice(request.getPrice());
         existing.setCategory(request.getCategory());
-        existing.setDescription(request.getDescription());
-        existing.setImageUrl(request.getImageUrl());
-        // ...other fields
+        existing.setQuantity(request.getQuantity());
+        existing.setBestSeller(request.isBestSeller());
+        existing.setNewArrival(request.isNewArrival());
 
-        Product saved = productService.create(existing); // or productService.update(existing)
+        // ✅ update images from imageUrls list
+        existing.clearImages(); // method you added on Product to remove old images
+
+        if (request.getImageUrls() != null) {
+            for (String url : request.getImageUrls()) {
+                ProductImage img = new ProductImage();
+                img.setImageUrl(url);
+                img.setProduct(existing);
+                existing.getProductImages().add(img);
+            }
+        }
+
+        // save (your service's `create` currently calls repository.save)
+        Product saved = productService.create(existing);
+        // if you later add an explicit update(), you can use that instead
+
         return ResponseEntity.ok(ProductMapper.toResponse(saved));
     }
+
 
 
     // tai anh san pham len CLoudinary, chi admin co token moi duoc phep.
