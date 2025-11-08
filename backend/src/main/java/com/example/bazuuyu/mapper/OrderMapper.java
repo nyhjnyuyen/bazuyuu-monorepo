@@ -7,32 +7,67 @@ import com.example.bazuuyu.entity.OrderItem;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OrderMapper {
 
     public static OrderItemResponse toItemResponse(OrderItem item) {
+        if (item == null) return null;
+
         OrderItemResponse response = new OrderItemResponse();
         response.setId(item.getId());
-        response.setProductName(item.getProduct().getName());
-        response.setQuantity(item.getQuantity());
-        response.setPrice(item.getPrice());
-        response.setTotalPrice(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+
+        // productName is safer than assuming product is always present
+        String productName = item.getProduct() != null
+                ? item.getProduct().getName()
+                : "Item";
+        response.setProductName(productName);
+
+        Integer quantity = item.getQuantity() != null ? item.getQuantity() : 0;
+        response.setQuantity(quantity);
+
+        BigDecimal unitPrice = item.getPrice() != null ? item.getPrice() : BigDecimal.ZERO;
+        response.setPrice(unitPrice);
+
+        response.setTotalPrice(unitPrice.multiply(BigDecimal.valueOf(quantity)));
+
         return response;
     }
 
     public static OrderResponse toResponse(Order order) {
+        if (order == null) return null;
+
         OrderResponse response = new OrderResponse();
         response.setId(order.getId());
-        response.setCustomerName(order.getCustomer().getUsername());
+
+        String customerName = order.getCustomer() != null
+                ? order.getCustomer().getUsername()
+                : null;
+        response.setCustomerName(customerName);
+
         response.setOrderDate(order.getOrderDate());
         response.setTotalAmount(order.getTotalAmount());
 
-        List<OrderItemResponse> items = order.getItems().stream()
+        // map items safely
+        List<OrderItemResponse> items = (order.getItems() == null)
+                ? List.of()
+                : order.getItems().stream()
                 .map(OrderMapper::toItemResponse)
                 .toList();
 
         response.setItems(items);
+
+        // 👇 If your OrderResponse has extra fields like status, address, etc.
+        // response.setStatus(order.getStatus() != null ? order.getStatus().name() : null);
+        // response.setOrderCode(order.getOrderCode());
+        // response.setPaymentChannel(order.getPaymentChannel());
+        // response.setAddressLine(order.getAddressLine());
+        // response.setProvince(order.getProvince());
+        // response.setDistrict(order.getDistrict());
+        // response.setWard(order.getWard());
+        // response.setPhone(order.getPhone());
+        // response.setFullName(order.getFullName());
+        // response.setNote(order.getNote());
+
         return response;
     }
 }

@@ -1,23 +1,19 @@
 package com.example.bazuuyu.service;
 
+import com.example.bazuuyu.dto.request.ShippingAddressRequest;
 import com.example.bazuuyu.entity.*;
+import com.example.bazuuyu.order.events.OrderPlacedEvent;
+import com.example.bazuuyu.order.events.PaymentCapturedEvent;
 import com.example.bazuuyu.repository.CartRepository;
 import com.example.bazuuyu.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.bazuuyu.dto.request.ShippingAddressRequest;
-import com.example.bazuuyu.repository.AddressDirectory;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.context.ApplicationEventPublisher;
-import com.example.bazuuyu.order.events.OrderPlacedEvent;
-import com.example.bazuuyu.order.events.PaymentCapturedEvent;
-
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,17 +25,19 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final ApplicationEventPublisher events;
 
-    public record OrderSummary(String orderNumber, String customerEmail, java.math.BigDecimal total){}
+    public record OrderSummary(String orderNumber, String customerEmail, BigDecimal total) {}
 
     public OrderSummary getOrderSummary(Long orderId) {
-        // You can optimize with a custom projection/repository method.
-        var o = orderRepository.findById(orderId)
+        Order o = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        return new OrderSummary(o.getOrderCode(),
+        return new OrderSummary(
+                o.getOrderCode(),
                 o.getCustomer().getEmail(),
-                o.getTotalAmount());
+                o.getTotalAmount()
+        );
     }
-    // Checkout: Convert active cart into an order
+
+    // ====== Checkout from active cart (by Customer) ======
     public Order placeOrder(Customer customer) {
         Cart cart = cartService.getActiveCart(customer)
                 .orElseThrow(() -> new IllegalStateException("No active cart found"));
@@ -73,25 +71,25 @@ public class OrderService {
                 .status(Order.OrderStatus.CREATED)
                 .build();
 
-        // Save order first to generate ID
+        // save to generate ID
         order = orderRepository.save(order);
 
-        // Set the order for each item before saving
+        // attach items
         for (OrderItem item : orderItems) {
             item.setOrder(order);
         }
         order.setItems(orderItems);
 
-        // Mark cart as CHECKED_OUT
+        // mark cart checked out
         cartService.updateCartStatus(cart.getId(), "CHECKED_OUT");
         cartItemService.clearItemsByCart(cart);
+
         Order saved = orderRepository.save(order);
-
         events.publishEvent(new OrderPlacedEvent(saved.getId()));
-
         return saved;
     }
-    // OrderService.java (only the changed/added method shown)
+
+    // ====== Checkout by cartId + shipping (used in /checkout/cart/{cartId}) ======
     @Transactional
     public Order placeOrderByCartId(Long cartId, ShippingAddressRequest dto) {
         if (dto == null) throw new IllegalArgumentException("shippingAddress is required");
@@ -99,12 +97,14 @@ public class OrderService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
-        var cartItems = cartItemService.getCartItemsByCart(cart);
+        List<CartItem> cartItems = cartItemService.getCartItemsByCart(cart);
         if (cartItems.isEmpty()) throw new IllegalStateException("Cart is empty");
 
-        var total = cartItems.stream()
-                .map(ci -> ci.getProduct().getPrice().multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        BigDecimal total = cartItems.stream()
+                .map(ci -> ci.getProduct()
+                        .getPrice()
+                        .multiply(BigDecimal.valueOf(ci.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         String phone = normalizeVNPhone(dto.getPhone());
 
@@ -121,7 +121,7 @@ public class OrderService {
 
         Order order = Order.builder()
                 .customer(cart.getCustomer())
-                .orderDate(java.time.LocalDateTime.now())
+                .orderDate(LocalDateTime.now())
                 .orderCode(genCode())
                 .totalAmount(total)
                 .status(Order.OrderStatus.CREATED)
@@ -130,8 +130,7 @@ public class OrderService {
 
         order = orderRepository.save(order);
 
-        // add items (init list or set once)
-        var orderItems = new java.util.ArrayList<OrderItem>();
+        List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem ci : cartItems) {
             orderItems.add(
                     OrderItem.builder()
@@ -148,9 +147,7 @@ public class OrderService {
         cartItemService.clearItemsByCart(cart);
 
         Order saved = orderRepository.save(order);
-
         events.publishEvent(new OrderPlacedEvent(saved.getId()));
-
         return saved;
     }
 
@@ -161,15 +158,17 @@ public class OrderService {
     }
 
     private String genCode() {
-        return UUID.randomUUID().toString().replace("-","").substring(0,10).toUpperCase();
+        return UUID.randomUUID().toString()
+                .replace("-", "")
+                .substring(0, 10)
+                .toUpperCase(Locale.ROOT);
     }
 
-    // View all orders for a customer
+    // ====== Queries ======
     public List<Order> getOrdersByCustomer(Customer customer) {
         return orderRepository.findByCustomer(customer);
     }
 
-    // Get a specific order by ID
     public Optional<Order> getOrderById(Long id) {
         return orderRepository.findById(id);
     }
@@ -182,23 +181,32 @@ public class OrderService {
         return orderRepository.findByCustomerIdOrderByOrderDateDesc(customerId);
     }
 
-    //PAYMENT STATES
+    public List<Order> findAllOrderByDateDesc() {
+        return orderRepository.findAllByOrderByOrderDateDesc();
+    }
+
+    // ====== PAYMENT / STATUS STATE MACHINE ======
     @Transactional
-    public void markAwaitingPayment(String orderCode, Order.PaymentChannel channel){
-        Order o = orderRepository.findByOrderCode(orderCode).orElseThrow(() -> new IllegalStateException("Order not found"));
-        if (o.getStatus() == Order.OrderStatus.CREATED){
+    public void markAwaitingPayment(String orderCode, Order.PaymentChannel channel) {
+        Order o = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new IllegalStateException("Order not found"));
+
+        if (o.getStatus() == Order.OrderStatus.CREATED) {
             o.setPaymentChannel(channel);
             o.setStatus(Order.OrderStatus.AWAITING_PAYMENT);
             orderRepository.save(o);
         }
     }
+
     @Transactional
-    public void markCodPending(String orderCode){
-        Order o = orderRepository.findByOrderCode(orderCode).orElseThrow(() -> new IllegalStateException("Order not found"));
+    public void markCodPending(String orderCode) {
+        Order o = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new IllegalStateException("Order not found"));
         o.setPaymentChannel(Order.PaymentChannel.COD);
         o.setStatus(Order.OrderStatus.COD_PENDING);
         orderRepository.save(o);
     }
+
     @Transactional
     public void markPaidByVnpay(String orderCode, String vnpTxnNo) {
         Order o = orderRepository.findByOrderCode(orderCode)
@@ -208,7 +216,6 @@ public class OrderService {
             o.setStatus(Order.OrderStatus.PAID);
             orderRepository.save(o);
             events.publishEvent(new PaymentCapturedEvent(o.getId()));
-
         }
     }
 
@@ -221,13 +228,29 @@ public class OrderService {
             orderRepository.save(o);
         }
     }
-    public List<Order> findAllOrderByDateDesc() {
-        return orderRepository.findAllByOrderByOrderDateDesc();
-    }
-    public void updateStatus(Long orderId, String status) {
-        Order o = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        o.setStatus(status);
-        orderRepository.save(o);
+
+    // ====== Generic admin status update ======
+    @Transactional
+    public void updateStatus(Long orderId, String statusName) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
+
+        if (statusName == null || statusName.isBlank()) {
+            throw new IllegalArgumentException("Status is required");
+        }
+
+        Order.OrderStatus newStatus;
+        try {
+            // convert "paid" / "Paid" / "PAID" → PAID
+            newStatus = Order.OrderStatus.valueOf(statusName.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid status: " + statusName
+                            + ". Allowed: " + Arrays.toString(Order.OrderStatus.values())
+            );
+        }
+
+        order.setStatus(newStatus);
+        orderRepository.save(order);
     }
 }
