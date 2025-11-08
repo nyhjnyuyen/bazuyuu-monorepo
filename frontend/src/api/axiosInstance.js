@@ -1,45 +1,49 @@
+// src/api/axiosInstance.js
 import axios from 'axios';
 
-const baseURL = process.env.REACT_APP_API_BASE_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8080');
+const isProd = process.env.NODE_ENV === 'production';
+const baseURL =
+    process.env.REACT_APP_API_BASE_URL ||
+    (isProd ? '/api' : 'http://localhost:8080/api');
 
-const api = axios.create({ baseURL, withCredentials: true });
+const apiClient = axios.create({ baseURL, withCredentials: true });
 
-api.interceptors.request.use((cfg) => {
-    const t = localStorage.getItem('jwt');     // single source of truth
-    if (t) (cfg.headers ||= {}).Authorization = `Bearer ${t}`;
+// Decide which token to send based on the request path
+function pickToken(url) {
+    const u = typeof url === 'string' ? url : url?.url || '';
+    // All admin APIs live under /admins -> use admin token
+    if (u.startsWith('/admins')) {
+        return (
+            localStorage.getItem('admin_jwt') ||
+            localStorage.getItem('admin_token') ||
+            null
+        );
+    }
+    // Everything else (customer/protected user APIs)
+    return (
+        localStorage.getItem('jwt') ||
+        localStorage.getItem('customer_jwt') ||
+        localStorage.getItem('token') ||
+        null
+    );
+}
+
+apiClient.interceptors.request.use((cfg) => {
+    const token = pickToken(cfg.url);
+    if (token) {
+        cfg.headers = cfg.headers || {};
+        cfg.headers.Authorization = `Bearer ${token}`;
+    } else if (cfg.url?.startsWith('/admins') && cfg.headers?.Authorization) {
+        // Never leak a customer token to admin endpoints
+        delete cfg.headers.Authorization;
+    }
     return cfg;
 });
 
-api.interceptors.response.use(
+// Keep response handling simple unless you really have a refresh endpoint
+apiClient.interceptors.response.use(
     (res) => res,
-    async (err) => {
-        const cfg = err.config || {};
-        const status = err.response?.status;
-
-        // refresh only once
-        if ((status !== 401 && status !== 403) || cfg._retry) {
-            return Promise.reject(err);
-        }
-
-        cfg._retry = true;
-        const rt = localStorage.getItem('refreshToken');
-        if (!rt) {
-            localStorage.removeItem('jwt');
-            return Promise.reject(err);
-        }
-
-        try {
-            const { data } = await axios.post(`${baseURL}/auth/refresh`, { refreshToken: rt });
-            const newAccess = data?.accessToken;
-            if (!newAccess) throw new Error('no token');
-            localStorage.setItem('jwt', newAccess);
-            (cfg.headers ||= {}).Authorization = `Bearer ${newAccess}`;
-            return api(cfg);
-        } catch (e) {
-            localStorage.removeItem('jwt'); // force guest mode
-            return Promise.reject(err);
-        }
-    }
+    (err) => Promise.reject(err)
 );
 
-export default api;
+export default apiClient;
