@@ -36,3 +36,12 @@ export const uploadProductImage = (file) => {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
 };
+
+export const getAllOrders = () =>
+    apiClient.get('/admins/orders'); // admin-only list
+
+export const getOrderItemsForOrder = (orderId) =>
+    apiClient.get(`/order-items/order/${orderId}`); // re-use existing controller
+
+export const updateOrderStatus = (orderId, status) =>
+    apiClient.patch(`/admins/orders/${orderId}/status`, null, { params: { status } });

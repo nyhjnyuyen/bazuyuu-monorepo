@@ -27,8 +27,10 @@ export default function AdminLoginPage() {
             if (refreshToken) setRefreshToken(refreshToken);
 
             // optional: also persist under both keys to be safe
+            localStorage.setItem('jwt', accessToken);
             localStorage.setItem('admin_jwt', accessToken);
             localStorage.setItem('admin_token', accessToken);
+            if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
 
             navigate('/admin/products', { replace: true });
         } catch (err) {

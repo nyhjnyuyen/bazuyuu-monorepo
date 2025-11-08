@@ -3,26 +3,21 @@ package com.example.bazuuyu.controller;
 import com.example.bazuuyu.dto.request.CreateAdminRequest;
 import com.example.bazuuyu.dto.request.LoginRequest;
 import com.example.bazuuyu.dto.request.ProductRequest;
-import com.example.bazuuyu.dto.response.AdminResponse;
-import com.example.bazuuyu.dto.response.LoginResponse;
-import com.example.bazuuyu.dto.response.ProductResponse;
+import com.example.bazuuyu.dto.response.*;
 import com.example.bazuuyu.entity.Admin;
 import com.example.bazuuyu.entity.Product;
 import com.example.bazuuyu.entity.Role;
 import com.example.bazuuyu.mapper.AdminMapper;
+import com.example.bazuuyu.mapper.OrderItemMapper;
+import com.example.bazuuyu.mapper.OrderMapper;
 import com.example.bazuuyu.mapper.ProductMapper;
 import com.example.bazuuyu.security.AdminDetails;
 import com.example.bazuuyu.security.JwtUtils;
-import com.example.bazuuyu.service.AdminService;
-import com.example.bazuuyu.service.CloudinaryService;
-import com.example.bazuuyu.service.ProductService;
+import com.example.bazuuyu.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +40,8 @@ public class AdminController {
     private final ProductService productService;
     private final CloudinaryService cloudinaryService;
     private final PasswordEncoder passwordEncoder;
+    private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
 
     // tao admin moi. chi SUPER_ADMIN moi duoc phep goi API nay.
@@ -148,6 +145,31 @@ public class AdminController {
         return ResponseEntity.ok(url);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SUPER_ADMIN')")
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderResponse>> listAllOrders() {
+        var orders = orderService.findAllOrderByDateDesc(); // see service below
+        var resp = orders.stream().map(OrderMapper::toResponse).toList();
+        return ResponseEntity.ok(resp);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SUPER_ADMIN')")
+    @GetMapping("/orders/{orderId}/items")
+    public ResponseEntity<List<OrderItemResponse>> getItems(@PathVariable Long orderId) {
+        var items = orderItemService.getItemsByOrderId(orderId);
+        var resp = items.stream().map(OrderItemMapper::toResponse).toList();
+        return ResponseEntity.ok(resp);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SUPER_ADMIN')")
+    @PatchMapping("/orders/{orderId}/status")
+    public ResponseEntity<Void> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam String status
+    ) {
+        orderService.updateStatus(orderId, status);
+        return ResponseEntity.noContent().build();
+    }
 
 
 

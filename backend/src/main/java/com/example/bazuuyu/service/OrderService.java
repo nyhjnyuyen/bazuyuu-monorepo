@@ -221,4 +221,13 @@ public class OrderService {
             orderRepository.save(o);
         }
     }
+    public List<Order> findAllOrderByDateDesc() {
+        return orderRepository.findAllByOrderByOrderDateDesc();
+    }
+    public void updateStatus(Long orderId, String status) {
+        Order o = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        o.setStatus(status);
+        orderRepository.save(o);
+    }
 }

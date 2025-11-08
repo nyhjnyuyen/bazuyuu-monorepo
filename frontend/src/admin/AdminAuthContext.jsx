@@ -47,8 +47,11 @@ export function AdminAuthProvider({ children }) {
     }, [refreshToken]);
 
     const logout = () => {
-        setToken('');
-        setRefreshToken('');
+        localStorage.removeItem('jwt');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('admin_jwt');
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_refresh');
     };
 
     return (
