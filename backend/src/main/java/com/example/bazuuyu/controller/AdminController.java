@@ -101,12 +101,15 @@ public class AdminController {
     }
 
     // add a new product
+    // AdminController.java
+
     @PostMapping("/products")
     public ResponseEntity<ProductResponse> addProduct(
             @RequestBody ProductRequest request,
             @AuthenticationPrincipal AdminDetails adminDetails
     ) {
-        if (!adminDetails.getAdmin().getRole().equals(Role.SUPER_ADMIN)) {
+        Role role = adminDetails.getAdmin().getRole();
+        if (role != Role.ADMIN && role != Role.SUPER_ADMIN) {
             return ResponseEntity.status(403).build();
         }
 
@@ -114,6 +117,7 @@ public class AdminController {
         Product saved = productService.create(product);
         return ResponseEntity.ok(ProductMapper.toResponse(saved));
     }
+
 
     // lay danh sach toan bo san pham.
     @GetMapping("/products")
@@ -127,10 +131,43 @@ public class AdminController {
 
     // delete product by ID
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProduct(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AdminDetails adminDetails
+    ) {
+        Role role = adminDetails.getAdmin().getRole();
+        if (role != Role.ADMIN && role != Role.SUPER_ADMIN) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
         productService.deleteById(id);
         return ResponseEntity.ok("Product deleted.");
     }
+    @PutMapping("/products/{id}")
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable Long id,
+            @RequestBody ProductRequest request,
+            @AuthenticationPrincipal AdminDetails adminDetails
+    ) {
+        Role role = adminDetails.getAdmin().getRole();
+        if (role != Role.ADMIN && role != Role.SUPER_ADMIN) {
+            return ResponseEntity.status(403).build();
+        }
+
+        Product existing = productService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        existing.setName(request.getName());
+        existing.setPrice(request.getPrice());
+        existing.setCategory(request.getCategory());
+        existing.setDescription(request.getDescription());
+        existing.setImageUrl(request.getImageUrl());
+        // ...other fields
+
+        Product saved = productService.create(existing); // or productService.update(existing)
+        return ResponseEntity.ok(ProductMapper.toResponse(saved));
+    }
+
 
     // tai anh san pham len CLoudinary, chi admin co token moi duoc phep.
     @PostMapping("/upload")

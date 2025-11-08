@@ -1,4 +1,7 @@
-import apiClient from '../api/axiosInstance';
+// src/api/apiAdmin.js
+import apiClient from './axiosInstance'; // same folder
+
+/** ───── AUTH ───── **/
 
 // Admin login
 export const loginAdmin = (credentials) =>
@@ -12,13 +15,20 @@ export const createAdmin = (payload) =>
 export const getAllAdmins = () =>
     apiClient.get('/admins/all');
 
-// Delete admin by ID
+// Delete admin by ID (SUPER_ADMIN only)
 export const deleteAdmin = (id, requesterId) =>
     apiClient.delete(`/admins/delete/${id}`, { params: { requesterId } });
 
-// Add product (SUPER_ADMIN only)
+
+/** ───── PRODUCTS (ADMIN + SUPER_ADMIN) ───── **/
+
+// Create product
 export const addProduct = (product) =>
     apiClient.post('/admins/products', product);
+
+// Update product
+export const updateProduct = (id, product) =>
+    apiClient.put(`/admins/products/${id}`, product);
 
 // Get all products
 export const getAllProducts = () =>
@@ -28,7 +38,7 @@ export const getAllProducts = () =>
 export const deleteProduct = (id) =>
     apiClient.delete(`/admins/products/${id}`);
 
-// Upload product image
+// Upload product image via backend (optional if you’re using Supabase directly)
 export const uploadProductImage = (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -37,11 +47,19 @@ export const uploadProductImage = (file) => {
     });
 };
 
+
+/** ───── ORDERS (ADMIN + SUPER_ADMIN) ───── **/
+
+// List all orders (admin-only endpoint)
 export const getAllOrders = () =>
-    apiClient.get('/admins/orders'); // admin-only list
+    apiClient.get('/admins/orders');
 
+// Get items for a specific order (uses /api/order-items controller)
 export const getOrderItemsForOrder = (orderId) =>
-    apiClient.get(`/order-items/order/${orderId}`); // re-use existing controller
+    apiClient.get(`/order-items/order/${orderId}`);
 
+// Update order status (?status=PAID, etc.)
 export const updateOrderStatus = (orderId, status) =>
-    apiClient.patch(`/admins/orders/${orderId}/status`, null, { params: { status } });
+    apiClient.patch(`/admins/orders/${orderId}/status`, null, {
+        params: { status },
+    });
