@@ -76,20 +76,28 @@ export default function ProductsControl() {
 
 
     async function uploadToSupabase(file) {
-        if (!supabase) throw new Error('Image upload is disabled (no Supabase config).');
-        const fileName = `${Date.now()}-${file.name}`;
+        if (!supabase) {
+            throw new Error("Supabase client not initialised (check env vars and supabaseClient.js)");
+        }
+
+        const fileName = `products/${Date.now()}-${file.name}`;
+
         const { data, error } = await supabase.storage
-            .from('product-images') // your bucket name
+            .from("product-images")        // 👈 bucket name must exist in Supabase
             .upload(fileName, file);
 
-        if (error) throw error;
+        if (error) {
+            console.error("[Supabase] upload error", error);
+            throw error;
+        }
 
         const { data: publicUrlData } = supabase.storage
-            .from('product-images')
+            .from("product-images")
             .getPublicUrl(data.path);
 
-        return publicUrlData.publicUrl; // 👈 this is the URL we store
+        return publicUrlData.publicUrl;
     }
+
 
     const handleImageFileChange = async (e) => {
         const file = e.target.files?.[0];

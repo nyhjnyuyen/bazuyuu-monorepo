@@ -1,8 +1,16 @@
 // src/supabaseClient.js
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const url = process.env.REACT_APP_SUPABASE_URL;
-const anon = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-// Export null instead of throwing when env vars aren’t present
-export const supabase = (url && anon) ? createClient(url, anon) : null;
+if (!supabaseUrl || !supabaseAnonKey) {
+    // This will show in the browser console if env vars are missing
+    console.warn(
+        "[Supabase] Missing REACT_APP_SUPABASE_URL or REACT_APP_SUPABASE_ANON_KEY"
+    );
+}
+
+export const supabase = supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
