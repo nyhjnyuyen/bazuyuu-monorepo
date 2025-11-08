@@ -68,9 +68,12 @@ export default function ProductsControl() {
         const firstImg = Array.isArray(p.imageUrls) ? p.imageUrls[0] : '';
         setImageUrl(firstImg || '');
         setQuantity(p.quantity != null ? String(p.quantity) : '');
-        setIsBestSeller(Boolean(p.isBestSeller));
-        setIsNewArrival(Boolean(p.isNewArrival));
+
+        // 👇 prefer "bestSeller"/"newArrival" but fall back to old names
+        setIsBestSeller(Boolean(p.bestSeller ?? p.isBestSeller));
+        setIsNewArrival(Boolean(p.newArrival ?? p.isNewArrival));
     };
+
 
 
 
@@ -127,10 +130,12 @@ export default function ProductsControl() {
             category: category.trim() || null,
             description: description.trim() || null,
             quantity: Number(quantity || 0),
-            isBestSeller,
-            isNewArrival,
+            bestSeller: isBestSeller,
+            newArrival: isNewArrival,
             imageUrls: imageUrl ? [imageUrl.trim()] : [],
         };
+
+
 
 
 
