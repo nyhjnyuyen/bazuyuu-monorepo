@@ -23,6 +23,7 @@ public class ProductMapper {
         product.setQuantity(request.getQuantity());
         product.setCategory(request.getCategory());
 
+        // 👇 IMPORTANT: copy the flags
         product.setBestSeller(request.isBestSeller());
         product.setNewArrival(request.isNewArrival());
 
