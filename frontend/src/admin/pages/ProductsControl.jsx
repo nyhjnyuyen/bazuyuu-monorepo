@@ -76,6 +76,7 @@ export default function ProductsControl() {
 
 
     async function uploadToSupabase(file) {
+        if (!supabase) throw new Error('Image upload is disabled (no Supabase config).');
         const fileName = `${Date.now()}-${file.name}`;
         const { data, error } = await supabase.storage
             .from('product-images') // your bucket name
