@@ -34,7 +34,7 @@ import AdminLoginPage from './admin/AdminLoginPage';
 import OrdersPage from './admin/pages/OrdersPage';
 import ProductsControl from './admin/pages/ProductsControl';
 import AdminsPage from './admin/pages/AdminsPage';
-
+import AdminLogout from './admin/AdminLogout';
 // Shell to hide the customer NavBar inside /admin/*
 function AppShell() {
     const { pathname } = useLocation();
@@ -74,6 +74,7 @@ function AppShell() {
 
                 {/* Admin auth */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route path="/admin/logout" element={<AdminLogout />} />
 
                 {/* Legacy redirect if anything tries /admin/dashboard */}
                 <Route

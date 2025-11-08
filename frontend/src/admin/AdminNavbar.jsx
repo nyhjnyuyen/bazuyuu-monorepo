@@ -14,12 +14,7 @@ export default function AdminNavbar() {
                 <NavLink to="/admin/admins">Admins</NavLink>
                 <a href="/" target="_blank" rel="noreferrer">View site</a>
             </nav>
-            <button
-                onClick={() => { logout(); navigate('/admin/login', { replace: true }); }}
-                className="px-3 py-1 rounded bg-violet-950 text-white"
-            >
-                Logout
-            </button>
-        </header>
+            <button onClick={() => navigate('/admin/logout')}>Logout</button>
+</header>
     );
 }
