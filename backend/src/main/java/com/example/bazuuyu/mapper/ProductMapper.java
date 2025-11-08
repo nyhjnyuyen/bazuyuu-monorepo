@@ -23,10 +23,12 @@ public class ProductMapper {
         product.setQuantity(request.getQuantity());
         product.setCategory(request.getCategory());
 
-        // ✅ Tạo mutable list mới
+        product.setBestSeller(request.isBestSeller());
+        product.setNewArrival(request.isNewArrival());
+
         List<ProductImage> imageEntities = new ArrayList<>();
         if (request.getImageUrls() != null) {
-            for (String imageUrl : new ArrayList<>(request.getImageUrls())) { // defensive copy
+            for (String imageUrl : new ArrayList<>(request.getImageUrls())) {
                 ProductImage image = new ProductImage();
                 image.setImageUrl(imageUrl);
                 image.setProduct(product);
@@ -37,8 +39,6 @@ public class ProductMapper {
 
         return product;
     }
-
-
 
 
     // chuyen doi tu product entity sang ProductResponse DTO

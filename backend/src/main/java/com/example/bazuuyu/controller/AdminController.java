@@ -158,18 +158,16 @@ public class AdminController {
         Product existing = productService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        // basic fields
         existing.setName(request.getName());
-        existing.setDescription(request.getDescription());
         existing.setPrice(request.getPrice());
         existing.setCategory(request.getCategory());
+        existing.setDescription(request.getDescription());
         existing.setQuantity(request.getQuantity());
         existing.setBestSeller(request.isBestSeller());
         existing.setNewArrival(request.isNewArrival());
 
-        // ✅ update images from imageUrls list
-        existing.clearImages(); // method you added on Product to remove old images
-
+        // images…
+        existing.clearImages();
         if (request.getImageUrls() != null) {
             for (String url : request.getImageUrls()) {
                 ProductImage img = new ProductImage();
@@ -179,13 +177,9 @@ public class AdminController {
             }
         }
 
-        // save (your service's `create` currently calls repository.save)
-        Product saved = productService.create(existing);
-        // if you later add an explicit update(), you can use that instead
-
+        Product saved = productService.create(existing); // or productService.update(existing)
         return ResponseEntity.ok(ProductMapper.toResponse(saved));
     }
-
 
 
     // tai anh san pham len CLoudinary, chi admin co token moi duoc phep.
