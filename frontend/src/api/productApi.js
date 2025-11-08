@@ -18,12 +18,13 @@ export const getProductById = (id) =>
 // alias for older imports
 export const getProduct = (id) => getProductById(id);
 
-export const getNewArrivals = async (page = 0, size = 24) => {
-    const { data } = await apiClient.get('/products', {
-        params: { page, size, newArrival: true }
+export const getNewArrivals = async () => {
+    const res = await apiClient.get('/products', {
+        params: { page: 0, size: 100, newArrival: true },
     });
-    return unwrap(data);
+    return res.data.content || [];
 };
+
 
 export const getLandingNewArrivals = async (size = 16) => {
     const { data } = await apiClient.get('/products', {

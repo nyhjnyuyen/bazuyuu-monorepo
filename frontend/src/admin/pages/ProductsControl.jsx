@@ -24,8 +24,9 @@ export default function ProductsControl() {
     const [description, setDescription] = useState('');
     const [imageUrl, setImageUrl] = useState(''); // we’ll map this into imageUrls: [imageUrl]
     const [quantity, setQuantity] = useState('');
-    const [bestSeller, setBestSeller] = useState(false);
-    const [newArrival, setNewArrival] = useState(false);
+    const [isBestSeller, setIsBestSeller] = useState(false);
+    const [isNewArrival, setIsNewArrival] = useState(false);
+
 
     const resetForm = () => {
         setEditingId(null);
@@ -35,10 +36,9 @@ export default function ProductsControl() {
         setDescription('');
         setImageUrl('');
         setQuantity('');
-        setBestSeller(false);
-        setNewArrival(false);
+        setIsBestSeller(false);
+        setIsNewArrival(false);
     };
-
 
     const loadProducts = async () => {
         try {
@@ -65,14 +65,13 @@ export default function ProductsControl() {
         setPrice(p.price != null ? String(p.price) : '');
         setCategory(p.category ?? '');
         setDescription(p.description ?? '');
-
         const firstImg = Array.isArray(p.imageUrls) ? p.imageUrls[0] : '';
         setImageUrl(firstImg || '');
-
         setQuantity(p.quantity != null ? String(p.quantity) : '');
-        setBestSeller(Boolean(p.bestSeller ?? p.isBestSeller));   // handle either shape
-        setNewArrival(Boolean(p.newArrival ?? p.isNewArrival));
+        setIsBestSeller(Boolean(p.isBestSeller));
+        setIsNewArrival(Boolean(p.isNewArrival));
     };
+
 
 
     async function uploadToSupabase(file) {
@@ -125,16 +124,14 @@ export default function ProductsControl() {
         const payload = {
             name: name.trim(),
             price: Number(price || 0),
-            category: category.trim() || null,      // must match your Category enum name
+            category: category.trim() || null,
             description: description.trim() || null,
-            imageUrls: imageUrl ? [imageUrl.trim()] : [],
-
             quantity: Number(quantity || 0),
-            // For your Java fields named `isBestSeller`, `isNewArrival`,
-            // Jackson will usually map JSON keys `bestSeller` and `newArrival`.
-            bestSeller,
-            newArrival,
+            isBestSeller,
+            isNewArrival,
+            imageUrls: imageUrl ? [imageUrl.trim()] : [],
         };
+
 
 
         try {
@@ -255,24 +252,25 @@ export default function ProductsControl() {
                             onChange={(e) => setQuantity(e.target.value)}
                         />
 
-                        <div className="flex items-center gap-4 md:col-span-2">
-                            <label className="flex items-center gap-2">
+                        <div className="md:col-span-2 flex items-center gap-6 mt-2">
+                            <label className="inline-flex items-center gap-2">
                                 <input
                                     type="checkbox"
-                                    checked={bestSeller}
-                                    onChange={(e) => setBestSeller(e.target.checked)}
+                                    checked={isBestSeller}
+                                    onChange={(e) => setIsBestSeller(e.target.checked)}
                                 />
-                                Best seller
+                                <span>Best seller</span>
                             </label>
-                            <label className="flex items-center gap-2">
+                            <label className="inline-flex items-center gap-2">
                                 <input
                                     type="checkbox"
-                                    checked={newArrival}
-                                    onChange={(e) => setNewArrival(e.target.checked)}
+                                    checked={isNewArrival}
+                                    onChange={(e) => setIsNewArrival(e.target.checked)}
                                 />
-                                New arrival
+                                <span>New arrival</span>
                             </label>
                         </div>
+
                         <div className="md:col-span-2 flex justify-end gap-3">
                             {isEditing && (
                                 <button
