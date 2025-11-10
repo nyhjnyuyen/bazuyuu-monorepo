@@ -7,7 +7,6 @@ import 'swiper/css/navigation';
 
 import heart from '../assets/heart.png';
 import flashmod from '../assets/activity.jpg';
-import activity from '../assets/activity.jpg';
 import wave from '../assets/wave.png';
 import slogan1 from '../assets/slogan1.jpg';
 import slogan2 from '../assets/slogan2.jpg';
@@ -331,7 +330,7 @@ export default function LandingPage() {
 
                     {/* Tiêu đề trên ảnh */}
                     <div className="relative z-10 flex flex-col items-center justify-start h-full text-center px-4 pt-12 sm:pt-12">
-                        <p className="text-l sm:text-xl font-light font-['Instrument_Serif'] mb-2 w-[50%] max-w-[600px] mx-auto leading-tight">
+                        <p className="text-xl font-light font-['Instrument_Serif'] mb-2 w-[50%] max-w-[600px] mx-auto leading-tight">
                             IBTE 2025 – International Baby Products & Toys Expo
                         </p>
                     </div>
@@ -363,14 +362,6 @@ export default function LandingPage() {
                                 className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                {/* Ảnh card IBTE */}
-                                <div className="bg-black flex items-center justify-center">
-                                    <img
-                                        src={activity}
-                                        alt="IBTE 2025 – International Baby Products & Toys Expo"
-                                        className="w-full h-[60vh] md:h-[80vh] object-contain"
-                                    />
-                                </div>
 
                                 {/* Nội dung mô tả */}
                                 <div className="p-6 md:p-8 flex flex-col">
