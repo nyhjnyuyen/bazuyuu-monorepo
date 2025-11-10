@@ -38,10 +38,31 @@ const categories = [
 ];
 
 const sloganItems = [
-    { src: slogan1, label: "Label 1", desc: "Description for item 1..." },
-    { src: slogan2, label: "Label 2", desc: "Description for item 2..." },
-    { src: slogan3, label: "Label 3", desc: "Description for item 3..." },
-    { src: slogan4, label: "Label 4", desc: "Description for item 4..." },
+    {
+        src: slogan1,
+        label: "IBTE 2024 – International Baby Products & Toys Expo",
+        desc:
+            "Hành trình với IBTE bắt đầu từ IBTE 2024, khi Bazuuyu lần đầu trưng bày dòng đồ chơi mềm dành cho mẹ & bé và nhận được phản hồi rất tích cực từ khách tham quan. Tiếp nối thành công đó, từ ngày 18–20/12/2025, chúng tôi quay lại IBTE 2025 với bộ sưu tập được nâng cấp: chất liệu mềm mại hơn, thiết kế an toàn hơn và câu chuyện thương hiệu rõ ràng hơn. Bazuuyu tiếp tục mang thông điệp thiết kế sáng tạo, chất lượng cao và sự đồng hành ấm áp đến với các gia đình trên khắp thế giới.",
+    },
+    {
+        src: slogan2,
+        label: "Toy Fair New York 2025",
+        desc:
+            "Từ ngày 1–4/3/2025, Bazuuyu lần đầu tiên xuất hiện tại Toy Fair New York 2025. Gian hàng BBQ và rau củ plush tương tác đã gây ấn tượng mạnh và mang về cho chúng tôi một giải thưởng thiết kế. Chính sự ghi nhận này là bước đệm để Bazuuyu tiếp tục mang bộ sưu tập đi giới thiệu tại các sự kiện quốc tế khác trong năm.",
+    },
+    {
+        src: slogan3,
+        label: "Licensing Expo 2025 – Las Vegas",
+        desc:
+            "Tiếp nối thành công tại New York Toy Fair, Bazuuyu tham dự Licensing Expo 2025 ở Mandalay Bay Convention Center, Las Vegas. Tại đây chúng tôi giới thiệu dòng đồ chơi rau củ, thực phẩm và BBQ plush đến các đối tác cấp phép và bán lẻ toàn cầu, tìm kiếm cơ hội hợp tác để đưa thương hiệu Bazuuyu đến với nhiều gia đình hơn nữa.",
+    },
+    {
+        src: slogan4,
+        label: "Brand Licensing Europe 2025 – London",
+        desc:
+            "Tại Brand Licensing Europe (BLE) 2025, diễn ra từ ngày 7–9/10 tại ExCeL London, Bazuuyu mang không gian chơi nấu ăn và BBQ đầy màu sắc đến với khách tham quan châu Âu. Sự kiện BLE tập trung vào xu hướng “kidult”, tính bền vững và trải nghiệm tương tác tại gian hàng. Bazuuyu tận dụng cơ hội này để kết nối với các nhà bán lẻ, nhà phân phối và đối tác bản quyền mới tại thị trường châu Âu.",
+    },
+
 ];
 
 export default function LandingPage() {
@@ -291,9 +312,8 @@ export default function LandingPage() {
                     <div className="absolute inset-0 bg-black/5" />
                     <div className="relative z-10 flex flex-col items-center justify-start h-full text-center px-4 pt-12 sm:pt-12">
                         <p className="text-l sm:text-xl font-light font-['Instrument_Serif'] mb-2 w-[50%] max-w-[600px] mx-auto leading-tight">
-                            Shenzhen Futian Tianhong Shopping Center
+                            IBTE 2025 – International Baby Products & Toys Expo
                         </p>
-                        <img src={flashmod_words} alt="flashmod_words" className="mx-auto w-[60%] max-w-[600px] h-auto" />
                     </div>
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
                         <a href="#" className="text-m sm:text-l text-white underline text-base font-light font-jakarta">
