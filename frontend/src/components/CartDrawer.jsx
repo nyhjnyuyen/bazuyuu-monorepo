@@ -2,12 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axiosInstance';
 import { isJwtValidNow } from '../api/auth';
 import { getLocalCart } from '../lib/localCart';
-
-const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-
+import {useNavigate} from 'react-router-dom';
+const money = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,   // thường VND không cần số lẻ, có thể bỏ nếu muốn
+});
 export default function CartDrawer({ open, onClose }) {
     const authed = isJwtValidNow();
     const [items, setItems] = useState([]);
+    const navigate = useNavigate()
     const [loading, setLoading] = useState(false);
 
     // fetch cart whenever opened or cart changes
@@ -149,7 +153,7 @@ export default function CartDrawer({ open, onClose }) {
                                                 <p className="font-medium">{g.name}</p>
                                                 <p className="text-sm text-gray-500">{money.format(g.unit)}</p>
                                             </div>
-                                            <button onClick={() => removeLine(g)} className="text-sm underline">Remove</button>
+                                            <button onClick={() => removeLine(g)} className="text-sm underline">Xoá</button>
                                         </div>
                                         <div className="mt-2 inline-flex items-center border rounded">
                                             <button onClick={() => updateQty(g, g.qty - 1)} className="px-2 py-1">−</button>
@@ -164,16 +168,20 @@ export default function CartDrawer({ open, onClose }) {
 
                 <div className="p-4 border-t">
                     <div className="flex justify-between mb-3">
-                        <span>Estimated Total</span>
+                        <span>Tổng cộng</span>
                         <span className="font-semibold">{money.format(subtotal)}</span>
                     </div>
-                    <a
-                        href="/cart"
+
+                    <button
+                        type="button"
                         className="block w-full text-center bg-violet-950 text-white py-3 rounded-xl font-semibold hover:bg-violet-900"
-                        onClick={onClose}
+                        onClick={() => {
+                            onClose();
+                            navigate('/cart');
+                        }}
                     >
-                        View Bag & Checkout
-                    </a>
+                        Xem giỏ hàng và thanh toán
+                    </button>
                 </div>
             </aside>
         </>

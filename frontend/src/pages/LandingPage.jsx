@@ -175,7 +175,7 @@ export default function LandingPage() {
                                 tabIndex={0}
                                 onClick={() => {
                                     if (cat.value === 'ALL') {
-                                        navigate('/shop');                       
+                                        navigate('/shop');
                                     } else {
                                         navigate(`/shop?category=${encodeURIComponent(cat.value)}`);
                                     }
@@ -350,9 +350,14 @@ export default function LandingPage() {
                             Upcoming
                         </p>
 
-                        {/* Tiêu đề IBTE – nhỏ lại chút, nằm giữa */}
+                        {/* Tiêu đề IBTE */}
                         <p className="max-w-4xl text-xl sm:text-2xl md:text-3xl font-heading font-semibold leading-snug">
                             IBTE 2025 – International Baby Products & Toys Expo
+                        </p>
+
+                        {/* Dòng ngày + địa điểm */}
+                        <p className="mt-2 text-sm sm:text-base text-white/90 font-heading">
+                            18–20.12.2025 · SECC quận 7, Hồ Chí Minh.
                         </p>
 
                         {/* Nút mở popup */}
@@ -367,6 +372,7 @@ export default function LandingPage() {
                             Click to view
                         </button>
                     </div>
+
 
                     {/* 🔍 IBTE popup – giữ nguyên như bạn đang có */}
                     {flashOpen && (
