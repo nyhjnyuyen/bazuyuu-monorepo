@@ -396,12 +396,12 @@ export default function LandingPage() {
 
                                 <p className="text-violet-900 font-heading leading-relaxed text-left text-base md:text-lg">
                                     Sau khi nhận giải thưởng tại Toy Fair New York 2025, Bazuuyu tiếp tục
-                                    mang bộ sưu tập đồ chơi BBQ & rau củ plush tới Licensing Expo 2025 ở
+                                    mang bộ sưu tập đồ chơi BBQ và rau củ plush tới Licensing Expo 2025 ở
                                     Las Vegas, mở ra thêm nhiều cơ hội hợp tác quốc tế.
                                     <br />
                                     <br />
                                     Trước đó, hành trình với IBTE đã bắt đầu từ IBTE 2024, khi Bazuuyu lần
-                                    đầu giới thiệu dòng sản phẩm dành cho mẹ & bé và nhận được sự ủng hộ
+                                    đầu giới thiệu dòng sản phẩm dành cho mẹ và bé và nhận được sự ủng hộ
                                     nồng nhiệt từ khách tham quan. IBTE 2025 đánh dấu một bước tiến mới:
                                     chúng tôi trưng bày phiên bản nâng cấp với thiết kế an toàn hơn, chất
                                     liệu cao cấp hơn và trải nghiệm chơi giàu tính giáo dục, giúp trẻ khám
