@@ -216,14 +216,14 @@ export default function LandingPage() {
 
                     {/* Swiper for New Arrivals */}
                     <div className="relative z-20 max-w-7xl mx-auto px-4 pb-20">
-                        {loading ? (
-                            <p className="text-center">Loading new arrivals...</p>
-                        ) : newArrivals.length === 0 ? (
-                            <p className="text-center">No new arrivals yet.</p>
-                        ) : (
-                            <Swiper
-                                modules={[Navigation]}
-                                navigation
+                                {loading ? (
+                                    <p className="text-center">Loading new arrivals...</p>
+                                ) : newArrivals.length === 0 ? (
+                                    <p className="text-center">No new arrivals yet.</p>
+                                ) : (
+                                    <Swiper
+                                        modules={[Navigation]}
+                                        navigation
                                 spaceBetween={20}
                                 slidesPerView={1}
                                 breakpoints={{ 640: { slidesPerView: 2 }, 1024: { slidesPerView: 4 } }}
