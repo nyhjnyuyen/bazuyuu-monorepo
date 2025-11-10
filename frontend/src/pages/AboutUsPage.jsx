@@ -21,30 +21,30 @@ export default function AboutUsPage() {
 
                 <div className="relative z-10">
                     <h1 className="text-4xl text-white font-heading font-bold drop-shadow-md">
-                        ABOUT US
+                        VỀ CHÚNG TÔI
                     </h1>
                 </div>
             </section>
 
             {/* 📄 About Content Section with Octopus Background */}
             <section className="relative flex-grow w-full bg-white py-16 px-6 text-center overflow-hidden">
-                {/* 🐙 Octopus Watermark */}
                 <img
                     src={octopus}
                     alt="Octopus Watermark"
                     className="absolute top-1/2 left-1/2 w-[80%] max-w-[700px] opacity-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
                 />
 
-                {/* ✅ Content Layer */}
                 <div className="relative z-10 max-w-5xl mx-auto">
                     <p className="max-w-6xl mx-auto text-violet-950 text-2xl font-normal font-heading leading-relaxed tracking-normal text-center">
                         Thành lập năm 2018, Bazuuyu là thương hiệu theo đuổi các xu hướng
                         đồ chơi thú vị và khác biệt. Những IP chính gồm A Niang Niang Hotpot,
                         Gia Đình Rau Củ, Free/Rich Flower, Youyou Family và Ghost.
-                        <br /><br />
+                        <br />
+                        <br />
                         Công ty tích hợp nghiên cứu – phát triển và sản xuất sản phẩm plush,
-                        vận hành & cấp phép IP, triển lãm chủ đề và pop-up store.
-                        <br /><br />
+                        vận hành &amp; cấp phép IP, triển lãm chủ đề và pop-up store.
+                        <br />
+                        <br />
                         Trong tương lai, Bazuuyu sẽ tiếp tục khám phá và sáng tạo các dòng
                         sản phẩm xoay quanh IP, hướng tới trở thành “siêu thị đồ plush”,
                         lan toả niềm vui và lối sống trẻ trung.
@@ -58,7 +58,7 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            {/* 🌟 Vietnamese Values Section (from your slide) */}
+            {/* 🌟 Vietnamese Values Section */}
             <section className="relative w-full bg-violet-50 py-14 px-6">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-extrabold font-heading text-violet-900 tracking-wide">
@@ -69,29 +69,26 @@ export default function AboutUsPage() {
                     </p>
 
                     <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {/* 1. Innovative & Unique Designs */}
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
                             <div className="text-3xl mb-3">✏️</div>
                             <h3 className="font-heading font-bold text-violet-900">
-                                THIẾT KẾ ĐỘC ĐÁO & SÁNG TẠO
+                                THIẾT KẾ ĐỘC ĐÁO &amp; SÁNG TẠO
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
                                 Sáng tạo vui nhộn: động vật kinh điển và hình khối nhân hoá cho nhiều gu thẩm mỹ.
                             </p>
                         </div>
 
-                        {/* 2. High Quality & Safety */}
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
                             <div className="text-3xl mb-3">⭐</div>
                             <h3 className="font-heading font-bold text-violet-900">
-                                CHẤT LƯỢNG & AN TOÀN
+                                CHẤT LƯỢNG &amp; AN TOÀN
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
                                 Đáp ứng tiêu chuẩn quốc tế; mềm mại, bền bỉ, phù hợp cho mọi độ tuổi.
                             </p>
                         </div>
 
-                        {/* 3. Warm Companionship */}
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
                             <div className="text-3xl mb-3">🤍</div>
                             <h3 className="font-heading font-bold text-violet-900">
@@ -102,7 +99,6 @@ export default function AboutUsPage() {
                             </p>
                         </div>
 
-                        {/* 4. Multicultural Inspiration */}
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
                             <div className="text-3xl mb-3">🌀</div>
                             <h3 className="font-heading font-bold text-violet-900">

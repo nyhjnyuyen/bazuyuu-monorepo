@@ -190,13 +190,13 @@ export default function ShopPage() {
                     <p className="text-center text-violet-925/70">No products found.</p>
                 ) : (
                     <>
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 items-stretch auto-rows-[420px]">
-                                {products.map((p) => (
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 items-stretch auto-rows-[430px]">
+                                {visible.map((p) => (
                                     <div key={p.id} className="h-full min-w-0">
                                         <ProductCard
                                             product={p}
-                                            onAddToCart={() => handleAddToCart(p)}
+                                            onAddToCart={handleAddToCart}
                                             isInWishlist={isInWishlist(p.id)}
                                             onToggleWishlist={() => toggleWishlist(p.id)}
                                         />

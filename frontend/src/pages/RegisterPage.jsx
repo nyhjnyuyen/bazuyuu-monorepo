@@ -37,10 +37,10 @@ export default function RegisterPage() {
             return;
         }
 
-        // ✅ Strip non-digits from phone (allows users to enter (123) 456-7890)
+        //  Strip non-digits from phone (allows users to enter (123) 456-7890)
         const phoneDigits = form.phone.replace(/\D/g, '');
 
-        // ✅ Validate phone has 10-15 digits
+        //  Validate phone has 10-15 digits
         if (phoneDigits.length < 10 || phoneDigits.length > 15) {
             setError('Phone number must be 10-15 digits.');
             return;
@@ -55,8 +55,8 @@ export default function RegisterPage() {
                 firstName: form.firstName.trim(),
                 lastName : form.lastName.trim(),
                 phone    : phoneDigits, // ✅ Send only digits
-                address  : form.address.trim() || '', // ✅ Empty string if blank
-                paymentInfo: '', // ✅ Include required field (optional but expected)
+                address  : form.address.trim() || '',
+                paymentInfo: '',
             });
 
             // Success! Navigate to login
