@@ -44,7 +44,10 @@ export default function ProductCard({
                 className="flex-1 flex flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-2xl"
             >
                 {/* Ảnh: dùng aspect-square để các card đều nhau */}
-                <div className="w-full aspect-square overflow-hidden bg-white rounded-t-2xl">
+                <div
+                    className="relative w-full overflow-hidden bg-white rounded-t-2xl"
+                    style={{ paddingTop: '100%' }}          // chiều cao = 100% chiều rộng -> vuông
+                >
                     <img
                         src={imgSrc}
                         alt={product?.name || 'Product'}
