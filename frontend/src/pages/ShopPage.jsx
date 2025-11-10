@@ -13,12 +13,13 @@ const CATEGORIES = ['ALL', 'HOTPOT', 'BBQ', 'VEGETABLE'];
 export default function ShopPage() {
     const location = useLocation();
     const navigate = useNavigate();
-    // initialize from URL on first render
+
     const initialCategory = (() => {
         const q = new URLSearchParams(location.search).get('category');
         const val = (q || 'ALL').toUpperCase();
         return CATEGORIES.includes(val) ? val : 'ALL';
     })();
+
     const [category, setCategory] = useState(initialCategory);
     const [page, setPage] = useState(0);
     const [products, setProducts] = useState([]);
@@ -27,9 +28,9 @@ export default function ShopPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // Wishlist context
     const { customer } = useContext(CustomerContext);
     const { isInWishlist, toggleWishlist } = useWishlist(customer);
+
     // reflect category → URL
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -44,7 +45,7 @@ export default function ShopPage() {
         }
     }, [category, location.search, navigate]);
 
-    // react to URL → category (Back/Forward or direct link)
+    // react to URL → category
     useEffect(() => {
         const q = new URLSearchParams(location.search).get('category');
         const next = (q || 'ALL').toUpperCase();
@@ -54,6 +55,7 @@ export default function ShopPage() {
             setProducts([]);
         }
     }, [location.search]);
+
     const url = useMemo(() => {
         const params = new URLSearchParams();
         params.set('page', String(page));
@@ -74,7 +76,11 @@ export default function ShopPage() {
                     console.error('Shop fetch failed: HTTP', res.status);
                     if (!ac.signal.aborted) {
                         setError(`Could not load products (HTTP ${res.status}).`);
-                        if (page === 0) { setProducts([]); setTotalElements(0); setTotalPages(0); }
+                        if (page === 0) {
+                            setProducts([]);
+                            setTotalElements(0);
+                            setTotalPages(0);
+                        }
                     }
                     return;
                 }
@@ -84,7 +90,11 @@ export default function ShopPage() {
                     console.error('Shop fetch failed: Expected JSON, got', ct);
                     if (!ac.signal.aborted) {
                         setError('Could not load products (bad content type).');
-                        if (page === 0) { setProducts([]); setTotalElements(0); setTotalPages(0); }
+                        if (page === 0) {
+                            setProducts([]);
+                            setTotalElements(0);
+                            setTotalPages(0);
+                        }
                     }
                     return;
                 }
@@ -101,7 +111,9 @@ export default function ShopPage() {
 
                 setTotalElements(elements);
                 setTotalPages(pages);
-                setProducts(prev => (page === 0 ? newContent : [...prev, ...newContent]));
+                setProducts(prev =>
+                    page === 0 ? newContent : [...prev, ...newContent]
+                );
                 setError('');
             } catch (e) {
                 console.error('Shop fetch failed:', e);
@@ -119,8 +131,7 @@ export default function ShopPage() {
         })();
 
         return () => ac.abort();
-    }, [url]); // <- only url; it already encodes category + page
-
+    }, [url]);
 
     const onSelectCategory = (cat) => {
         if (cat === category) return;
@@ -150,7 +161,9 @@ export default function ShopPage() {
             <main className="flex-grow">
                 {/* Header */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-                    <h1 className="text-2xl md:text-3xl font-bold text-violet-925 mb-6">Shop</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-violet-925 mb-6">
+                        Shop
+                    </h1>
 
                     {/* Category bar */}
                     <div className="w-full bg-violet-950/10 rounded-xl px-4 sm:px-6 py-4">
@@ -161,7 +174,9 @@ export default function ShopPage() {
 
                             <div className="flex flex-wrap gap-3">
                                 {CATEGORIES.map(cat => {
-                                    const active = (cat === 'ALL' && category === 'ALL') || category === cat;
+                                    const active =
+                                        (cat === 'ALL' && category === 'ALL') ||
+                                        category === cat;
                                     return (
                                         <button
                                             key={cat}
@@ -187,7 +202,9 @@ export default function ShopPage() {
                 ) : error && products.length === 0 ? (
                     <p className="text-center text-red-600">{error}</p>
                 ) : products.length === 0 ? (
-                    <p className="text-center text-violet-925/70">No products found.</p>
+                    <p className="text-center text-violet-925/70">
+                        No products found.
+                    </p>
                 ) : (
                     <>
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
@@ -198,7 +215,9 @@ export default function ShopPage() {
                                             product={p}
                                             onAddToCart={handleAddToCart}
                                             isInWishlist={isInWishlist(p.id)}
-                                            onToggleWishlist={() => toggleWishlist(p.id)}
+                                            onToggleWishlist={() =>
+                                                toggleWishlist(p.id)
+                                            }
                                         />
                                     </div>
                                 ))}
