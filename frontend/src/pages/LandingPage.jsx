@@ -15,14 +15,16 @@ import slogan4 from '../assets/slogan4.jpg';
 import banner1 from '../assets/banner-01.jpg';
 import banner2 from '../assets/banner-02.jpg';
 import banner3 from '../assets/banner-03.jpg';
-import category1 from '../assets/category1.jpg';
-import category2 from '../assets/category2.jpg';
-import category3 from '../assets/category3.png';
+import vegecat from '../assets/category1.jpg';
 import octopus from '../assets/octopus.svg';
 import shoppingCart from '../assets/shopping-cart.svg';
 import { useNavigate } from 'react-router-dom';
 import { addToCart } from '../api/cartApi';
 import SloganGrid from "../components/SloganGrid";
+import bbqcat from '../assets/BBQcat.JPG';
+import hotpotcat from '../assets/Hotpotcat.jpg';
+import catAll from '../assets/catall.png';
+
 
 
 import Footer from '../components/Footer';
@@ -31,9 +33,10 @@ import useWishlist from '../hook/useWishlist';
 import { getLandingNewArrivals } from '../api/productApi';
 
 const categories = [
-    { title: 'VEGETABLE', value: 'VEGETABLE', img: category1 },
-    { title: 'HOT POT', value: 'HOTPOT', img: category2 },
-    { title: 'BBQ', value: 'BBQ', img: category3 },
+    { title: 'VEGETABLE', value: 'VEGETABLE', img: vegecat },
+    { title: 'HOT POT', value: 'HOTPOT', img: hotpotcat },
+    { title: 'BBQ', value: 'BBQ', img: bbqcat},
+    { title: 'ALL', value: 'ALL', img: catAll },
 ];
 
 const sloganItems = [
@@ -170,13 +173,24 @@ export default function LandingPage() {
                                 className="relative group flex flex-col items-center cursor-pointer"
                                 role="button"
                                 tabIndex={0}
-                                onClick={() => navigate(`/shop?category=${encodeURIComponent(cat.value)}`)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
+                                onClick={() => {
+                                    if (cat.value === 'ALL') {
+                                        navigate('/shop');                       // 👈 All = không query
+                                    } else {
                                         navigate(`/shop?category=${encodeURIComponent(cat.value)}`);
                                     }
                                 }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        if (cat.value === 'ALL') {
+                                            navigate('/shop');
+                                        } else {
+                                            navigate(`/shop?category=${encodeURIComponent(cat.value)}`);
+                                        }
+                                    }
+                                }}
+
                             >
                                 <div className="w-full aspect-[1/1] rounded-[20px] overflow-hidden">
                                     <img src={cat.img} alt={cat.title} className="w-full h-full object-cover" />

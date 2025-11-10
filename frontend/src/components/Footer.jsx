@@ -49,30 +49,30 @@ export default function Footer() {
                     <p className="max-w-3xl text-base md:text-lg font-heading mb-6">
                         Hãy đăng ký bản tin email của chúng tôi để nhận tin tức mới nhất, bao gồm các đợt ra mắt nhân vật mới, sự kiện và nhiều cập nhật thú vị khác.
                     </p>
-                    <div className="w-full max-w-md sm:max-w-2xl flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0">
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Nhập email vào đây"
-                            className="h-12 flex-1 min-w-0
-                   rounded-full sm:rounded-l-[1.5rem] sm:rounded-r-none
-                   px-4 text-violet-925 placeholder-violet-925/40
-                   bg-white border border-violet-200 sm:border-r-0"
-                            disabled={busy}
-                        />
-                        <button
-                            onClick={handleSubscribe}
-                            disabled={busy}
-                            className="h-12 w-full sm:w-[130px]
-                   bg-violet-925 text-white font-brand font-bold lg:text-xl text-base
-                   rounded-full sm:rounded-l-none sm:rounded-r-[1.5rem]
-                   disabled:opacity-60"
-                        >
-                            {busy ? 'Joining…' : 'Join now'}
-                        </button>
+                    <div className="w-full flex justify-center">
+                        <div className="flex items-stretch w-full max-w-xs sm:max-w-md md:max-w-lg">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your email address here"
+                                className="h-12 flex-1 min-w-0
+                       rounded-l-[1.5rem]
+                       px-4 text-violet-925 placeholder-violet-925/40
+                       bg-white border border-violet-200 border-r-0"
+                                disabled={busy}
+                            />
+                            <button
+                                onClick={handleSubscribe}
+                                disabled={busy}
+                                className="h-12 px-4 md:px-6
+                       bg-violet-925 text-white font-brand font-bold lg:text-xl text-base
+                       rounded-r-[1.5rem] disabled:opacity-60 whitespace-nowrap"
+                            >
+                                {busy ? 'Joining…' : 'Join now'}
+                            </button>
+                        </div>
                     </div>
-                    {msg && <p className="mt-3 text-sm">{msg}</p>}
                 </div>
             </section>
 
