@@ -343,21 +343,25 @@ export default function LandingPage() {
                     <div className="absolute inset-0 bg-black/5" />
 
                     {/* Tiêu đề trên ảnh */}
-                    <div className="relative z-10 flex flex-col items-center justify-start h-full text-center px-4 pt-12 sm:pt-12">
-                        <p className="text-xl font-light font-['Instrument_Serif'] mb-2 w-[50%] max-w-[600px] mx-auto leading-tight">
+                    <div className="max-w-4xl mx-auto px-6 text-center">
+                        {/* dòng "UPCOMING" */}
+                        <p className="text-xs sm:text-sm tracking-[0.3em] uppercase text-violet-200 mb-3">
+                            Upcoming
+                        </p>
+
+                        {/* tiêu đề IBTE 2025 – to hơn, nằm giữa */}
+                        <p className="text-2xl sm:text-3xl md:text-4xl font-heading font-semibold mb-6 leading-snug">
                             IBTE 2025 – International Baby Products & Toys Expo
                         </p>
-                    </div>
 
-                    {/* Nút mở popup */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
+                        {/* nút mở popup */}
                         <button
                             type="button"
                             onClick={(e) => {
                                 e.preventDefault();
                                 setFlashOpen(true);
                             }}
-                            className="text-m sm:text-l text-white underline text-base font-light font-jakarta"
+                            className="inline-block text-base sm:text-lg underline font-light font-jakarta"
                         >
                             Click to view
                         </button>
@@ -376,17 +380,25 @@ export default function LandingPage() {
                                 className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden"
                                 onClick={(e) => e.stopPropagation()}
                             >
+                                {/* Ảnh card IBTE (nhớ đã import ibteCard ở trên file) */}
+                                <div className="bg-black flex items-center justify-center">
+                                    <img
+                                        src={ibteCard}
+                                        alt="IBTE 2025 – International Baby Products & Toys Expo"
+                                        className="w-full h-[60vh] md:h-[80vh] object-contain"
+                                    />
+                                </div>
 
                                 {/* Nội dung mô tả */}
                                 <div className="p-6 md:p-8 flex flex-col">
                                     <h3
                                         id="ibte-dialog-title"
-                                        className="text-2xl font-heading font-semibold text-violet-950"
+                                        className="text-2xl md:text-3xl font-heading font-semibold text-violet-950 mb-4 text-left"
                                     >
                                         IBTE 2025 – International Baby Products & Toys Expo
                                     </h3>
 
-                                    <p className="mt-3 text-violet-900 font-heading leading-relaxed text-left">
+                                    <p className="text-violet-900 font-heading leading-relaxed text-left text-base md:text-lg">
                                         Sau khi nhận giải thưởng tại Toy Fair New York 2025, Bazuuyu tiếp tục
                                         mang bộ sưu tập đồ chơi BBQ & rau củ plush tới Licensing Expo 2025 ở
                                         Las Vegas, mở ra thêm nhiều cơ hội hợp tác quốc tế.
