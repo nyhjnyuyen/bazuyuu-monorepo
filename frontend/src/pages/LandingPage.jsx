@@ -7,6 +7,7 @@ import 'swiper/css/navigation';
 
 import heart from '../assets/heart.png';
 import flashmod from '../assets/activity.jpg';
+import activity from '../assets/activity.jpg';
 import wave from '../assets/wave.png';
 import slogan1 from '../assets/slogan1.jpg';
 import slogan2 from '../assets/slogan2.jpg';
@@ -365,7 +366,7 @@ export default function LandingPage() {
                                 {/* Ảnh card IBTE */}
                                 <div className="bg-black flex items-center justify-center">
                                     <img
-                                        src={ibteCard}
+                                        src={activity}
                                         alt="IBTE 2025 – International Baby Products & Toys Expo"
                                         className="w-full h-[60vh] md:h-[80vh] object-contain"
                                     />

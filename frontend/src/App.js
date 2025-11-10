@@ -41,7 +41,7 @@ function AppShell() {
     const inAdmin = pathname.startsWith('/admin');
 
     return (
-        <div className="App relative font-serif">
+        <div className="App relative font-serif overflow-x-hidden">
             {!inAdmin && (
                 <div className="relative z-10">
                     <NavBar />
