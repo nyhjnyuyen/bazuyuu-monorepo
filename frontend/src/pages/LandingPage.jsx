@@ -24,7 +24,7 @@ import SloganGrid from "../components/SloganGrid";
 import bbqcat from '../assets/BBQcat.JPG';
 import hotpotcat from '../assets/Hotpotcat.jpg';
 import catAll from '../assets/catall.png';
-import ProductCard from '../components/ProductCard';
+
 
 
 import Footer from '../components/Footer';
@@ -215,53 +215,124 @@ export default function LandingPage() {
                     />
 
                     {/* Swiper for New Arrivals */}
-                    {/* Swiper for New Arrivals */}
                     <div className="relative z-20 max-w-7xl mx-auto px-4 pb-20">
                         {loading ? (
                             <p className="text-center">Loading new arrivals...</p>
                         ) : newArrivals.length === 0 ? (
                             <p className="text-center">No new arrivals yet.</p>
                         ) : (
-                            <>
-                                <Swiper
-                                    modules={[Navigation]}
-                                    navigation
-                                    spaceBetween={20}
-                                    slidesPerView={1}
-                                    breakpoints={{
-                                        640: { slidesPerView: 2 },
-                                        1024: { slidesPerView: 4 },
-                                    }}
-                                    className="pb-4"
-                                >
-                                    {newArrivals.map((item) => (
+                            <Swiper
+                                modules={[Navigation]}
+                                navigation
+                                spaceBetween={20}
+                                slidesPerView={1}
+                                breakpoints={{ 640: { slidesPerView: 2 }, 1024: { slidesPerView: 4 } }}
+                            >
+                                {newArrivals.map((item) => {
+                                    const wish = isInWishlist(item.id);
+                                    const inCart = inCartIds.has(item.id);
+
+                                    return (
                                         <SwiperSlide key={item.id} className="!h-auto flex">
+                                            {/* wrapper để card luôn đầy chiều cao slide */}
                                             <div className="w-full h-full">
-                                                <ProductCard
-                                                    product={item}
-                                                    onAddToCart={() => handleAddToCart(item)}
-                                                    isInWishlist={isInWishlist(item.id)}
-                                                    onToggleWishlist={() => toggleWishlist(item.id)}
-                                                />
+                                                <div className="border border-violet-950 rounded-[20px] bg-[#F6F2FF] flex flex-col items-center overflow-hidden h-full">
+                                                    {/* hình */}
+                                                    <div className="w-full aspect-square bg-white flex items-center justify-center rounded-[20px] overflow-hidden">
+                                                        <img
+                                                            src={item.imageUrl || item.image}
+                                                            alt={item.name}
+                                                            className="object-contain h-4/5 w-4/5"
+                                                        />
+                                                    </div>
+
+                                                    {/* text + actions */}
+                                                    <div className="w-full px-4 py-4 flex flex-col flex-1">
+                                                        {/* tên sản phẩm: cố định 2 dòng, chiều cao bằng nhau */}
+                                                        <p
+                                                            className="text-left text-xl font-heading text-violet-950 overflow-hidden"
+                                                            style={{
+                                                                display: '-webkit-box',
+                                                                WebkitLineClamp: 2,
+                                                                WebkitBoxOrient: 'vertical',
+                                                                lineHeight: '1.6rem',
+                                                                height: '3.2rem', // ~ 2 dòng
+                                                            }}
+                                                        >
+                                                            {item.name}
+                                                        </p>
+
+                                                        {/* hàng giá + nút dính đáy card */}
+                                                        <div className="flex justify-between items-center mt-3 mt-auto">
+                                                            <p className="justify-start text-violet-950 text-xl font-bold font-brand">
+                                                                {new Intl.NumberFormat('vi-VN', {
+                                                                    style: 'currency',
+                                                                    currency: 'VND',
+                                                                    maximumFractionDigits: 0,
+                                                                }).format(Number(item.price ?? 0))}
+                                                            </p>
+
+                                                            {/* ACTIONS */}
+                                                            <div className="flex gap-3">
+                                                                {/* Heart button */}
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label={wish ? 'Remove from wishlist' : 'Add to wishlist'}
+                                                                    aria-pressed={wish}
+                                                                    className={`w-9 h-9 rounded-full border transition flex items-center justify-center
+                      ${
+                                                                        wish
+                                                                            ? 'bg-violet-950 border-violet-950 hover:bg-violet-950'
+                                                                            : 'bg-white border-violet-200 hover:bg-violet-100'
+                                                                    }`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        e.preventDefault();
+                                                                        toggleWishlist(item.id);
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={heart}
+                                                                        alt=""
+                                                                        className={`w-5 h-5 ${wish ? 'filter brightness-0 invert' : ''}`}
+                                                                    />
+                                                                </button>
+
+                                                                {/* Add to cart button */}
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label={inCart ? 'Added to cart' : 'Add to cart'}
+                                                                    disabled={addingId === item.id}
+                                                                    className={`w-9 h-9 rounded-full border transition flex items-center justify-center
+                      ${
+                                                                        inCart
+                                                                            ? 'bg-violet-950 border-violet-950 hover:bg-violet-950'
+                                                                            : 'bg-white border-violet-200 hover:bg-violet-100'
+                                                                    }
+                      ${addingId === item.id ? 'opacity-50 pointer-events-none' : ''}`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        e.preventDefault();
+                                                                        handleAddToCart(item);
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={shoppingCart}
+                                                                        alt=""
+                                                                        className={`w-5 h-5 ${inCart ? 'filter brightness-0 invert' : ''}`}
+                                                                    />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </SwiperSlide>
-                                    ))}
-                                </Swiper>
-
-                                {/* (Tuỳ chọn) nút xem tất cả */}
-                                <div className="mt-6 flex justify-center">
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate('/new')}
-                                        className="px-6 py-2 border border-violet-950 text-violet-950 text-lg font-jakarta rounded-full hover:bg-violet-100 transition"
-                                    >
-                                        View all New Arrivals
-                                    </button>
-                                </div>
-                            </>
+                                    );
+                                })}
+                            </Swiper>
                         )}
                     </div>
-
                 </section>
 
                 {/* Slogan Section */}

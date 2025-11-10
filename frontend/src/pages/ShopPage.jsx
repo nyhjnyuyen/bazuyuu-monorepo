@@ -191,7 +191,7 @@ export default function ShopPage() {
                 ) : (
                     <>
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 items-stretch auto-rows-[430px]">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 items-stretch auto-rows-[360px]">
                                 {visible.map((p) => (
                                     <div key={p.id} className="h-full min-w-0">
                                         <ProductCard
