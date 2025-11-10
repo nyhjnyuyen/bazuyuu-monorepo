@@ -166,7 +166,7 @@ export default function LandingPage() {
                         BAZUUYU'S  FAMILIES
                     </h2>
 
-                    <div className="relative z-20 grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10 max-w-7xl mx-auto px-4">
+                    <div className="relative z-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto px-4">
                         {categories.map((cat, index) => (
                             <div
                                 key={index}
@@ -175,7 +175,7 @@ export default function LandingPage() {
                                 tabIndex={0}
                                 onClick={() => {
                                     if (cat.value === 'ALL') {
-                                        navigate('/shop');                       // 👈 All = không query
+                                        navigate('/shop');                       
                                     } else {
                                         navigate(`/shop?category=${encodeURIComponent(cat.value)}`);
                                     }
@@ -335,40 +335,40 @@ export default function LandingPage() {
                     <SloganGrid items={sloganItems} />
                 </section>
 
-                {/* Flashmod */}
+                {/* Flashmod / Upcoming IBTE */}
                 <section
                     className="relative h-[360px] bg-cover bg-center text-white"
                     style={{ backgroundImage: `url(${flashmod})` }}
                 >
-                    <div className="absolute inset-0 bg-black/5" />
+                    {/* Lớp tối nền phía sau chữ */}
+                    <div className="absolute inset-0 bg-black/40" />
 
-                    {/* Tiêu đề trên ảnh */}
-                    <div className="max-w-4xl mx-auto px-6 text-center">
-                        {/* dòng "UPCOMING" */}
-                        <p className="text-xs sm:text-sm tracking-[0.3em] uppercase text-violet-200 mb-3">
+                    {/* Khối chữ ở GIỮA chiều cao */}
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
+                        {/* U P C O M I N G – màu trắng */}
+                        <p className="text-xs sm:text-sm tracking-[0.3em] uppercase text-white mb-3">
                             Upcoming
                         </p>
 
-                        {/* tiêu đề IBTE 2025 – to hơn, nằm giữa */}
-                        <p className="text-2xl sm:text-3xl md:text-4xl font-heading font-semibold mb-6 leading-snug">
+                        {/* Tiêu đề IBTE – nhỏ lại chút, nằm giữa */}
+                        <p className="max-w-4xl text-xl sm:text-2xl md:text-3xl font-heading font-semibold leading-snug">
                             IBTE 2025 – International Baby Products & Toys Expo
                         </p>
 
-                        {/* nút mở popup */}
+                        {/* Nút mở popup */}
                         <button
                             type="button"
                             onClick={(e) => {
                                 e.preventDefault();
                                 setFlashOpen(true);
                             }}
-                            className="inline-block text-base sm:text-lg underline font-light font-jakarta"
+                            className="mt-4 inline-block text-base sm:text-lg underline font-light font-jakarta"
                         >
                             Click to view
                         </button>
                     </div>
 
-                    {/* 🔍 IBTE popup */}
-                    {/* 🔍 IBTE popup – only text, no image */}
+                    {/* 🔍 IBTE popup – giữ nguyên như bạn đang có */}
                     {flashOpen && (
                         <div
                             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
