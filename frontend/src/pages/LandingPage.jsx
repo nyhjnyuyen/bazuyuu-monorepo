@@ -368,6 +368,7 @@ export default function LandingPage() {
                     </div>
 
                     {/* 🔍 IBTE popup */}
+                    {/* 🔍 IBTE popup – only text, no image */}
                     {flashOpen && (
                         <div
                             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
@@ -377,49 +378,37 @@ export default function LandingPage() {
                             aria-labelledby="ibte-dialog-title"
                         >
                             <div
-                                className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden"
+                                className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-6 md:p-10"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                {/* Ảnh card IBTE (nhớ đã import ibteCard ở trên file) */}
-                                <div className="bg-black flex items-center justify-center">
-                                    <img
-                                        src={activity}
-                                        alt="IBTE 2025 – International Baby Products & Toys Expo"
-                                        className="w-full h-[60vh] md:h-[80vh] object-contain"
-                                    />
-                                </div>
+                                <h3
+                                    id="ibte-dialog-title"
+                                    className="text-2xl md:text-3xl font-heading font-semibold text-violet-950 mb-4 text-center"
+                                >
+                                    IBTE 2025 – International Baby Products & Toys Expo
+                                </h3>
 
-                                {/* Nội dung mô tả */}
-                                <div className="p-6 md:p-8 flex flex-col">
-                                    <h3
-                                        id="ibte-dialog-title"
-                                        className="text-2xl md:text-3xl font-heading font-semibold text-violet-950 mb-4 text-left"
+                                <p className="text-violet-900 font-heading leading-relaxed text-left text-base md:text-lg">
+                                    Sau khi nhận giải thưởng tại Toy Fair New York 2025, Bazuuyu tiếp tục
+                                    mang bộ sưu tập đồ chơi BBQ & rau củ plush tới Licensing Expo 2025 ở
+                                    Las Vegas, mở ra thêm nhiều cơ hội hợp tác quốc tế.
+                                    <br />
+                                    <br />
+                                    Trước đó, hành trình với IBTE đã bắt đầu từ IBTE 2024, khi Bazuuyu lần
+                                    đầu giới thiệu dòng sản phẩm dành cho mẹ & bé và nhận được sự ủng hộ
+                                    nồng nhiệt từ khách tham quan. IBTE 2025 đánh dấu một bước tiến mới:
+                                    chúng tôi trưng bày phiên bản nâng cấp với thiết kế an toàn hơn, chất
+                                    liệu cao cấp hơn và trải nghiệm chơi giàu tính giáo dục, giúp trẻ khám
+                                    phá thế giới qua những món ăn quen thuộc mỗi ngày.
+                                </p>
+
+                                <div className="mt-8 flex justify-center">
+                                    <button
+                                        className="px-6 py-2 rounded-xl bg-violet-900 text-white hover:bg-violet-800 font-heading"
+                                        onClick={() => setFlashOpen(false)}
                                     >
-                                        IBTE 2025 – International Baby Products & Toys Expo
-                                    </h3>
-
-                                    <p className="text-violet-900 font-heading leading-relaxed text-left text-base md:text-lg">
-                                        Sau khi nhận giải thưởng tại Toy Fair New York 2025, Bazuuyu tiếp tục
-                                        mang bộ sưu tập đồ chơi BBQ & rau củ plush tới Licensing Expo 2025 ở
-                                        Las Vegas, mở ra thêm nhiều cơ hội hợp tác quốc tế.
-                                        <br />
-                                        <br />
-                                        Trước đó, hành trình với IBTE đã bắt đầu từ IBTE 2024, khi Bazuuyu lần
-                                        đầu giới thiệu dòng sản phẩm dành cho mẹ & bé và nhận được sự ủng hộ
-                                        nồng nhiệt từ khách tham quan. IBTE 2025 đánh dấu một bước tiến mới:
-                                        chúng tôi trưng bày phiên bản nâng cấp với thiết kế an toàn hơn, chất
-                                        liệu cao cấp hơn và trải nghiệm chơi giàu tính giáo dục, giúp trẻ khám
-                                        phá thế giới qua những món ăn quen thuộc mỗi ngày.
-                                    </p>
-
-                                    <div className="mt-auto pt-6 flex justify-end">
-                                        <button
-                                            className="px-4 py-2 rounded-xl bg-violet-900 text-white hover:bg-violet-800 font-heading"
-                                            onClick={() => setFlashOpen(false)}
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
+                                        Close
+                                    </button>
                                 </div>
                             </div>
                         </div>
