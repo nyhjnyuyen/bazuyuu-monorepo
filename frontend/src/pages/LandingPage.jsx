@@ -383,7 +383,7 @@ export default function LandingPage() {
                                 {/* Ảnh card IBTE (nhớ đã import ibteCard ở trên file) */}
                                 <div className="bg-black flex items-center justify-center">
                                     <img
-                                        src={ibteCard}
+                                        src={activity}
                                         alt="IBTE 2025 – International Baby Products & Toys Expo"
                                         className="w-full h-[60vh] md:h-[80vh] object-contain"
                                     />
