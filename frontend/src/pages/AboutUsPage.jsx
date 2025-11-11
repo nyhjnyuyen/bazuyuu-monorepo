@@ -38,24 +38,18 @@ export default function AboutUsPage() {
                     className="absolute top-1/2 left-1/2 w-[80%] max-w-[700px] opacity-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
                 />
 
-                <div className="relative z-10 max-w-5xl mx-auto">
-                    <p className="max-w-6xl mx-auto text-violet-950 text-2xl font-normal font-heading leading-relaxed tracking-normal text-center">
-                        Thành lập năm 2018, Bazuuyu là thương hiệu theo đuổi các xu hướng
-                        đồ chơi thú vị và khác biệt. Những IP chính gồm A Niang Niang Hotpot,
-                        Gia Đình Rau Củ, Free/Rich Flower, Youyou Family và Ghost.
-                        <br />
-                        <br />
-                        Công ty tích hợp nghiên cứu – phát triển và sản xuất sản phẩm plush,
-                        vận hành &amp; cấp phép IP, triển lãm chủ đề và pop-up store.
-                        <br />
-                        <br />
-                        Trong tương lai, Bazuuyu sẽ tiếp tục khám phá và sáng tạo các dòng
-                        sản phẩm xoay quanh IP, hướng tới trở thành “siêu thị đồ plush”,
-                        lan toả niềm vui và lối sống trẻ trung.
+                <div className="max-w-4xl mx-auto px-6 py-8 bg-white/80 border border-violet-200 rounded-3xl shadow-sm">
+                    <p className="text-violet-950 text-xl md:text-2xl font-normal font-heading leading-relaxed tracking-normal text-justify">
+                        Thành lập năm 2018, Bazuuyu là thương hiệu đồ chơi plush theo đuổi những xu hướng độc đáo và thú vị trên thị trường.
+                        <br /><br />
+                        Các IP chủ lực của Bazuuyu bao gồm A Niang Hotpot, Gia đình Rau Củ, Casual Flowers, Youyou Family và Ghost, với phong cách thiết kế vui nhộn, hiện đại và giàu cá tính.
+                        <br /><br />
+                        Bazuuyu không chỉ phát triển và sản xuất các dòng thú bông mà còn vận hành hệ sinh thái IP trọn vẹn: từ phát triển nội dung, cấp phép thương mại cho đến triển lãm chủ đề và các cửa hàng pop-up trải nghiệm.
+                        <br /><br />
+                        Trong tương lai, Bazuuyu sẽ tiếp tục mở rộng các sản phẩm xoay quanh IP, hướng tới trở thành thế giới thú bông nơi hội tụ những thiết kế sáng tạo, lan tỏa niềm vui và phản chiếu phong cách sống năng động của thế hệ trẻ.
                     </p>
-
                     <div className="mt-12 border-t border-violet-200 pt-8">
-                        <p className="text-xl text-violet-900 font-semibold font-heading">
+                        <p className="text-2xl text-violet-900 font-semibold font-heading">
                             “Chúng tôi tin vào niềm vui, sự sáng tạo và những câu chuyện mềm mại.”
                         </p>
                     </div>
