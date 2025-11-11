@@ -123,7 +123,9 @@ export default function ContactPage() {
                                 Gửi tin nhắn nhanh
                             </h2>
                             <p className=" md:text-base text-violet-900/80 font-heading text-l mb-4">
-                                Nhấn nút bên dưới để mở ứng dụng email trên thiết bị của bạn. Địa chỉ
+                                Nhấn nút bên dưới để mở ứng dụng email trên thiết bị của bạn.
+                                <br/>
+                                Địa chỉ
                                 nhận sẽ được điền sẵn, bạn chỉ cần viết nội dung mong muốn.
                             </p>
                             <a
