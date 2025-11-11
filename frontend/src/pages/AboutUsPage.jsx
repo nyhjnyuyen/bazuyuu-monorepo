@@ -103,7 +103,7 @@ export default function AboutUsPage() {
                                 SỰ ĐỒNG HÀNH
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Đồ chơi nhồi bông êm ái – bạn đồng hành cảm xúc cho cả trẻ em và người lớn.
+                                Đồ chơi nhồi bông êm ái – bạn đồng hành cảm xúc cho trẻ em và người lớn.
                             </p>
                         </div>
 
@@ -117,7 +117,7 @@ export default function AboutUsPage() {
                                 ĐA VĂN HOÁ
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Thiết kế mang sức hút toàn cầu, lý tưởng làm quà tặng kết nối cảm xúc xuyên văn hoá.
+                                Thiết kế mang sức hút toàn cầu, lý tưởng làm quà tặng kết nối cảm xúc xuyên ranh giới văn hoá.
                             </p>
                         </div>
                     </div>

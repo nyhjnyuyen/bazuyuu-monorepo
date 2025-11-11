@@ -59,12 +59,12 @@ export default function ContactPage() {
                         <h1 className="text-violet-950 text-3xl md:text-4xl font-bold font-brand tracking-wide mb-4 uppercase">
                             CẦN HỖ TRỢ? LIÊN HỆ VỚI BAZUUYU!
                         </h1>
-                        <p className="text-violet-925 text-l leading-relaxed mb-3">
+                        <p className="text-violet-925 text-xl leading-relaxed mb-3">
                             Bazuuyu chuyên thiết kế và sản xuất các dòng đồ chơi plush lấy cảm hứng
                             từ ẩm thực và đời sống hằng ngày – với nhiều kích thước, chất liệu và
                             phong cách khác nhau.
                         </p>
-                        <p className="text-violet-925 text-l leading-relaxed">
+                        <p className="text-violet-925 text-xl leading-relaxed">
                             Nếu bạn đang tìm đối tác cho dự án cấp phép, đồng thương hiệu, mở kênh
                             bán lẻ mới hoặc chỉ đơn giản là có câu hỏi về sản phẩm, đừng ngần ngại
                             liên hệ với chúng tôi. Đội ngũ Bazuuyu luôn sẵn sàng đồng hành cùng bạn.
@@ -75,10 +75,10 @@ export default function ContactPage() {
                     <div className="space-y-10">
                         {/* Cards */}
                         <div>
-                            <h2 className="text-violet-950 text-xl font-semibold mb-2">
+                            <h2 className="text-violet-950 text-2xl font-semibold mb-2">
                                 Thông tin liên hệ trực tiếp
                             </h2>
-                            <p className="text-violet-925/80 mb-5">
+                            <p className="text-violet-925/80  text-xl mb-5">
                                 Chọn kênh phù hợp với nhu cầu của bạn – từ thương mại điện tử, hợp tác
                                 kinh doanh cho tới chăm sóc khách hàng.
                             </p>
@@ -89,9 +89,9 @@ export default function ContactPage() {
                                         key={c.value}
                                         className="rounded-2xl border border-violet-200/70 bg-white/60 backdrop-blur p-5 shadow-sm hover:shadow transition"
                                     >
-                                        <div className="text-violet-950 font-semibold">{c.title}</div>
+                                        <div className="text-violet-950 text-xl font-heading font-semibold">{c.title}</div>
                                         {c.note && (
-                                            <div className="text-sm text-violet-900/60 mt-0.5">{c.note}</div>
+                                            <div className=" text-violet-900/60 text-xl mt-0.5">{c.note}</div>
                                         )}
 
                                         <div className="mt-3 flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function ContactPage() {
                                             </a>
                                             <button
                                                 onClick={() => copy(c.value)}
-                                                className="px-2.5 py-1.5 text-sm rounded-full border border-violet-200 hover:border-violet-400 text-violet-900"
+                                                className="px-2.5 py-1.5 text-l rounded-full border border-violet-200 hover:border-violet-400 text-violet-900"
                                                 aria-label={`Copy ${c.type}`}
                                             >
                                                 Sao chép
@@ -119,10 +119,10 @@ export default function ContactPage() {
 
                         {/* Quick message (mailto) */}
                         <div className="rounded-2xl border border-violet-200/70 p-5 bg-white/60">
-                            <h2 className="text-violet-950 font-semibold font-heading text-lg mb-3">
+                            <h2 className="text-violet-950 font-semibold font-heading text-2xl mb-3">
                                 Gửi tin nhắn nhanh
                             </h2>
-                            <p className="text-sm md:text-base text-violet-900/80 font-brand mb-4">
+                            <p className=" md:text-base text-violet-900/80 font-brand text-l mb-4">
                                 Nhấn nút bên dưới để mở ứng dụng email trên thiết bị của bạn. Địa chỉ
                                 nhận sẽ được điền sẵn, bạn chỉ cần viết nội dung mong muốn.
                             </p>
@@ -134,9 +134,6 @@ export default function ContactPage() {
                             >
                                 Gửi email cho bộ phận kinh doanh
                             </a>
-                            <p className="text-xs md:text-sm text-violet-900 mt-3">
-                                Thời gian phản hồi dự kiến: 1–2 ngày làm việc (Thứ Hai – Thứ Sáu).
-                            </p>
                         </div>
                     </div>
                 </div>

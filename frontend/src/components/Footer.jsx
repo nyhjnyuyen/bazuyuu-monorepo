@@ -55,7 +55,7 @@ export default function Footer() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Enter your email address here"
+                                placeholder="Nhập email vào đây"
                                 className="h-12 flex-1 min-w-0
                        rounded-l-[1.5rem]
                        px-4 text-violet-925 placeholder-violet-925/40
@@ -69,7 +69,7 @@ export default function Footer() {
                        bg-violet-925 text-white font-brand font-bold lg:text-xl text-base
                        rounded-r-[1.5rem] disabled:opacity-60 whitespace-nowrap"
                             >
-                                {busy ? 'Joining…' : 'Join now'}
+                                {busy ? 'Đang tham gia…' : 'Đăng kí'}
                             </button>
                         </div>
                     </div>
