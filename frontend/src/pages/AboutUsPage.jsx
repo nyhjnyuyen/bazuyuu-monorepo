@@ -94,7 +94,7 @@ export default function AboutUsPage() {
                                 className="w-8 h-8 object-containmb-3"
                             />
                             <h3 className="font-heading font-bold text-violet-900">
-                                CHẤT LƯỢNG và AN TOÀN
+                                CHẤT LƯỢNG AN TOÀN
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
                                 Đáp ứng các tiêu chuẩn quốc tế, mang đến đồ chơi mềm mại, bền bỉ, an toàn cho mọi lứa tuổi.
@@ -108,7 +108,7 @@ export default function AboutUsPage() {
                                 className="w-8 h-8 object-contain mb-3"
                             />
                             <h3 className="font-heading font-bold text-violet-900">
-                                SỰ ĐỒNG HÀNH ẤM ÁP
+                                SỰ ĐỒNG HÀNH
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
                                 Đồ chơi nhồi bông êm ái – bạn đồng hành cảm xúc cho cả trẻ em và người lớn.
@@ -122,7 +122,7 @@ export default function AboutUsPage() {
                                 className="w-8 h-8 object-contain mb-3"
                             />
                             <h3 className="font-heading font-bold text-violet-900">
-                                CẢM HỨNG ĐA VĂN HOÁ
+                                ĐA VĂN HOÁ
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
                                 Thiết kế mang sức hút toàn cầu, lý tưởng làm quà tặng kết nối cảm xúc xuyên văn hoá.
