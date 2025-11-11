@@ -73,7 +73,7 @@ export default function AboutUsPage() {
                     </p>
 
                     <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 ">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 flex flex-col items-center text-center">
                             <img
                                 src={creativityIcon}
                                 alt="Thiết kế độc đáo sáng tạo"
@@ -83,11 +83,11 @@ export default function AboutUsPage() {
                                 THIẾT KẾ ĐỘC ĐÁO
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Các sản phẩm sáng tạo vui nhộn lấy cảm hứng từ các  loài động vật và hình khối nhân hoá, đáp ứng nhiều gu thẩm mỹ khác nhau.
+                                Các sản phẩm độc đáo lấy cảm hứng từ các loài động vật và hình khối nhân hoá, đáp ứng nhiều gu thẩm mỹ khác nhau.
                             </p>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 flex flex-col items-center text-center">
                             <img
                                 src={qualityIcon}
                                 alt="chất lượng và an toàn"
@@ -101,7 +101,7 @@ export default function AboutUsPage() {
                             </p>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 flex flex-col items-center text-center">
                             <img
                                 src={accompanyIcon}
                                 alt="đồng hành ấm áp"
@@ -115,7 +115,7 @@ export default function AboutUsPage() {
                             </p>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 flex flex-col items-center text-center">
                             <img
                                 src={diversityIcon}
                                 alt="đa văn hoá"
