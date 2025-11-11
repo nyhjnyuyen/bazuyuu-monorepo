@@ -2,6 +2,10 @@
 import React from 'react';
 import Footer from '../components/Footer';
 import octopus from '../assets/octopus.svg';
+import creativityIcon from '../assets/creative-idea.png';
+import qualityIcon from '../assets/badge.png';
+import accompanyIcon from '../assets/group.png';
+import diversityIcon from '../assets/diversity.png';
 
 export default function AboutUsPage() {
     return (
@@ -62,45 +66,61 @@ export default function AboutUsPage() {
             <section className="relative w-full bg-violet-50 py-14 px-6">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-extrabold font-heading text-violet-900 tracking-wide">
-                        TẠO XU HƯỚNG • LAN TỎA VẺ ĐẸP
+                        TẠO XU HƯỚNG LAN TỎA CÁI ĐẸP
                     </h2>
                     <p className="mt-2 text-violet-700 uppercase tracking-wider">
-                        BAZUUYU VỚI THIẾT KẾ SÁNG TẠO — CHẤT LƯỢNG, AN TOÀN VÀ SỰ ĐỒNG HÀNH ẤM ÁP LÀ CỐT LÕI
+                        BAZUUYU VỚI CÁC GÍA TRỊ CỐT LỖI
                     </p>
 
                     <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">✏️</div>
+                            <img
+                                src={creativityIcon}
+                                alt="Thiết kế độc đáo sáng tạo"
+                                className="w-8 h-8 object-contain"
+                            />
                             <h3 className="font-heading font-bold text-violet-900">
-                                THIẾT KẾ ĐỘC ĐÁO &amp; SÁNG TẠO
+                                THIẾT KẾ ĐỘC ĐÁO
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Sáng tạo vui nhộn: động vật kinh điển và hình khối nhân hoá cho nhiều gu thẩm mỹ.
+                                Các sản phẩm sáng tạo vui nhộn lấy cảm hứng từ các  loài động vật và Những sáng tạo vui nhộn lấy cảm hứng từ các loài động vật kinh điển và hình khối nhân hoá giàu trí tưởng tượng, đáp ứng nhiều gu thẩm mỹ khác nhau.
                             </p>
                         </div>
 
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">⭐</div>
+                            <img
+                                src={qualityIcon}
+                                alt="chất lượng và an toàn"
+                                className="w-8 h-8 object-contain"
+                            />
                             <h3 className="font-heading font-bold text-violet-900">
-                                CHẤT LƯỢNG &amp; AN TOÀN
+                                CHẤT LƯỢNG và AN TOÀN
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Đáp ứng tiêu chuẩn quốc tế; mềm mại, bền bỉ, phù hợp cho mọi độ tuổi.
+                                Đáp ứng các tiêu chuẩn quốc tế, mang đến đồ chơi mềm mại, bền bỉ, an toàn cho mọi lứa tuổi.
                             </p>
                         </div>
 
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">🤍</div>
+                            <img
+                                src={accompanyIcon}
+                                alt="đồng hành ấm áp"
+                                className="w-8 h-8 object-contain"
+                            />
                             <h3 className="font-heading font-bold text-violet-900">
                                 SỰ ĐỒNG HÀNH ẤM ÁP
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Plush êm ái – bạn đồng hành cảm xúc cho cả trẻ em và người lớn.
+                                Đồ chơi nhồi bông êm ái – bạn đồng hành cảm xúc cho cả trẻ em và người lớn.
                             </p>
                         </div>
 
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">🌀</div>
+                            <img
+                                src={diversityIcon}
+                                alt="đa văn hoá"
+                                className="w-8 h-8 object-contain"
+                            />
                             <h3 className="font-heading font-bold text-violet-900">
                                 CẢM HỨNG ĐA VĂN HOÁ
                             </h3>

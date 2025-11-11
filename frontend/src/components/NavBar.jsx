@@ -14,7 +14,6 @@ import { localWishlistCount } from '../lib/localWishlist';
 import { localCartCount } from '../lib/localCart';
 import CartDrawer from './CartDrawer';
 
-
 export default function Navbar() {
     const containerRef = useRef(null);
     const leftRef = useRef(null);
@@ -115,9 +114,6 @@ export default function Navbar() {
 
     return (
         <div className="w-full z-50 relative bg-white shadow-md font-['Instrument_Serif']">
-            <div className="text-center py-1 bg-violet-925 text-white text-m font-heading">
-                SUMMER SALE: UP TO 70% OFF SELECTED ITEMS
-            </div>
 
             <div ref={containerRef} className="relative grid grid-cols-[auto_1fr_auto] items-center px-4 py-8 md:px-10">
                 {/* Left: burger + links */}
