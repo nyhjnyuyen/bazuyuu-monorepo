@@ -68,12 +68,12 @@ export default function AboutUsPage() {
                     <h2 className="text-3xl md:text-4xl font-extrabold font-heading text-violet-900 tracking-wide">
                         TẠO XU HƯỚNG LAN TỎA CÁI ĐẸP
                     </h2>
-                    <p className="mt-2 text-violet-700 uppercase tracking-wider">
-                        BAZUUYU VỚI CÁC GÍA TRỊ CỐT LỖI
+                    <p className="mt-2 text-violet-700 text-xl uppercase tracking-wider">
+                        BAZUUYU CÙNG CÁC GIÁ TRỊ CỐT LỖI
                     </p>
 
-                    <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
+                    <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 ">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
                             <img
                                 src={creativityIcon}
                                 alt="Thiết kế độc đáo sáng tạo"
@@ -83,11 +83,11 @@ export default function AboutUsPage() {
                                 THIẾT KẾ ĐỘC ĐÁO
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Các sản phẩm sáng tạo vui nhộn lấy cảm hứng từ các  loài động vật và Những sáng tạo vui nhộn lấy cảm hứng từ các loài động vật kinh điển và hình khối nhân hoá giàu trí tưởng tượng, đáp ứng nhiều gu thẩm mỹ khác nhau.
+                                Các sản phẩm sáng tạo vui nhộn lấy cảm hứng từ các  loài động vật và hình khối nhân hoá giàu trí tưởng tượng, đáp ứng nhiều gu thẩm mỹ khác nhau.
                             </p>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
                             <img
                                 src={qualityIcon}
                                 alt="chất lượng và an toàn"
@@ -101,7 +101,7 @@ export default function AboutUsPage() {
                             </p>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
                             <img
                                 src={accompanyIcon}
                                 alt="đồng hành ấm áp"
@@ -115,7 +115,7 @@ export default function AboutUsPage() {
                             </p>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100 items-center">
                             <img
                                 src={diversityIcon}
                                 alt="đa văn hoá"
