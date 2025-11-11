@@ -59,12 +59,12 @@ export default function ContactPage() {
                         <h1 className="text-violet-950 text-3xl md:text-4xl font-bold font-brand tracking-wide mb-4 uppercase">
                             CẦN HỖ TRỢ? LIÊN HỆ VỚI BAZUUYU!
                         </h1>
-                        <p className="text-violet-925 text-xl font-heading leading-relaxed mb-3">
+                        <p className="text-violet-925 text-xl font-brand leading-relaxed mb-3">
                             Bazuuyu chuyên thiết kế và sản xuất các dòng đồ chơi plush lấy cảm hứng
                             từ ẩm thực và đời sống hằng ngày – với nhiều kích thước, chất liệu và
                             phong cách khác nhau.
                         </p>
-                        <p className="text-violet-925 text-xl font-heading leading-relaxed">
+                        <p className="text-violet-925 text-xl font-brand leading-relaxed">
                             Nếu bạn đang tìm đối tác cho dự án cấp phép, đồng thương hiệu, mở kênh
                             bán lẻ mới hoặc chỉ đơn giản là có câu hỏi về sản phẩm, đừng ngần ngại
                             liên hệ với chúng tôi. Đội ngũ Bazuuyu luôn sẵn sàng đồng hành cùng bạn.
