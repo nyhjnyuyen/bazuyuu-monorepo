@@ -5,27 +5,27 @@ import octopus from '../assets/octopus.svg';
 
 const contacts = [
     {
-        title: 'Tài khoản chính thức và kênh thương mại điện tử',
-        note: 'Douyin, Xiaohongshu, Taobao, Tmall, Pinduoduo',
+        title: 'Email cho tất cả kênh truyền thông',
+        note: 'Website, Douyin, Xiaohongshu, Taobao, Tmall, Pinduoduo',
         value: 'Market01@suamoon.cn',
         href: 'mailto:Market01@suamoon.cn',
         type: 'email',
     },
     {
-        title: 'Thư từ và hợp tác kinh doanh',
+        title: 'Email liên hệ hợp tác kinh doanh',
         note: 'Đồng thương hiệu, cấp phép, hợp tác',
         value: 'Market01@bazuuyutoy.com',
         href: 'mailto:Market01@bazuuyutoy.com',
         type: 'email',
     },
     {
-        title: 'Chăm sóc khách hàng',
+        title: 'Dịch vụ chăm sóc khách hàng',
         value: '18038251568',
         href: 'tel:18038251568',
         type: 'phone',
     },
     {
-        title: 'Yêu cầu số cửa hàng backend',
+        title: 'Số điện thoại để đăng ký/ mở gian hàng',
         value: '18028263925',
         href: 'tel:18028263925',
         type: 'phone',
