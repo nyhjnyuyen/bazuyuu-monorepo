@@ -149,7 +149,7 @@ export default function ShopPage() {
     const handleAddToCart = async (product) => {
         try {
             await addToCart({ productId: product.id, quantity: 1 });
-            alert(`🛒 ${product.name} added to cart!`);
+            alert(` ${product.name} added to cart!`);
         } catch (e) {
             console.error('Add to cart failed:', e);
             alert('Failed to add to cart. Please try again.');

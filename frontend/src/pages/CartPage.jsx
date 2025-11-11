@@ -133,17 +133,18 @@ export default function CartPage() {
     };
 
     const goToCheckout = () => {
-        if (!authed) {
-            alert('Please sign in to check out. Your cart is saved locally.');
+        if (authed && !cartId) {
+            alert('Cart chưa sẵn sàng, vui lòng tải lại trang.');
             return;
         }
-        if (!cartId) {
-            alert('Cart ID not found yet. Please refresh and try again.');
-            return;
-        }
-        navigate('/checkout', { state: { cartId } });
-    };
 
+        // Ai cũng được chuyển sang /checkout,
+        // user login thì truyền cartId, guest thì không cần
+        navigate('/checkout', {
+            state: authed && cartId ? { cartId } : undefined,
+        });
+    };
+    
     return (
         <div className="min-h-screen bg-white text-violet-950">
             <div className="max-w-5xl mx-auto px-6 py-12">
