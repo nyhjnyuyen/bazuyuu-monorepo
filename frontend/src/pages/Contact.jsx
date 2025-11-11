@@ -59,12 +59,12 @@ export default function ContactPage() {
                         <h1 className="text-violet-950 text-3xl md:text-4xl font-bold font-brand tracking-wide mb-4 uppercase">
                             CẦN HỖ TRỢ? LIÊN HỆ VỚI BAZUUYU!
                         </h1>
-                        <p className="text-violet-925 text-xl leading-relaxed mb-3">
+                        <p className="text-violet-925 text-xl font-heading leading-relaxed mb-3">
                             Bazuuyu chuyên thiết kế và sản xuất các dòng đồ chơi plush lấy cảm hứng
                             từ ẩm thực và đời sống hằng ngày – với nhiều kích thước, chất liệu và
                             phong cách khác nhau.
                         </p>
-                        <p className="text-violet-925 text-xl leading-relaxed">
+                        <p className="text-violet-925 text-xl font-heading leading-relaxed">
                             Nếu bạn đang tìm đối tác cho dự án cấp phép, đồng thương hiệu, mở kênh
                             bán lẻ mới hoặc chỉ đơn giản là có câu hỏi về sản phẩm, đừng ngần ngại
                             liên hệ với chúng tôi. Đội ngũ Bazuuyu luôn sẵn sàng đồng hành cùng bạn.
@@ -75,12 +75,12 @@ export default function ContactPage() {
                     <div className="space-y-10">
                         {/* Cards */}
                         <div>
-                            <h2 className="text-violet-950 text-2xl font-semibold mb-2">
+                            <h2 className="text-violet-950 text-2xl font-heading font-semibold mb-2">
                                 Thông tin liên hệ trực tiếp
                             </h2>
                             <p className="text-violet-925/80  text-xl mb-5">
-                                Chọn kênh phù hợp với nhu cầu của bạn – từ thương mại điện tử, hợp tác
-                                kinh doanh cho tới chăm sóc khách hàng.
+                                Chọn kênh phù hợp với nhu cầu của bạn – thương mại điện tử, hợp tác
+                                kinh doanh, và chăm sóc khách hàng.
                             </p>
 
                             <div className="grid gap-6 sm:grid-cols-2">
@@ -91,13 +91,13 @@ export default function ContactPage() {
                                     >
                                         <div className="text-violet-950 text-xl font-heading font-semibold">{c.title}</div>
                                         {c.note && (
-                                            <div className=" text-violet-900/60 text-xl mt-0.5">{c.note}</div>
+                                            <div className=" text-violet-900/60 font-heading text-l mt-0.5">{c.note}</div>
                                         )}
 
                                         <div className="mt-3 flex items-center gap-3">
                                             <a
                                                 href={c.href}
-                                                className="text-violet-925 font-heading underline underline-offset-4 decoration-violet-300 hover:decoration-violet-600 break-all"
+                                                className="text-violet-925 text-l underline underline-offset-4 decoration-violet-300 hover:decoration-violet-600 break-all"
                                             >
                                                 {c.value}
                                             </a>
@@ -122,7 +122,7 @@ export default function ContactPage() {
                             <h2 className="text-violet-950 font-semibold font-heading text-2xl mb-3">
                                 Gửi tin nhắn nhanh
                             </h2>
-                            <p className=" md:text-base text-violet-900/80 font-brand text-l mb-4">
+                            <p className=" md:text-base text-violet-900/80 font-heading text-l mb-4">
                                 Nhấn nút bên dưới để mở ứng dụng email trên thiết bị của bạn. Địa chỉ
                                 nhận sẽ được điền sẵn, bạn chỉ cần viết nội dung mong muốn.
                             </p>

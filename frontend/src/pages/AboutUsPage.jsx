@@ -39,7 +39,7 @@ export default function AboutUsPage() {
                 />
 
                 <div className="max-w-4xl mx-auto px-6 py-8 bg-white/80 border border-violet-200 rounded-3xl shadow-sm">
-                    <p className="text-violet-950 text-xl md:text-2xl font-normal font-heading leading-relaxed tracking-normal text-justify">
+                    <p className="text-violet-950 text-xl md:text-2xl font-normal font-brand leading-relaxed tracking-normal text-justify">
                         Thành lập năm 2018, Bazuuyu là thương hiệu đồ chơi plush theo đuổi những xu hướng độc đáo và thú vị trên thị trường.
                         Các IP chủ lực của Bazuuyu bao gồm A Niang Hotpot, Gia đình Rau Củ, Casual Flowers, Youyou Family và Ghost, với phong cách thiết kế vui nhộn, hiện đại và giàu cá tính.
                         <br /><br />
@@ -74,7 +74,7 @@ export default function AboutUsPage() {
                             <h3 className="font-heading font-bold text-violet-900">
                                 THIẾT KẾ ĐỘC ĐÁO
                             </h3>
-                            <p className="mt-2 text-sm text-violet-800/80">
+                            <p className="mt-2 text-sm font-brand text-violet-800/80">
                                 Các sản phẩm độc đáo lấy cảm hứng từ các loài động vật và hình khối nhân hoá, đáp ứng nhiều gu thẩm mỹ khác nhau.
                             </p>
                         </div>
