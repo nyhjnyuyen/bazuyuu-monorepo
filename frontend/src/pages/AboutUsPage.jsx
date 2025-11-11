@@ -77,13 +77,13 @@ export default function AboutUsPage() {
                             <img
                                 src={creativityIcon}
                                 alt="Thiết kế độc đáo sáng tạo"
-                                className="w-8 h-8 object-contain"
+                                className="w-8 h-8 object-contain mb-3"
                             />
                             <h3 className="font-heading font-bold text-violet-900">
                                 THIẾT KẾ ĐỘC ĐÁO
                             </h3>
                             <p className="mt-2 text-sm text-violet-800/80">
-                                Các sản phẩm sáng tạo vui nhộn lấy cảm hứng từ các  loài động vật và hình khối nhân hoá giàu trí tưởng tượng, đáp ứng nhiều gu thẩm mỹ khác nhau.
+                                Các sản phẩm sáng tạo vui nhộn lấy cảm hứng từ các  loài động vật và hình khối nhân hoá, đáp ứng nhiều gu thẩm mỹ khác nhau.
                             </p>
                         </div>
 
@@ -91,7 +91,7 @@ export default function AboutUsPage() {
                             <img
                                 src={qualityIcon}
                                 alt="chất lượng và an toàn"
-                                className="w-8 h-8 object-contain"
+                                className="w-8 h-8 object-containmb-3"
                             />
                             <h3 className="font-heading font-bold text-violet-900">
                                 CHẤT LƯỢNG và AN TOÀN
@@ -105,7 +105,7 @@ export default function AboutUsPage() {
                             <img
                                 src={accompanyIcon}
                                 alt="đồng hành ấm áp"
-                                className="w-8 h-8 object-contain"
+                                className="w-8 h-8 object-contain mb-3"
                             />
                             <h3 className="font-heading font-bold text-violet-900">
                                 SỰ ĐỒNG HÀNH ẤM ÁP
@@ -119,7 +119,7 @@ export default function AboutUsPage() {
                             <img
                                 src={diversityIcon}
                                 alt="đa văn hoá"
-                                className="w-8 h-8 object-contain"
+                                className="w-8 h-8 object-contain mb-3"
                             />
                             <h3 className="font-heading font-bold text-violet-900">
                                 CẢM HỨNG ĐA VĂN HOÁ
