@@ -144,7 +144,7 @@ export default function CartPage() {
             state: authed && cartId ? { cartId } : undefined,
         });
     };
-    
+
     return (
         <div className="min-h-screen bg-white text-violet-950">
             <div className="max-w-5xl mx-auto px-6 py-12">

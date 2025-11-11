@@ -58,7 +58,7 @@ export default function CheckoutPage() {
 
     const placeOrder = async () => {
         // 1) Create order on backend
-        const { data: order } = await apiClient.post('/api/orders/checkout', {
+        const { data: order } = await apiClient.post('/orders/checkout', {
             receiverEmail: form.email,
             receiverName: form.fullName,
             receiverPhone: form.phone,
@@ -84,12 +84,12 @@ export default function CheckoutPage() {
 
         // 3) Pay / redirect
         if (form.payment === 'COD') {
-            await apiClient.post(`/api/payments/cod/${orderCode}`);
+            await apiClient.post(`/payments/cod/${orderCode}`);
             alert('Đặt hàng thành công (COD). Cám ơn bạn!');
             // navigate('/thank-you') // if you want
         } else {
             const { data: payUrl } = await apiClient.get(
-                `/api/payments/vnpay/${orderCode}`,
+                `/payments/vnpay/${orderCode}`,
                 { params: { channel: 'VNPAY_QR' } }
             );
             window.location.href = payUrl;
