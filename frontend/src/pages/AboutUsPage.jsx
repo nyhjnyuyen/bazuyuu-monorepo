@@ -1,111 +1,141 @@
-// src/pages/AboutUsPage.jsx
+// src/pages/ContactPage.jsx
 import React from 'react';
 import Footer from '../components/Footer';
 import octopus from '../assets/octopus.svg';
 
-export default function AboutUsPage() {
+const contacts = [
+    {
+        title: 'Tài khoản chính thức & kênh thương mại điện tử',
+        note: 'Douyin, Xiaohongshu, Taobao, Tmall, Pinduoduo',
+        value: 'Market01@suamoon.cn',
+        href: 'mailto:Market01@suamoon.cn',
+        type: 'email',
+    },
+    {
+        title: 'Thư từ & hợp tác kinh doanh',
+        note: 'Đồng thương hiệu, cấp phép, hợp tác',
+        value: 'Market01@bazuuyutoy.com',
+        href: 'mailto:Market01@bazuuyutoy.com',
+        type: 'email',
+    },
+    {
+        title: 'Chăm sóc khách hàng',
+        value: '18038251568',
+        href: 'tel:18038251568',
+        type: 'phone',
+    },
+    {
+        title: 'Yêu cầu số cửa hàng backend',
+        value: '18028263925',
+        href: 'tel:18028263925',
+        type: 'phone',
+    },
+];
+
+export default function ContactPage() {
+    const copy = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            console.info('Copied:', text);
+        } catch {
+            // im lặng nếu browser không hỗ trợ
+        }
+    };
+
     return (
-        <div className="flex flex-col min-h-screen bg-white">
-            {/* 🎥 Hero Section with Video Background */}
-            <section className="relative w-full aspect-video sm:h-[60vh] md:h-[70vh] lg:h-[80vh] overflow-hidden flex items-center justify-center">
-                <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover z-0"
-                >
-                    <source src="/bannervideo.mp4" type="video/mp4" />
-                    Trình duyệt của bạn không hỗ trợ video.
-                </video>
-
-                <div className="relative z-10">
-                    <h1 className="text-4xl text-white font-heading font-bold drop-shadow-md">
-                        VỀ CHÚNG TÔI
-                    </h1>
-                </div>
-            </section>
-
-            {/* 📄 About Content Section with Octopus Background */}
-            <section className="relative flex-grow w-full bg-white py-16 px-6 text-center overflow-hidden">
+        <div className="flex flex-col min-h-screen bg-white font-heading">
+            {/* Header + Watermark */}
+            <section className="relative flex-grow w-full bg-white py-16 px-6 overflow-hidden">
+                {/* Watermark bạch tuộc */}
                 <img
                     src={octopus}
-                    alt="Octopus Watermark"
-                    className="absolute top-1/2 left-1/2 w-[80%] max-w-[700px] opacity-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
+                    alt=""
+                    className="pointer-events-none absolute top-1/2 left-1/2 w-[80%] max-w-[700px] opacity-10 -translate-x-1/2 -translate-y-1/2 z-0"
                 />
 
-                <div className="relative z-10 max-w-5xl mx-auto">
-                    <p className="max-w-6xl mx-auto text-violet-950 text-2xl font-normal font-heading leading-relaxed tracking-normal text-center">
-                        Thành lập năm 2018, Bazuuyu là thương hiệu theo đuổi các xu hướng
-                        đồ chơi thú vị và khác biệt. Những IP chính gồm A Niang Niang Hotpot,
-                        Gia Đình Rau Củ, Free/Rich Flower, Youyou Family và Ghost.
-                        <br />
-                        <br />
-                        Công ty tích hợp nghiên cứu – phát triển và sản xuất sản phẩm plush,
-                        vận hành &amp; cấp phép IP, triển lãm chủ đề và pop-up store.
-                        <br />
-                        <br />
-                        Trong tương lai, Bazuuyu sẽ tiếp tục khám phá và sáng tạo các dòng
-                        sản phẩm xoay quanh IP, hướng tới trở thành “siêu thị đồ plush”,
-                        lan toả niềm vui và lối sống trẻ trung.
-                    </p>
-
-                    <div className="mt-12 border-t border-violet-200 pt-8">
-                        <p className="text-xl text-violet-900 font-semibold font-heading">
-                            “Chúng tôi tin vào niềm vui, sự sáng tạo và những câu chuyện mềm mại.”
+                <div className="relative z-10 max-w-6xl mx-auto">
+                    {/* Hero text */}
+                    <div className="max-w-3xl mx-auto text-center mb-12">
+                        <h1 className="text-violet-950 text-3xl md:text-4xl font-bold font-brand tracking-wide mb-4 uppercase">
+                            CẦN HỖ TRỢ? LIÊN HỆ VỚI BAZUUYU!
+                        </h1>
+                        <p className="text-violet-925 leading-relaxed mb-3">
+                            Bazuuyu chuyên thiết kế và sản xuất các dòng đồ chơi plush lấy cảm hứng
+                            từ ẩm thực và đời sống hằng ngày – với nhiều kích thước, chất liệu và
+                            phong cách khác nhau.
+                        </p>
+                        <p className="text-violet-925 leading-relaxed">
+                            Nếu bạn đang tìm đối tác cho dự án cấp phép, đồng thương hiệu, mở kênh
+                            bán lẻ mới hoặc chỉ đơn giản là có câu hỏi về sản phẩm, đừng ngần ngại
+                            liên hệ với chúng tôi. Đội ngũ Bazuuyu luôn sẵn sàng đồng hành cùng bạn.
                         </p>
                     </div>
-                </div>
-            </section>
 
-            {/* 🌟 Vietnamese Values Section */}
-            <section className="relative w-full bg-violet-50 py-14 px-6">
-                <div className="max-w-6xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-4xl font-extrabold font-heading text-violet-900 tracking-wide">
-                        TẠO XU HƯỚNG • LAN TỎA VẺ ĐẸP
-                    </h2>
-                    <p className="mt-2 text-violet-700 uppercase tracking-wider">
-                        BAZUUYU VỚI THIẾT KẾ SÁNG TẠO — CHẤT LƯỢNG, AN TOÀN VÀ SỰ ĐỒNG HÀNH ẤM ÁP LÀ CỐT LÕI
-                    </p>
-
-                    <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">✏️</div>
-                            <h3 className="font-heading font-bold text-violet-900">
-                                THIẾT KẾ ĐỘC ĐÁO &amp; SÁNG TẠO
-                            </h3>
-                            <p className="mt-2 text-sm text-violet-800/80">
-                                Sáng tạo vui nhộn: động vật kinh điển và hình khối nhân hoá cho nhiều gu thẩm mỹ.
+                    {/* Nội dung chính: thẻ liên hệ + email nhanh */}
+                    <div className="space-y-10">
+                        {/* Cards */}
+                        <div>
+                            <h2 className="text-violet-950 text-xl font-semibold mb-2">
+                                Thông tin liên hệ trực tiếp
+                            </h2>
+                            <p className="text-violet-925/80 mb-5">
+                                Chọn kênh phù hợp với nhu cầu của bạn – từ thương mại điện tử, hợp tác
+                                kinh doanh cho tới chăm sóc khách hàng.
                             </p>
+
+                            <div className="grid gap-6 sm:grid-cols-2">
+                                {contacts.map((c) => (
+                                    <div
+                                        key={c.value}
+                                        className="rounded-2xl border border-violet-200/70 bg-white/60 backdrop-blur p-5 shadow-sm hover:shadow transition"
+                                    >
+                                        <div className="text-violet-950 font-semibold">{c.title}</div>
+                                        {c.note && (
+                                            <div className="text-sm text-violet-900/60 mt-0.5">{c.note}</div>
+                                        )}
+
+                                        <div className="mt-3 flex items-center gap-3">
+                                            <a
+                                                href={c.href}
+                                                className="text-violet-925 font-heading underline underline-offset-4 decoration-violet-300 hover:decoration-violet-600 break-all"
+                                            >
+                                                {c.value}
+                                            </a>
+                                            <button
+                                                onClick={() => copy(c.value)}
+                                                className="px-2.5 py-1.5 text-sm rounded-full border border-violet-200 hover:border-violet-400 text-violet-900"
+                                                aria-label={`Copy ${c.type}`}
+                                            >
+                                                Sao chép
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">⭐</div>
-                            <h3 className="font-heading font-bold text-violet-900">
-                                CHẤT LƯỢNG &amp; AN TOÀN
-                            </h3>
-                            <p className="mt-2 text-sm text-violet-800/80">
-                                Đáp ứng tiêu chuẩn quốc tế; mềm mại, bền bỉ, phù hợp cho mọi độ tuổi.
-                            </p>
-                        </div>
+                        {/* Divider */}
+                        <div className="border-t border-violet-200" />
 
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">🤍</div>
-                            <h3 className="font-heading font-bold text-violet-900">
-                                SỰ ĐỒNG HÀNH ẤM ÁP
-                            </h3>
-                            <p className="mt-2 text-sm text-violet-800/80">
-                                Plush êm ái – bạn đồng hành cảm xúc cho cả trẻ em và người lớn.
+                        {/* Quick message (mailto) */}
+                        <div className="rounded-2xl border border-violet-200/70 p-5 bg-white/60">
+                            <h2 className="text-violet-950 font-semibold font-heading text-lg mb-3">
+                                Gửi tin nhắn nhanh
+                            </h2>
+                            <p className="text-sm md:text-base text-violet-900/80 font-brand mb-4">
+                                Nhấn nút bên dưới để mở ứng dụng email trên thiết bị của bạn. Địa chỉ
+                                nhận sẽ được điền sẵn, bạn chỉ cần viết nội dung mong muốn.
                             </p>
-                        </div>
-
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-violet-100">
-                            <div className="text-3xl mb-3">🌀</div>
-                            <h3 className="font-heading font-bold text-violet-900">
-                                CẢM HỨNG ĐA VĂN HOÁ
-                            </h3>
-                            <p className="mt-2 text-sm text-violet-800/80">
-                                Thiết kế mang sức hút toàn cầu, lý tưởng làm quà tặng kết nối cảm xúc xuyên văn hoá.
+                            <a
+                                href={`mailto:Market01@bazuuyutoy.com?subject=${encodeURIComponent(
+                                    'Liên hệ từ bazuuyu.com'
+                                )}`}
+                                className="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-violet-950 text-white font-semibold hover:bg-violet-900"
+                            >
+                                Gửi email cho bộ phận kinh doanh
+                            </a>
+                            <p className="text-xs md:text-sm text-violet-900 mt-3">
+                                Thời gian phản hồi dự kiến: 1–2 ngày làm việc (Thứ Hai – Thứ Sáu).
                             </p>
                         </div>
                     </div>
