@@ -161,12 +161,12 @@ export default function LandingPage() {
                 </section>
 
                 {/* Categories & New Arrivals */}
-                <section className="relative z-20 pt-40 pb-20 bg-white-950/10 rounded-t-[60px]">
+                <section className="relative pt-40 pb-20 bg-white-950/10 rounded-t-[60px]">
                     <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight -mt-24 mb-12 md:mb-16 lg:mb-16">
                         BAZUUYU'S  FAMILIES
                     </h2>
 
-                    <div className="relative z-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto px-4">
+                    <div className="relative grid grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto px-4">
                         {categories.map((cat, index) => (
                             <div
                                 key={index}
@@ -203,7 +203,7 @@ export default function LandingPage() {
                         ))}
                     </div>
 
-                    <div className="relative z-20 mt-16 mb-12">
+                    <div className="relative mt-16 mb-12">
                         <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight  mb-12 md:mb-16 lg:mb-20">
                             NEW <span className="italic">A</span>RRIV<span className="italic">A</span>LS
                         </h2>
@@ -215,7 +215,7 @@ export default function LandingPage() {
                     />
 
                     {/* Swiper for New Arrivals */}
-                    <div className="relative z-20 max-w-7xl mx-auto px-4 pb-20">
+                    <div className="relative  max-w-7xl mx-auto px-4 pb-20">
                                 {loading ? (
                                     <p className="text-center">Loading new arrivals...</p>
                                 ) : newArrivals.length === 0 ? (
