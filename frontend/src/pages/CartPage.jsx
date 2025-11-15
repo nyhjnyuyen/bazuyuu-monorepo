@@ -148,10 +148,10 @@ export default function CartPage() {
     return (
         <div className="min-h-screen bg-white text-violet-950">
             <div className="max-w-5xl mx-auto px-6 py-12">
-                <h1 className="text-3xl font-['Instrument_Serif'] mb-8">Your Cart</h1>
+                <h1 className="text-3xl font-['Instrument_Serif'] mb-8">Giỏ hàng của bạn</h1>
 
                 {loading ? (
-                    <p>Loading...</p>
+                    <p>Đang tải giỏ hàng...</p>
                 ) : grouped.length === 0 ? (
                     <p>Your cart is empty.</p>
                 ) : (
@@ -183,7 +183,7 @@ export default function CartPage() {
                         </ul>
 
                         <div className="flex justify-between items-center mb-6">
-                            <span className="font-semibold">Total</span>
+                            <span className="font-semibold">Tổng cộng</span>
                             <span className="text-lg font-jakarta">{VND.format(cartTotal)}</span>
                         </div>
 
@@ -192,7 +192,7 @@ export default function CartPage() {
                             disabled={busy}
                             className="w-full bg-violet-950 text-white py-3 rounded-xl font-semibold hover:bg-violet-900 disabled:opacity-60"
                         >
-                            Check Out
+                            Thanh toán
                         </button>
                     </>
                 )}

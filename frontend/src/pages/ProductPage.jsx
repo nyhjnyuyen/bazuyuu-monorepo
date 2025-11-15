@@ -8,6 +8,12 @@ import Footer from '../components/Footer';
 import { CustomerContext } from '../components/CustomerContext';
 import useWishlist from '../hook/useWishlist';
 
+const priceFormatted = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+}).format(Number(product.price ?? 0));
+
 export default function ProductPage() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
@@ -170,7 +176,7 @@ export default function ProductPage() {
                             </p>
                         )}
                         <p className="mt-4 text-2xl font-brand text-violet-925 font-semibold">
-                            ${price}
+                            {priceFormatted}
                         </p>
 
                         {product.description && (
@@ -231,7 +237,18 @@ export default function ProductPage() {
 
 function normalizeImages(p) {
     if (!p) return [];
-    if (Array.isArray(p.images) && p.images.length) return p.images;
-    const single = p?.imageUrl || p?.image;
+
+    // 1. Prefer array from Supabase uploads
+    if (Array.isArray(p.imageUrls) && p.imageUrls.length) {
+        return p.imageUrls;
+    }
+
+    // 2. Fallback to old `images` array if it exists
+    if (Array.isArray(p.images) && p.images.length) {
+        return p.images;
+    }
+
+    // 3. Single URL fields
+    const single = p.imageUrl || p.image;
     return single ? [single] : [];
 }
