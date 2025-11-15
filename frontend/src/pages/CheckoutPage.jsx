@@ -1,20 +1,6 @@
 // src/pages/CheckoutPage.jsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import apiClient from '../api/axiosInstance';
-
-// Minimal demo data. In real app, load from /vn-locations.json (put in /public).
-const DEMO = {
-    provinces: [
-        { code: '01', name: 'Hà Nội', districts: [
-                { code: '0101', name: 'Ba Đình', wards: [{ code:'010101', name:'Phúc Xá' }, { code:'010102', name:'Trúc Bạch' }] },
-                { code: '0102', name: 'Hoàn Kiếm', wards: [{ code:'010201', name:'Chương Dương' }] },
-            ]},
-        { code: '79', name: 'TP. Hồ Chí Minh', districts: [
-                { code: '7901', name: 'Quận 1', wards: [{ code:'790101', name:'Bến Nghé' }] },
-                { code: '7907', name: 'Quận 7', wards: [{ code:'790701', name:'Tân Phú' }] },
-            ]},
-    ],
-};
 
 export default function CheckoutPage() {
     const [form, setForm] = useState({
@@ -29,22 +15,66 @@ export default function CheckoutPage() {
         payment: 'VNPAY_QR', // 'COD' or 'VNPAY_QR'
     });
 
-    // --- locations (replace with fetch to your JSON if you have it) ---
-    const [locations, setLocations] = useState({ provinces: [] });
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
 
     useEffect(() => {
-        // If you have a JSON file: fetch('/vn-locations.json').then(r=>r.json()).then(setLocations);
-        setLocations(DEMO);
+        const loadProvinces = async () => {
+            try {
+                const res = await apiClient.get('/vn/provinces'); // -> /api/vn/provinces
+                const data = res.data;
+                const items = Array.isArray(data) ? data : data.data || [];
+                setProvinces(items);
+            } catch (e) {
+                console.error('Error loading provinces', e);
+            }
+        };
+        loadProvinces();
     }, []);
 
-    const province = useMemo(
-        () => locations.provinces.find(p => p.code === form.province) || null,
-        [locations, form.province]
-    );
-    const district = useMemo(
-        () => province?.districts.find(d => d.code === form.district) || null,
-        [province, form.district]
-    );
+    useEffect(() => {
+        if (!form.province) {
+            setDistricts([]);
+            setWards([]);
+            return;
+        }
+        const loadDistricts = async () => {
+            try {
+                const res = await apiClient.get('/vn/districts', {
+                    params: { provinceId: form.province },
+                });
+                const data = res.data;
+                const items = Array.isArray(data) ? data : data.data || [];
+                setDistricts(items);
+                setWards([]);
+            } catch (e) {
+                console.error('Error loading districts', e);
+            }
+        };
+        loadDistricts();
+    }, [form.province]);
+
+    useEffect(() => {
+        if (!form.district) {
+            setWards([]);
+            return;
+        }
+        const loadWards = async () => {
+            try {
+                const res = await apiClient.get('/vn/wards', {
+                    params: { districtId: form.district },
+                });
+                const data = res.data;
+                const items = Array.isArray(data) ? data : data.data || [];
+                setWards(items);
+            } catch (e) {
+                console.error('Error loading wards', e);
+            }
+        };
+        loadWards();
+    }, [form.district]);
+
 
     const onChange = (e) => {
         const { name, value } = e.target;
@@ -57,44 +87,42 @@ export default function CheckoutPage() {
     };
 
     const placeOrder = async () => {
-        // 1) Create order on backend
-        const { data: order } = await apiClient.post('/orders/checkout', {
-            receiverEmail: form.email,
-            receiverName: form.fullName,
-            receiverPhone: form.phone,
-            address: {
+        const payload = {
+            shippingAddress: {
+                fullName: form.fullName,
+                phone: form.phone,
+                province: form.province,   // store ViettelPost ID or code
+                district: form.district,
+                ward: form.ward,
                 addressLine: form.address,
-                provinceCode: form.province,
-                districtCode: form.district,
-                wardCode: form.ward,
+                note: form.note,
+                country: 'VN',
             },
-            note: form.note,
-        });
+            // if you also handle email on the order, add another field to CheckoutRequest
+            // e.g. receiverEmail: form.email
+        };
 
-        // 2) Normalize whatever your backend returns into a single code string
-        const orderCode=
+        const { data: order } = await apiClient.post('/orders/checkout', payload);
+
+        const orderCode =
             order?.orderCode ??
             order?.code ??
             order?.id ??
             (typeof order === 'string' ? order : null);
 
-        if (!orderCode) {
-            throw new Error('No orderCode returned from /api/orders/checkout');
-        }
+        if (!orderCode) throw new Error('No orderCode returned from /orders/checkout');
 
-        // 3) Pay / redirect
         if (form.payment === 'COD') {
             await apiClient.post(`/payments/cod/${orderCode}`);
             alert('Đặt hàng thành công (COD). Cám ơn bạn!');
-            // navigate('/thank-you') // if you want
         } else {
-            const { data: payUrl } = await apiClient.get(
-                `/payments/vnpay/${orderCode}`,
-                { params: { channel: 'VNPAY_QR' } }
-            );
+            const { data: payUrl } = await apiClient.get(`/payments/vnpay/${orderCode}`, {
+                params: { channel: 'VNPAY_QR' },
+            });
             window.location.href = payUrl;
         }
     };
+
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -166,8 +194,13 @@ export default function CheckoutPage() {
                                     className="border rounded-lg px-3 py-2 bg-white"
                                 >
                                     <option value="">Tỉnh thành</option>
-                                    {locations.provinces.map(p => (
-                                        <option key={p.code} value={p.code}>{p.name}</option>
+                                    {provinces.map(p => (
+                                        <option
+                                            key={p.PROVINCE_ID}
+                                            value={p.PROVINCE_ID} // dùng ID để gọi tiếp district
+                                        >
+                                            {p.PROVINCE_NAME}
+                                        </option>
                                     ))}
                                 </select>
 
@@ -175,12 +208,14 @@ export default function CheckoutPage() {
                                     name="district"
                                     value={form.district}
                                     onChange={onChange}
-                                    disabled={!province}
+                                    disabled={!form.province}
                                     className="border rounded-lg px-3 py-2 bg-white disabled:bg-gray-100"
                                 >
                                     <option value="">Quận huyện</option>
-                                    {province?.districts.map(d => (
-                                        <option key={d.code} value={d.code}>{d.name}</option>
+                                    {districts.map(d => (
+                                        <option key={d.DISTRICT_ID} value={d.DISTRICT_ID}>
+                                            {d.DISTRICT_NAME}
+                                        </option>
                                     ))}
                                 </select>
 
@@ -188,12 +223,14 @@ export default function CheckoutPage() {
                                     name="ward"
                                     value={form.ward}
                                     onChange={onChange}
-                                    disabled={!district}
+                                    disabled={!form.district}
                                     className="border rounded-lg px-3 py-2 bg-white disabled:bg-gray-100"
                                 >
                                     <option value="">Phường xã</option>
-                                    {district?.wards.map(w => (
-                                        <option key={w.code} value={w.code}>{w.name}</option>
+                                    {wards.map(w => (
+                                        <option key={w.WARDS_ID} value={w.WARDS_ID}>
+                                            {w.WARDS_NAME}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
