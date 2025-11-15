@@ -22,9 +22,22 @@ export default function CheckoutPage() {
     useEffect(() => {
         const loadProvinces = async () => {
             try {
-                const res = await apiClient.get('/vn/provinces'); // -> /api/vn/provinces
+                const res = await apiClient.get('/vn/provinces');
+                console.log('VN provinces raw:', res.data);   // 👈 add this
                 const data = res.data;
-                const items = Array.isArray(data) ? data : data.data || [];
+
+                let items = [];
+                if (Array.isArray(data)) {
+                    items = data;
+                } else if (data && Array.isArray(data.data)) {
+                    // in case ViettelPost wraps it like { status, error, message, data: [...] }
+                    items = data.data;
+                } else if (data && Array.isArray(data.result)) {
+                    // just in case some gateway wraps it as { result: [...] }
+                    items = data.result;
+                }
+
+                console.log('VN provinces parsed:', items);
                 setProvinces(items);
             } catch (e) {
                 console.error('Error loading provinces', e);
@@ -32,6 +45,7 @@ export default function CheckoutPage() {
         };
         loadProvinces();
     }, []);
+
 
     useEffect(() => {
         if (!form.province) {
