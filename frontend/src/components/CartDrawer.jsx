@@ -138,16 +138,16 @@ export default function CartDrawer({ open, onClose }) {
     transition-transform duration-300 z-50
     ${open ? 'translate-x-0' : 'translate-x-full'}`}
                 role="dialog"
-                aria-label="Your Bag"
+                aria-label="Giỏ hàng của bạn"
             >
                 <div className="flex items-center justify-between p-4 border-b">
-                    <h2 className="text-lg font-semibold">Your Bag</h2>
+                    <h2 className="text-lg font-semibold">Giỏ hàng của bạn</h2>
                     <button onClick={onClose} className="p-2 rounded hover:bg-gray-100" aria-label="Close">✕</button>
                 </div>
 
                 <div className="p-4 overflow-y-auto h-[calc(100%-160px)]">
-                    {loading ? <p>Loading…</p> :
-                        grouped.length === 0 ? <p>Your bag is empty.</p> :
+                    {loading ? <p>Đang tải giỏ hàng…</p> :
+                        grouped.length === 0 ? <p>Giỏ hàng của bạn đang trống.</p> :
                             grouped.map(g => (
                                 <div key={g.key} className="flex items-start gap-3 py-3 border-b">
                                     <img src={g.img} alt="" className="w-14 h-14 object-cover rounded" />

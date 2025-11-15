@@ -217,9 +217,9 @@ export default function LandingPage() {
                     {/* Swiper for New Arrivals */}
                     <div className="relative  max-w-7xl mx-auto px-4 pb-20">
                                 {loading ? (
-                                    <p className="text-center">Loading new arrivals...</p>
+                                    <p className="text-center">Đang tải sản phẩm mới...</p>
                                 ) : newArrivals.length === 0 ? (
-                                    <p className="text-center">No new arrivals yet.</p>
+                                    <p className="text-center">Hiện chưa có sản phẩm mới.</p>
                                 ) : (
                                     <Swiper
                                         modules={[Navigation]}
@@ -389,7 +389,7 @@ export default function LandingPage() {
                             }}
                             className="mt-4 inline-block text-base sm:text-lg underline font-light font-jakarta"
                         >
-                            Click to view
+                            Nhấn để xem chi tiết
                         </button>
                     </div>
 
@@ -433,7 +433,7 @@ export default function LandingPage() {
                                         className="px-6 py-2 rounded-xl bg-violet-900 text-white hover:bg-violet-800 font-heading"
                                         onClick={() => setFlashOpen(false)}
                                     >
-                                        Close
+                                        Đóng
                                     </button>
                                 </div>
                             </div>
