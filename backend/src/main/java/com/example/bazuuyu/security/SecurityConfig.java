@@ -59,6 +59,10 @@ public class SecurityConfig {
                                 "/api/customers/login", "/api/customers/register",
                                 "/api/password/send-reset-token", "/api/password/reset").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+
+                        // 👇 NEW: allow ViettelPost proxy endpoints (provinces/districts/wards)
+                        .requestMatchers("/api/vn/**").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/api/products", "/api/admins/products")
                         .hasAnyAuthority("ROLE_ADMIN","ROLE_SUPER_ADMIN")
                         .requestMatchers("/api/customers/**").hasAuthority("ROLE_CUSTOMER")
@@ -66,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
