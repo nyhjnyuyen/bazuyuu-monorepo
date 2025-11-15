@@ -127,14 +127,18 @@ export default function CartDrawer({ open, onClose }) {
             {/* overlay */}
             <div
                 onClick={onClose}
-                className={`fixed inset-0 bg-black/30 transition-opacity ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 bg-black/30 transition-opacity z-40
+    ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 aria-hidden="true"
             />
+
             {/* panel */}
             <aside
-                className={`fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white shadow-2xl transition-transform duration-300
-                    ${open ? 'translate-x-0' : 'translate-x-full'}`}
-                role="dialog" aria-label="Your Bag"
+                className={`fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white shadow-2xl
+    transition-transform duration-300 z-50
+    ${open ? 'translate-x-0' : 'translate-x-full'}`}
+                role="dialog"
+                aria-label="Your Bag"
             >
                 <div className="flex items-center justify-between p-4 border-b">
                     <h2 className="text-lg font-semibold">Your Bag</h2>

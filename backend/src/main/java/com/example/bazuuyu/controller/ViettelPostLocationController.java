@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping("/api/vn") // 👈 important: /api + /vn matches axios base + path
+@RequestMapping("/api/vn")
 @RequiredArgsConstructor
 public class ViettelPostLocationController {
 
@@ -15,23 +15,23 @@ public class ViettelPostLocationController {
     private static final String VTP_BASE = "https://partner.viettelpost.vn/v2/categories";
 
     @GetMapping("/provinces")
-    public ResponseEntity<String> getProvinces() {
+    public ResponseEntity<?> getProvinces() {
         String url = VTP_BASE + "/listProvince";
-        String body = restTemplate.getForObject(url, String.class);
+        Object body = restTemplate.getForObject(url, Object.class); // 👈 note Object.class
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/districts")
-    public ResponseEntity<String> getDistricts(@RequestParam("provinceId") String provinceId) {
+    public ResponseEntity<?> getDistricts(@RequestParam("provinceId") String provinceId) {
         String url = VTP_BASE + "/listDistrict?provinceId=" + provinceId;
-        String body = restTemplate.getForObject(url, String.class);
+        Object body = restTemplate.getForObject(url, Object.class);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/wards")
-    public ResponseEntity<String> getWards(@RequestParam("districtId") String districtId) {
+    public ResponseEntity<?> getWards(@RequestParam("districtId") String districtId) {
         String url = VTP_BASE + "/listWards?districtId=" + districtId;
-        String body = restTemplate.getForObject(url, String.class);
+        Object body = restTemplate.getForObject(url, Object.class);
         return ResponseEntity.ok(body);
     }
 }
