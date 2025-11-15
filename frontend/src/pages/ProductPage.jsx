@@ -8,11 +8,7 @@ import Footer from '../components/Footer';
 import { CustomerContext } from '../components/CustomerContext';
 import useWishlist from '../hook/useWishlist';
 
-const priceFormatted = new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-}).format(Number(product.price ?? 0));
+
 
 export default function ProductPage() {
     const { id } = useParams();
@@ -67,19 +63,19 @@ export default function ProductPage() {
             cancelled = true;
         };
     }, [id]);
+    const images = useMemo(() => normalizeImages(product), [product]);
 
     const handleAddToCart = async () => {
         if (!product) return;
         try {
             await addToCart({ productId: product.id, quantity: 1 });
-            alert(`🛒 ${product.name} added to cart!`);
+            alert(` ${product.name} đã được thêm vào giỏ hàng!`);
         } catch (e) {
             console.error('Add to cart failed', e);
-            alert('Failed to add to cart. Please try again.');
+            alert('Thêm vao giỏ thất bại. Xin vui lòng thử lại.');
         }
     };
 
-    const images = useMemo(() => normalizeImages(product), [product]);
 
     if (loading) {
         return (
@@ -106,9 +102,13 @@ export default function ProductPage() {
     }
 
     const wishlisted = isInWishlist(product.id);
-    const price = Number(product.price ?? 0).toFixed(2);
     const categoryLink = `/shop?category=${encodeURIComponent(product.category ?? '')}`;
-
+    const priceFormatted = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        maximumFractionDigits: 0,
+    }).format(Number(product.price ?? 0));
+    
     return (
         <div className="flex flex-col min-h-screen bg-white">
             <main className="flex-grow max-w-7xl mx-auto px-4 lg:px-6 py-10">
