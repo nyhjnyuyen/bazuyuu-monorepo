@@ -60,7 +60,8 @@ public class SecurityConfig {
                                 "/api/password/send-reset-token", "/api/password/reset").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
-                        // 👇 NEW: allow ViettelPost proxy endpoints (provinces/districts/wards)
+                        .requestMatchers(HttpMethod.POST, "/api/orders/checkout").permitAll()
+                        .requestMatchers("/api/payments/**").permitAll()
                         .requestMatchers("/api/vn/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/products", "/api/admins/products")
