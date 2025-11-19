@@ -10,7 +10,7 @@ import flashmod from '../assets/activity.jpg';
 import wave from '../assets/wave.png';
 import slogan1 from '../assets/event1.jpg';
 import slogan2 from '../assets/event2.jpg';
-import slogan3 from '../assets/event3.JPG';
+import slogan3 from '../assets/event3-1.JPG';
 import slogan4 from '../assets/event4.JPG';
 import banner1 from '../assets/banner-01.jpg';
 import banner2 from '../assets/banner-02.jpg';
