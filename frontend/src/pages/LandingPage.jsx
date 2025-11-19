@@ -9,7 +9,7 @@ import heart from '../assets/heart.png';
 import flashmod from '../assets/activity.jpg';
 import wave from '../assets/wave.png';
 import slogan1 from '../assets/slogan1.jpg';
-import slogan2 from '../assets/slogan2.jpg';
+import slogan2 from '../assets/IMG_7638.heic';
 import slogan3 from '../assets/slogan3.jpg';
 import slogan4 from '../assets/slogan4.jpg';
 import banner1 from '../assets/banner-01.jpg';

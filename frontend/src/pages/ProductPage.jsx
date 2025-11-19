@@ -108,7 +108,7 @@ export default function ProductPage() {
         currency: 'VND',
         maximumFractionDigits: 0,
     }).format(Number(product.price ?? 0));
-    
+
     return (
         <div className="flex flex-col min-h-screen bg-white">
             <main className="flex-grow max-w-7xl mx-auto px-4 lg:px-6 py-10">
