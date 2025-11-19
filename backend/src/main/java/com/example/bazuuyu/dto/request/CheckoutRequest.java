@@ -7,6 +7,9 @@ import lombok.*;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class CheckoutRequest {
+    @NotNull
+    private Long cartId;                 // ID giỏ hàng (guest / customer gì cũng được)
+
     @Valid @NotNull
     private ShippingAddressRequest shippingAddress;
 }

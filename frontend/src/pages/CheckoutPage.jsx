@@ -100,8 +100,11 @@ export default function CheckoutPage() {
         });
     };
 
+    const cartId = localStorage.getItem('cartId');
+
     const placeOrder = async () => {
         const payload = {
+            cartId,
             shippingAddress: {
                 fullName: form.fullName,
                 phone: form.phone,

@@ -1,5 +1,6 @@
 package com.example.bazuuyu.controller;
 
+import com.example.bazuuyu.dto.request.CheckoutRequest;
 import com.example.bazuuyu.dto.request.ShippingAddressRequest;
 import com.example.bazuuyu.dto.response.OrderItemResponse;
 import com.example.bazuuyu.dto.response.OrderResponse;
@@ -11,7 +12,6 @@ import com.example.bazuuyu.service.CustomerService;
 import com.example.bazuuyu.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -110,4 +110,16 @@ public class OrderController {
 
         return ResponseEntity.ok(resp);
     }
+    @PostMapping("/checkout")
+    public ResponseEntity<OrderResponse> checkout(
+            @RequestBody @jakarta.validation.Valid CheckoutRequest req
+    ) {
+        Long cartId = req.getCartId();
+        ShippingAddressRequest shipping = req.getShippingAddress();
+
+        Order order = orderService.placeOrderByCartId(cartId, shipping);
+        return ResponseEntity.ok(OrderMapper.toResponse(order));
+    }
+
+
 }

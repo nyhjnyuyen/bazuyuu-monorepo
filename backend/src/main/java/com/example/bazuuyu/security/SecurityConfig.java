@@ -70,9 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admins/**").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
-                )
-
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                );
         return http.build();
     }
 
