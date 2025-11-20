@@ -5,7 +5,6 @@ import com.example.bazuuyu.dto.request.CreateCartItemRequest;
 import com.example.bazuuyu.dto.response.CartResponse;
 import com.example.bazuuyu.entity.CartItem;
 import com.example.bazuuyu.service.CartService;
-import com.example.bazuuyu.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,6 @@ import java.util.Map;
 public class CartController {
 
     private final CartService cartService;
-    private final OrderService orderService;
 
 
     // them san pham vao cart
@@ -74,18 +72,6 @@ public class CartController {
         return ResponseEntity.ok(cartService.getActiveCart(customerId));
     }
 
-    // tien hanh thanh toan cho gio hang
-    @PostMapping("/checkout/{cartId}")
-    public ResponseEntity<Map<String, Object>> checkout(
-            @PathVariable Long cartId,
-            @Valid @RequestBody CheckoutRequest body
-    ) {
-        var order = orderService.placeOrderByCartId(cartId, body.getShippingAddress());
-        return ResponseEntity.ok(Map.of(
-                "orderCode", order.getOrderCode(),
-                "totalAmount", order.getTotalAmount()
-        ));
-    }
 
     @PostMapping("/merge")
     @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
