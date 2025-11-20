@@ -4,10 +4,12 @@ import com.example.bazuuyu.dto.request.CheckoutRequest;
 import com.example.bazuuyu.dto.request.ShippingAddressRequest;
 import com.example.bazuuyu.dto.response.OrderItemResponse;
 import com.example.bazuuyu.dto.response.OrderResponse;
+import com.example.bazuuyu.entity.Cart;
 import com.example.bazuuyu.entity.Customer;
 import com.example.bazuuyu.entity.Order;
 import com.example.bazuuyu.mapper.OrderMapper;
 import com.example.bazuuyu.security.JwtUtils;
+import com.example.bazuuyu.service.CartService;
 import com.example.bazuuyu.service.CustomerService;
 import com.example.bazuuyu.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
 
+    private final CartService cartService;
     private final OrderService orderService;
     private final CustomerService customerService;
     private final JwtUtils jwtUtils;
@@ -112,12 +115,24 @@ public class OrderController {
     }
     @PostMapping("/checkout")
     public ResponseEntity<OrderResponse> checkout(
-            @RequestBody @jakarta.validation.Valid CheckoutRequest req
+            HttpServletRequest request,
+            @RequestBody @jakarta.validation.Valid ShippingAddressRequest shipping
     ) {
-        Long cartId = req.getCartId();
-        ShippingAddressRequest shipping = req.getShippingAddress();
+        String token = jwtUtils.resolveToken(request);
+        Long customerId = null;
+        String guestId = (String) request.getAttribute("guestId");
 
-        Order order = orderService.placeOrderByCartId(cartId, shipping);
+        Cart cart;
+        if (token != null) {
+            String username = jwtUtils.getUsernameFromToken(token);
+            Customer customer = customerService.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+            cart = cartService.getOrCreateActiveCartForCustomer(customer);
+        } else {
+            cart = cartService.getOrCreateActiveCartForGuest(guestId);
+        }
+
+        Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
         return ResponseEntity.ok(OrderMapper.toResponse(order));
     }
 

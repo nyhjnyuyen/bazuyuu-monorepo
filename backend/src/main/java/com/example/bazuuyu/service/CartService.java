@@ -17,9 +17,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * xu ly logic cho cart, bao gom them/xoa san pham, cap nhat so luong
- */
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -29,7 +26,8 @@ public class CartService {
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
 
-    // them 1 san pham vao gio hang
+    // ----------------- CRUD CART ITEM -----------------
+
     public void addCartItem(CreateCartItemRequest request) {
         Cart cart = cartRepository.findById(request.getCartId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
@@ -45,12 +43,10 @@ public class CartService {
         cartItemRepository.save(item);
     }
 
-    // lay danh sach san pham trong gio hang theo ID cua gio hang
     public List<CartItem> getCartItems(Long cartId) {
         return cartItemRepository.findByCartId(cartId);
     }
 
-    // update item quantity
     public void updateCartItemQuantity(Long itemId, int quantity) {
         CartItem item = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
@@ -58,45 +54,34 @@ public class CartService {
         cartItemRepository.save(item);
     }
 
-    // xoa 1 san pham khoi gio hang
     public void removeCartItem(Long itemId) {
         cartItemRepository.deleteById(itemId);
     }
 
-    //  GET ACTIVE CART FOR CUSTOMER
+    // ----------------- ACTIVE CART: CUSTOMER -----------------
+
     public CartResponse getActiveCart(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-        Cart cart = cartRepository.findByCustomerAndStatus(customer, "ACTIVE")
-                .orElseGet(() -> {
-                    Cart newCart = Cart.builder()
-                            .customer(customer)
-                            .status("ACTIVE")
-                            .createdAt(LocalDateTime.now())
-                            .build();
-                    return cartRepository.save(newCart);
-                });
 
+        Cart cart = getOrCreateActiveCartForCustomer(customer);
         return CartMapper.toResponse(cart);
-
     }
+
     public Optional<Cart> getActiveCart(Customer customer) {
         return cartRepository.findByCustomerAndStatus(customer, "ACTIVE");
     }
 
-
-    // CAP NHAT status cua cart
-    public void updateCartStatus(Long cartId, String status) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.setStatus(status);
-        cartRepository.save(cart);
-    }
-
+    // Helper dùng nội bộ
     private Cart getOrCreateActiveCartEntity(Long customerId) {
-        var customer = customerRepository.findById(customerId)
+        Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
+        return getOrCreateActiveCartForCustomer(customer);
+    }
+
+    // 👇 PUBLIC helper: dùng trong Checkout / Add-to-cart
+    public Cart getOrCreateActiveCartForCustomer(Customer customer) {
         return cartRepository.findByCustomerAndStatus(customer, "ACTIVE")
                 .orElseGet(() -> cartRepository.save(
                         Cart.builder()
@@ -105,6 +90,33 @@ public class CartService {
                                 .createdAt(LocalDateTime.now())
                                 .build()
                 ));
+    }
+
+    // ----------------- ACTIVE CART: GUEST -----------------
+
+    // 👇 NEW: lấy hoặc tạo cart cho guest (dựa trên guestId từ cookie/header)
+    public Cart getOrCreateActiveCartForGuest(String guestId) {
+        if (guestId == null || guestId.isBlank()) {
+            throw new IllegalArgumentException("guestId is required");
+        }
+
+        return cartRepository.findByGuestIdAndStatus(guestId, "ACTIVE")
+                .orElseGet(() -> cartRepository.save(
+                        Cart.builder()
+                                .guestId(guestId)
+                                .status("ACTIVE")
+                                .createdAt(LocalDateTime.now())
+                                .build()
+                ));
+    }
+
+    // ----------------- STATUS + MERGE -----------------
+
+    public void updateCartStatus(Long cartId, String status) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        cart.setStatus(status);
+        cartRepository.save(cart);
     }
 
     @Transactional
@@ -120,7 +132,6 @@ public class CartService {
             Product product = productRepository.findById(it.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found: " + it.getProductId()));
 
-            // if already in cart => sum quantities; else create
             var existing = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
             if (existing.isPresent()) {
                 CartItem ci = existing.get();

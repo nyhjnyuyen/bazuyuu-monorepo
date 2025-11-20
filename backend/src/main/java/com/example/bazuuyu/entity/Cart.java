@@ -25,6 +25,9 @@ public class Cart {
     @JoinColumn(name = "customer_id")
     private Customer customer; // khach hang so huu
 
+    @Column(name = "guest_id")
+    private String guestId;
+
     private LocalDateTime createdAt;
     private String status; // e.g., ACTIVE, SAVED, CHECKED_OUT
 
