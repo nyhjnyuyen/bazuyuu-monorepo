@@ -1,6 +1,5 @@
 package com.example.bazuuyu.controller;
 
-import com.example.bazuuyu.dto.request.CheckoutRequest;
 import com.example.bazuuyu.dto.request.ShippingAddressRequest;
 import com.example.bazuuyu.dto.response.OrderItemResponse;
 import com.example.bazuuyu.dto.response.OrderResponse;

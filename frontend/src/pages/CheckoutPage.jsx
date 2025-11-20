@@ -100,23 +100,17 @@ export default function CheckoutPage() {
         });
     };
 
-    const cartId = Number(localStorage.getItem('cartId'));
 
     const placeOrder = async () => {
         const payload = {
-            cartId,
-            shippingAddress: {
-                fullName: form.fullName,
-                phone: form.phone,
-                province: form.province,   // store ViettelPost ID or code
-                district: form.district,
-                ward: form.ward,
-                addressLine: form.address,
-                note: form.note,
-                country: 'VN',
-            },
-            // if you also handle email on the order, add another field to CheckoutRequest
-            // e.g. receiverEmail: form.email
+            fullName: form.fullName,
+            phone: form.phone,
+            province: form.province,
+            district: form.district,
+            ward: form.ward,
+            addressLine: form.address,
+            note: form.note,
+            country: 'VN',
         };
 
         const { data: order } = await apiClient.post('/orders/checkout', payload);
@@ -139,6 +133,7 @@ export default function CheckoutPage() {
             window.location.href = payUrl;
         }
     };
+
 
 
     const onSubmit = async (e) => {

@@ -1,7 +1,6 @@
 package com.example.bazuuyu.controller;
 
 import com.example.bazuuyu.dto.request.CartMergeRequest;
-import com.example.bazuuyu.dto.request.CheckoutRequest;
 import com.example.bazuuyu.dto.request.CreateCartItemRequest;
 import com.example.bazuuyu.dto.response.CartResponse;
 import com.example.bazuuyu.entity.CartItem;
@@ -14,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
