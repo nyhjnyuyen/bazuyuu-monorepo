@@ -336,9 +336,9 @@ export default function LandingPage() {
                 </section>
 
                 {/* Slogan Section */}
-                <section className="py-20 bg-white">
+                <section className="py-12 bg-white">
                     <div className="mt-12">
-                        <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight  mb-12 md:mb-8 lg:mb-8">
+                        <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight  mb-12 md:mb-16 lg:mb-8">
                             CREATE TRENDS SHARE BEAUTY
                         </h2>
                         <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-h2 leading-tight  ">
