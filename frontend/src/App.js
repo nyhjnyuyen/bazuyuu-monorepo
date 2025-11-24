@@ -22,6 +22,7 @@ import WishlistPage from './pages/WishlistPage';
 import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
 import CustomerProfile from './pages/CustomerProfile';
+import SearchPage from './pages/SearchPage';
 
 import NavBar from './components/NavBar';
 import ProtectedRoute from './api/ProtectedRoute';
@@ -52,6 +53,7 @@ function AppShell() {
                 {/* Customer site */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/new" element={<NewArrivalsPage />} />
+                <Route path="/search" element={<SearchPage />} />
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/login" element={<LoginPage />} />

@@ -40,12 +40,6 @@ export const getBestSellers = async (page = 0, size = 24) => {
     return unwrap(data);
 };
 
-export const searchProducts = async (keyword, page = 0, size = 24) => {
-    const { data } = await apiClient.get('/products/search', {
-        params: { query: keyword, page, size }
-    });
-    return unwrap(data);
-};
 
 // keep this — your build previously failed without it
 export const getSortedProducts = async (sortBy, page = 0, size = 24) => {
@@ -62,7 +56,7 @@ export async function searchProducts({ keyword = '', category = '', page = 0, si
     params.set('page', page);
     params.set('size', size);
 
-    const res = await fetch(`/api/search?${params.toString()}`);
+    const res = await fetch(`/search?${params.toString()}`);
     if (!res.ok) throw new Error('Failed to search products');
     return res.json(); // this is Spring's Page<ProductResponse>
 }
