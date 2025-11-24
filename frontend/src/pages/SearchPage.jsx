@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchProducts } from '../api/productApi';
 
 export default function SearchPage() {
@@ -10,7 +10,7 @@ export default function SearchPage() {
     const [result, setResult] = useState(null); // will hold the Page object
     const [loading, setLoading] = useState(false);
     const [error,   setError]   = useState('');
-
+    const navigate = useNavigate();
     useEffect(() => {
         if (!keyword) {
             setResult(null);
@@ -55,6 +55,7 @@ export default function SearchPage() {
                     <div
                         key={p.id}
                         className="border rounded-lg p-3 shadow-sm hover:shadow-md transition cursor-pointer"
+                        onClick={() => navigate(`/products/${p.id}`)}
                     >
                         <img
                             src={p.imageUrls?.[0]}
