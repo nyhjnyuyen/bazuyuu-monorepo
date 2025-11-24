@@ -66,7 +66,11 @@ export default function SearchPage() {
                             {p.description}
                         </div>
                         <div className="mt-2 font-bold text-base">
-                            ${Number(p.price).toFixed(2)}
+                            {new Intl.NumberFormat('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            }).format(p.price)}
+
                         </div>
                     </div>
                 ))}
