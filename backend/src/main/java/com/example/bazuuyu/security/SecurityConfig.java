@@ -63,6 +63,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/orders/checkout").permitAll()
                         .requestMatchers("/api/payments/**").permitAll()
                         .requestMatchers("/api/vn/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
+
 
                         .requestMatchers(HttpMethod.POST, "/api/products", "/api/admins/products")
                         .hasAnyAuthority("ROLE_ADMIN","ROLE_SUPER_ADMIN")
