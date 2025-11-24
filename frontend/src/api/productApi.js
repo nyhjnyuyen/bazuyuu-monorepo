@@ -55,6 +55,19 @@ export const getSortedProducts = async (sortBy, page = 0, size = 24) => {
     return unwrap(data);
 };
 
+export async function searchProducts({ keyword = '', category = '', page = 0, size = 24 }) {
+    const params = new URLSearchParams();
+    if (keyword) params.set('keyword', keyword);
+    if (category) params.set('category', category);
+    params.set('page', page);
+    params.set('size', size);
+
+    const res = await fetch(`/api/search?${params.toString()}`);
+    if (!res.ok) throw new Error('Failed to search products');
+    return res.json(); // this is Spring's Page<ProductResponse>
+}
+
+
 // ---------- WRITE (admin) ----------
 export const createProduct = (productData) =>
     apiClient.post('/products', productData);

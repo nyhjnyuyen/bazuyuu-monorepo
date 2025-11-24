@@ -25,16 +25,15 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     List<Product> findByIsNewArrivalTrue();
 
     @Query("""
-      SELECT p FROM Product p
-      WHERE (:kw IS NULL OR :kw = '' OR
-             LOWER(p.name) LIKE LOWER(CONCAT('%', :kw, '%')) OR
-             LOWER(p.description) LIKE LOWER(CONCAT('%', :kw, '%')))
-        AND (:cat IS NULL OR :cat = '' OR p.category = :catEnum)
-      """)
+        SELECT p FROM Product p
+        WHERE (:keyword IS NULL OR :keyword = '' 
+               OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+          AND (:category IS NULL OR p.category = :category)
+        """)
     Page<Product> search(
-            @Param("kw") String kw,
-            @Param("cat") String cat,        // for optional string binding
-            @Param("catEnum") Category catEnum, // derived enum (may be null)
+            @Param("keyword") String keyword,
+            @Param("category") Category category,
             Pageable pageable
     );
 }

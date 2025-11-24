@@ -25,14 +25,15 @@ public class SearchController {
             @RequestParam(defaultValue = "24") int size) {
         return service.search(keyword, category, page, size);
     }
-    // If you still need the view version:
-    @GetMapping("/search")
 
-    public String searchView(@RequestParam(required=false) String keyword,
-                             @RequestParam(required=false) String category,
-                             @RequestParam(defaultValue="0") int page,
-                             @RequestParam(defaultValue="24") int size,
-                             Model model) {
+
+    @GetMapping("/search")
+    public String searchView(
+            @RequestParam(required=false) String keyword,
+            @RequestParam(required=false) String category,
+            @RequestParam(defaultValue="0") int page,
+            @RequestParam(defaultValue="24") int size,
+            Model model) {
         var pageResp = service.search(keyword, category, page, size);
         model.addAttribute("products", pageResp.getContent());
         model.addAttribute("page", pageResp);
@@ -40,5 +41,4 @@ public class SearchController {
         model.addAttribute("category", category == null ? "" : category);
         return "search";
     }
-
 }

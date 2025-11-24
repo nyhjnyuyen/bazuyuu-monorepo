@@ -1,78 +1,97 @@
-// src/pages/SearchPage.jsx
-import React, { useEffect, useState, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import { getApiBaseUrl } from '../api/baseUrl';
-
-const API_BASE = getApiBaseUrl();
-
-const PAGE_SIZE = 24;
-
-function useQuery() {
-    const { search } = useLocation();
-    return useMemo(() => new URLSearchParams(search), [search]);
-}
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { searchProducts } from '../api/productApi';
 
 export default function SearchPage() {
-    const q = useQuery();
-    const keyword = q.get('keyword') || '';
-    const page = Number(q.get('page') || '0');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const keyword = (searchParams.get('keyword') || '').trim();
+    const [page, setPage] = useState(Number(searchParams.get('page') || 0));
 
-    const [data, setData] = useState({
-        content: [],
-        totalElements: 0,
-        number: 0,
-        size: PAGE_SIZE,
-    });
-    const [error, setError] = useState('');
+    const [result, setResult] = useState(null); // will hold the Page object
+    const [loading, setLoading] = useState(false);
+    const [error,   setError]   = useState('');
 
     useEffect(() => {
-        const controller = new AbortController();
-        const url = `${API_BASE}/api/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${PAGE_SIZE}`;
+        if (!keyword) {
+            setResult(null);
+            return;
+        }
 
-        (async () => {
-            try {
-                const res = await fetch(url, { signal: controller.signal });
-                const ct = res.headers.get('content-type') || '';
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                if (!ct.includes('application/json')) {
-                    // helpful for catching accidental HTML from port 3000
-                    const text = await res.text();
-                    throw new Error(`Expected JSON, got: ${ct}. Body: ${text.slice(0, 200)}`);
-                }
-                const json = await res.json();
-                setData(json);
-                setError('');
-            } catch (e) {
-                if (e.name !== 'AbortError') {
-                    console.warn('Search fetch failed:', e);
-                    setError('Could not load search results.');
-                    setData(d => ({ ...d, content: [] }));
-                }
-            }
-        })();
+        setLoading(true);
+        setError('');
 
-        return () => controller.abort();
+        searchProducts({ keyword, page, size: 24 })
+            .then(setResult)
+            .catch(err => {
+                console.error(err);
+                setError('Something went wrong, please try again.');
+            })
+            .finally(() => setLoading(false));
     }, [keyword, page]);
 
+    const products = result?.content || [];
+    const totalPages = result?.totalPages || 0;
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+        setSearchParams({ keyword, page: newPage });
+    };
+
     return (
-        <div className="max-w-6xl mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold mb-4">Search results for “{keyword}”</h1>
-            {error && <p className="text-red-600 mb-2">{error}</p>}
-            {data.content.length === 0 ? (
-                <p className="text-gray-600">No products found.</p>
-            ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {data.content.map(p => (
-                        <div key={p.id} className="border rounded-xl p-3 shadow-sm hover:shadow">
-                            <img src={p.thumbnailUrl} alt={p.name} className="w-full h-40 object-cover rounded-lg"/>
-                            <div className="mt-2">
-                                <div className="font-semibold">{p.name}</div>
-                                {p?.price != null && (
-                                    <div className="text-sm text-gray-500">${Number(p.price).toFixed(2)}</div>
-                                )}
-                            </div>
+        <div className="min-h-screen px-4 md:px-10 py-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-4">
+                Search results for “{keyword}”
+            </h1>
+
+            {loading && <p>Loading...</p>}
+            {error && <p className="text-red-500">{error}</p>}
+
+            {!loading && !error && keyword && products.length === 0 && (
+                <p>No products found.</p>
+            )}
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+                {products.map((p) => (
+                    <div
+                        key={p.id}
+                        className="border rounded-lg p-3 shadow-sm hover:shadow-md transition cursor-pointer"
+                    >
+                        <img
+                            src={p.imageUrls?.[0]}
+                            alt={p.name}
+                            className="w-full h-40 object-cover rounded-md mb-2"
+                        />
+                        <div className="font-semibold text-sm md:text-base">{p.name}</div>
+                        <div className="mt-1 text-sm text-gray-600 line-clamp-2">
+                            {p.description}
                         </div>
-                    ))}
+                        <div className="mt-2 font-bold text-base">
+                            ${Number(p.price).toFixed(2)}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex items-center gap-3 mt-6">
+                    <button
+                        disabled={page === 0}
+                        onClick={() => handlePageChange(page - 1)}
+                        className="px-3 py-1 border rounded disabled:opacity-50"
+                    >
+                        Prev
+                    </button>
+                    <span>
+            Page {page + 1} / {totalPages}
+          </span>
+                    <button
+                        disabled={page + 1 >= totalPages}
+                        onClick={() => handlePageChange(page + 1)}
+                        className="px-3 py-1 border rounded disabled:opacity-50"
+                    >
+                        Next
+                    </button>
                 </div>
             )}
         </div>
