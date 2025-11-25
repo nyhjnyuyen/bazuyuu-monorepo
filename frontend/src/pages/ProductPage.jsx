@@ -1,26 +1,32 @@
 // src/pages/ProductPage.jsx
 import React, { useEffect, useMemo, useState, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getProduct, getProductsByCategory } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
-import ProductCard from '../components/ProductCard';
 import Footer from '../components/Footer';
 import { CustomerContext } from '../components/CustomerContext';
 import useWishlist from '../hook/useWishlist';
+
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-
-
+import heart from '../assets/heart.png';
+import shoppingCart from '../assets/shopping-cart.svg';
 
 export default function ProductPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
+
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState(null);
     const [related, setRelated] = useState([]);
     const [activeImage, setActiveImage] = useState(null);
+
+    // for related add-to-cart state (like LandingPage)
+    const [addingId, setAddingId] = useState(null);
+    const [inCartIds, setInCartIds] = useState(() => new Set());
 
     const { customer } = useContext(CustomerContext);
     const { isInWishlist, toggleWishlist } = useWishlist(customer);
@@ -52,7 +58,6 @@ export default function ProductPage() {
                 } else {
                     setRelated([]);
                 }
-
             } catch (e) {
                 console.error('Failed to load product:', e);
                 if (!cancelled) {
@@ -69,19 +74,39 @@ export default function ProductPage() {
             cancelled = true;
         };
     }, [id]);
+
     const images = useMemo(() => normalizeImages(product), [product]);
 
     const handleAddToCart = async () => {
         if (!product) return;
         try {
             await addToCart({ productId: product.id, quantity: 1 });
+            window.dispatchEvent(new Event('cart-updated'));
             alert(` ${product.name} đã được thêm vào giỏ hàng!`);
         } catch (e) {
             console.error('Add to cart failed', e);
-            alert('Thêm vao giỏ thất bại. Xin vui lòng thử lại.');
+            alert('Thêm vào giỏ thất bại. Xin vui lòng thử lại.');
         }
     };
 
+    const handleAddRelatedToCart = async (item) => {
+        setAddingId(item.id);
+        try {
+            await addToCart({ productId: item.id, quantity: 1 });
+            setInCartIds(prev => {
+                const next = new Set(prev);
+                next.add(item.id);
+                return next;
+            });
+            window.dispatchEvent(new Event('cart-updated'));
+            alert(` ${item.name} đã được thêm vào giỏ hàng!`);
+        } catch (e) {
+            console.error('Add to cart failed', e);
+            alert('Thêm vào giỏ thất bại. Xin vui lòng thử lại.');
+        } finally {
+            setAddingId(null);
+        }
+    };
 
     if (loading) {
         return (
@@ -212,10 +237,10 @@ export default function ProductPage() {
                     </div>
                 </div>
 
-                {/* Related products */}
+                {/* Related products – same style as NEW ARRIVALS */}
                 <section className="mt-16">
-                    <h2 className="text-center font-heading text-violet-925 tracking-[0.06em] text-h2 leading-tight mb-8">
-                        Related Products
+                    <h2 className="mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight mb-12">
+                        RELATED PRODUCTS
                     </h2>
 
                     {related.length === 0 ? (
@@ -223,30 +248,133 @@ export default function ProductPage() {
                             No related products found.
                         </p>
                     ) : (
-                        <div className="relative w-full">
+                        <div className="relative max-w-7xl mx-auto px-0 pb-4">
                             <Swiper
                                 modules={[Navigation]}
                                 navigation
                                 spaceBetween={20}
                                 slidesPerView={1}
-                                className="related-swiper"
                                 breakpoints={{
                                     640: { slidesPerView: 2 },
-                                    1024: { slidesPerView: 4 }, // 4 visible, up to 8 total with arrows
+                                    1024: { slidesPerView: 4 },
                                 }}
                             >
-                                {related.map((p) => (
-                                    <SwiperSlide key={p.id} className="!h-auto flex">
-                                        <div className="w-full h-full">
-                                            <ProductCard
-                                                product={p}
-                                                onAddToCart={() =>
-                                                    addToCart({ productId: p.id, quantity: 1 })
-                                                }
-                                            />
-                                        </div>
-                                    </SwiperSlide>
-                                ))}
+                                {related.map((item) => {
+                                    const wish = isInWishlist(item.id);
+                                    const inCart = inCartIds.has(item.id);
+                                    const imgSrc =
+                                        item.imageUrls?.[0] || item.imageUrl || item.image;
+
+                                    return (
+                                        <SwiperSlide key={item.id} className="!h-auto flex">
+                                            <div className="w-full h-full">
+                                                <div
+                                                    className="border border-violet-950 rounded-[20px] bg-[#F6F2FF] flex flex-col items-center overflow-hidden h-full cursor-pointer"
+                                                    onClick={() => navigate(`/product/${item.id}`)}
+                                                >
+                                                    {/* image */}
+                                                    <div className="w-full aspect-square bg-white flex items-center justify-center rounded-[20px] overflow-hidden">
+                                                        {imgSrc ? (
+                                                            <img
+                                                                src={imgSrc}
+                                                                alt={item.name}
+                                                                className="object-contain h-4/5 w-4/5"
+                                                            />
+                                                        ) : (
+                                                            <span className="text-violet-300 text-sm">
+                                                                No image
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* text + actions */}
+                                                    <div className="w-full px-4 py-4 flex flex-col flex-1">
+                                                        {/* name (2 lines) */}
+                                                        <p
+                                                            className="text-left text-xl font-heading text-violet-950 overflow-hidden"
+                                                            style={{
+                                                                display: '-webkit-box',
+                                                                WebkitLineClamp: 2,
+                                                                WebkitBoxOrient: 'vertical',
+                                                                lineHeight: '1.6rem',
+                                                                height: '3.2rem',
+                                                            }}
+                                                        >
+                                                            {item.name}
+                                                        </p>
+
+                                                        {/* price + buttons */}
+                                                        <div className="flex justify-between items-center mt-3 mt-auto">
+                                                            <p className="justify-start text-violet-950 text-xl font-bold font-brand">
+                                                                {new Intl.NumberFormat('vi-VN', {
+                                                                    style: 'currency',
+                                                                    currency: 'VND',
+                                                                    maximumFractionDigits: 0,
+                                                                }).format(Number(item.price ?? 0))}
+                                                            </p>
+
+                                                            <div className="flex gap-3">
+                                                                {/* Heart */}
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label={wish ? 'Remove from wishlist' : 'Add to wishlist'}
+                                                                    aria-pressed={wish}
+                                                                    className={`w-9 h-9 rounded-full border transition flex items-center justify-center ${
+                                                                        wish
+                                                                            ? 'bg-violet-950 border-violet-950 hover:bg-violet-950'
+                                                                            : 'bg-white border-violet-200 hover:bg-violet-100'
+                                                                    }`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        e.preventDefault();
+                                                                        toggleWishlist(item.id);
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={heart}
+                                                                        alt=""
+                                                                        className={`w-5 h-5 ${
+                                                                            wish ? 'filter brightness-0 invert' : ''
+                                                                        }`}
+                                                                    />
+                                                                </button>
+
+                                                                {/* Cart */}
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label={inCart ? 'Added to cart' : 'Add to cart'}
+                                                                    disabled={addingId === item.id}
+                                                                    className={`w-9 h-9 rounded-full border transition flex items-center justify-center ${
+                                                                        inCart
+                                                                            ? 'bg-violet-950 border-violet-950 hover:bg-violet-950'
+                                                                            : 'bg-white border-violet-200 hover:bg-violet-100'
+                                                                    } ${
+                                                                        addingId === item.id
+                                                                            ? 'opacity-50 pointer-events-none'
+                                                                            : ''
+                                                                    }`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        e.preventDefault();
+                                                                        handleAddRelatedToCart(item);
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={shoppingCart}
+                                                                        alt=""
+                                                                        className={`w-5 h-5 ${
+                                                                            inCart ? 'filter brightness-0 invert' : ''
+                                                                        }`}
+                                                                    />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </SwiperSlide>
+                                    );
+                                })}
                             </Swiper>
                         </div>
                     )}
@@ -260,18 +388,8 @@ export default function ProductPage() {
 
 function normalizeImages(p) {
     if (!p) return [];
-
-    // 1. Prefer array from Supabase uploads
-    if (Array.isArray(p.imageUrls) && p.imageUrls.length) {
-        return p.imageUrls;
-    }
-
-    // 2. Fallback to old `images` array if it exists
-    if (Array.isArray(p.images) && p.images.length) {
-        return p.images;
-    }
-
-    // 3. Single URL fields
+    if (Array.isArray(p.imageUrls) && p.imageUrls.length) return p.imageUrls;
+    if (Array.isArray(p.images) && p.images.length) return p.images;
     const single = p.imageUrl || p.image;
     return single ? [single] : [];
 }
