@@ -223,25 +223,32 @@ export default function ProductPage() {
                             No related products found.
                         </p>
                     ) : (
-                        <Swiper
-                            modules={[Navigation]}
-                            navigation      // ← shows < and > arrows
-                            spaceBetween={24}
-                            slidesPerView={1}
-                            breakpoints={{
-                                640: { slidesPerView: 2 },  // tablet
-                                1024: { slidesPerView: 4 }, // desktop: show 4 at a time
-                            }}
-                        >
-                            {related.map((p) => (
-                                <SwiperSlide key={p.id}>
-                                    <ProductCard
-                                        product={p}
-                                        onAddToCart={() => addToCart({ productId: p.id, quantity: 1 })}
-                                    />
-                                </SwiperSlide>
-                            ))}
-                        </Swiper>
+                        <div className="relative max-w-7xl mx-auto">
+                            <Swiper
+                                modules={[Navigation]}
+                                navigation
+                                spaceBetween={20}
+                                slidesPerView={1}
+                                breakpoints={{
+                                    640: { slidesPerView: 2 },
+                                    1024: { slidesPerView: 4 }, // 4 visible, up to 8 total with arrows
+                                }}
+                            >
+                                {related.map((p) => (
+                                    <SwiperSlide key={p.id} className="!h-auto flex">
+                                        {/* wrapper so card fills the slide height like New Arrivals */}
+                                        <div className="w-full h-full">
+                                            <ProductCard
+                                                product={p}
+                                                onAddToCart={() =>
+                                                    addToCart({ productId: p.id, quantity: 1 })
+                                                }
+                                            />
+                                        </div>
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                        </div>
                     )}
                 </section>
             </main>
