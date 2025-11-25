@@ -6,6 +6,8 @@ import Footer from '../components/Footer';
 import { addToCart } from '../api/cartApi';
 import { CustomerContext } from '../components/CustomerContext';
 import useWishlist from '../hook/useWishlist';
+
+// Xiao Kou story images
 import xiaogui1 from '../assets/xiaogui_01.jpg';
 import xiaogui2 from '../assets/xiaogui_02.jpg';
 import xiaogui3 from '../assets/xiaogui_03.jpg';
@@ -17,36 +19,57 @@ import xiaogui8 from '../assets/xiaogui_08.jpg';
 import xiaogui9 from '../assets/xiaogui_09.jpg';
 import xiaogui10 from '../assets/xiaogui_10.jpg';
 import xiaogui11 from '../assets/xiaogui_11.jpg';
+
 const PAGE_SIZE = 24;
 
-// ALL = “haven’t chosen family yet”
-const CATEGORIES = ['ALL', 'CRUX', 'XIAO_KOU', 'VEGETABLE'];
-
+// ─────────────────────────────
+// Family definitions
+// ─────────────────────────────
 const FAMILY_DEFS = [
     {
         id: 'CRUX',
-        title: "Gia Đình U U",
-        images: [
-            "/story/vegetable/1.jpg",
-            "/story/vegetable/2.jpg",
-            "/story/vegetable/3.jpg",
-        ]
+        title: 'Gia Đình U U',
+        description:
+            'Bộ plush “Gia đình U U” với concept mộng mơ, dễ thương và ấm áp – dành cho những ai thích không khí nhẹ nhàng, ngọt ngào.',
+        images: [] // bạn có thể thêm ảnh sau
     },
     {
         id: 'XIAO_KOU',
-        title: "Xiao Kou",
+        title: 'Ghost Xiao Kou',
+        description:
+            'Thế giới “cống rãnh” kỳ lạ, nơi những nhân vật nhỏ như ruồi, gián, muỗi… được biến hoá thành các plush & móc khóa siêu dễ thương.',
         images: [
-            xiaogui1, xiaogui2, xiaogui3,xiaogui4, xiaogui5, xiaogui6,xiaogui7, xiaogui8, xiaogui9,xiaogui10, xiaogui11
+            xiaogui1,
+            xiaogui2,
+            xiaogui3,
+            xiaogui4,
+            xiaogui5,
+            xiaogui6,
+            xiaogui7,
+            xiaogui8,
+            xiaogui9,
+            xiaogui10,
+            xiaogui11
         ]
     },
     {
+        id: 'VEGETABLE',
+        title: 'Vegetable Family',
+        description:
+            'Gia đình rau củ mềm mại, đầy màu sắc – giúp giờ chơi của bé trở nên sinh động và giàu trí tưởng tượng.',
+        images: [] // thêm ảnh rau củ nếu có
+    },
+    {
         id: 'KINGKONG',
-        title: "KingKong",
-        images: [
-
-        ]
+        title: 'KingKong',
+        description:
+            'Nhân vật KingKong mạnh mẽ nhưng vẫn rất dễ thương, phù hợp cho fan monster & kaiju.',
+        images: [] // thêm ảnh KingKong nếu có
     }
 ];
+
+// ALL = chưa chọn gia đình
+const CATEGORIES = ['ALL', ...FAMILY_DEFS.map((f) => f.id)];
 
 export default function ShopPage() {
     const location = useLocation();
@@ -156,9 +179,7 @@ export default function ShopPage() {
 
                 setTotalElements(elements);
                 setTotalPages(pages);
-                setProducts(prev =>
-                    page === 0 ? newContent : [...prev, ...newContent]
-                );
+                setProducts((prev) => (page === 0 ? newContent : [...prev, ...newContent]));
                 setError('');
             } catch (e) {
                 console.error('Shop fetch failed:', e);
@@ -202,9 +223,7 @@ export default function ShopPage() {
     };
 
     const currentFamilyStory =
-        category !== 'ALL'
-            ? FAMILY_DEFS.find((f) => f.id === category)
-            : null;
+        category !== 'ALL' ? FAMILY_DEFS.find((f) => f.id === category) : null;
 
     // ─────────────────────────────
     // 1️⃣ SCREEN: CHỌN GIA ĐÌNH
@@ -223,29 +242,23 @@ export default function ShopPage() {
                             xem câu chuyện và sản phẩm nhé.
                         </p>
 
-                        <div className="grid gap-6 md:grid-cols-3">
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {FAMILY_DEFS.map((fam) => (
                                 <button
                                     key={fam.id}
                                     type="button"
                                     onClick={() => onSelectCategory(fam.id)}
-                                    className={`group text-left rounded-3xl border border-violet-200 bg-gradient-to-br ${fam.bg} p-5 md:p-6 shadow-sm hover:shadow-md hover:border-violet-500 transition flex flex-col h-full`}
+                                    className="group text-left rounded-3xl border border-violet-200 bg-white p-5 md:p-6 shadow-sm hover:shadow-md hover:border-violet-500 transition flex flex-col h-full"
                                 >
-                                    <span className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 mb-3">
-                                        {fam.badge}
-                                    </span>
                                     <h2 className="text-xl md:text-2xl font-heading text-violet-950 mb-2">
                                         {fam.title}
                                     </h2>
-                                    <p className="text-sm md:text-base font-heading text-violet-900 mb-4">
-                                        {fam.tagline}
-                                    </p>
-                                    <p className="text-sm text-violet-900/80 flex-1">
+                                    <p className="text-sm md:text-base font-heading text-violet-900 flex-1">
                                         {fam.description}
                                     </p>
                                     <span className="mt-4 inline-flex items-center text-sm font-semibold text-violet-950 group-hover:underline">
-                                        Xem câu chuyện &amp; sản phẩm →
-                                    </span>
+                    Xem câu chuyện &amp; sản phẩm →
+                  </span>
                                 </button>
                             ))}
                         </div>
@@ -257,7 +270,7 @@ export default function ShopPage() {
     }
 
     // ─────────────────────────────
-    // 2️⃣ SCREEN: STORY + PRODUCT LIST CỦA GIA ĐÌNH
+    // 2️⃣ SCREEN: STORY (HÌNH) + PRODUCT LIST CỦA GIA ĐÌNH
     // ─────────────────────────────
     return (
         <div className="flex flex-col min-h-screen bg-white">
@@ -272,7 +285,7 @@ export default function ShopPage() {
                         ← Quay lại chọn gia đình
                     </button>
 
-                    <h1 className="text-2xl md:text-3xl font-bold text-violet-925 mb-4">
+                    <h1 className="text-2xl md:text-3xl font-bold text-violet-925 mb-3">
                         {currentFamilyStory?.title || 'Gia đình BAZUUYU'}
                     </h1>
                     <p className="text-violet-925/80 font-heading max-w-2xl">
@@ -280,21 +293,25 @@ export default function ShopPage() {
                     </p>
                 </div>
 
-                {/* Story highlight block */}
-                {currentFamilyStory && (
-                    <section className="max-w-7xl mx-auto px-4 sm:px-6">
-                        <div
-                            className={`rounded-3xl border border-violet-100 bg-gradient-to-br ${currentFamilyStory.bg} p-6 md:p-8 mb-10`}
-                        >
-                            <p className="text-xs uppercase tracking-[0.22em] text-violet-800 mb-3">
-                                Family Story
-                            </p>
-                            <h2 className="text-xl md:text-2xl font-heading text-violet-950 mb-2">
-                                {currentFamilyStory.tagline}
-                            </h2>
-                            <p className="text-sm md:text-base text-violet-900 max-w-3xl">
-                                {currentFamilyStory.description}
-                            </p>
+                {/* Story gallery (images) */}
+                {currentFamilyStory && currentFamilyStory.images.length > 0 && (
+                    <section className="max-w-7xl mx-auto px-4 sm:px-6 mb-10">
+                        <h2 className="text-lg md:text-xl font-heading text-violet-925 mb-4">
+                            Story Gallery
+                        </h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {currentFamilyStory.images.map((img, i) => (
+                                <div
+                                    key={i}
+                                    className="w-full overflow-hidden rounded-2xl shadow-sm border border-violet-100"
+                                >
+                                    <img
+                                        src={img}
+                                        alt={`${currentFamilyStory.title} story ${i + 1}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </section>
                 )}
@@ -328,8 +345,7 @@ export default function ShopPage() {
                         {/* Footer with Show More */}
                         <div className="w-full flex flex-col items-center mt-12 space-y-4 mb-12">
                             <p className="text-violet-950 text-center text-lg font-heading">
-                                Showing {products.length} of {totalElements} items in this
-                                family
+                                Showing {products.length} of {totalElements} items in this family
                             </p>
 
                             <div className="w-80 h-2 bg-violet-950/10 rounded-full overflow-hidden">
