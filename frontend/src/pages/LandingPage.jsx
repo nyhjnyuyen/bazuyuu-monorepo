@@ -12,7 +12,7 @@ import slogan1 from '../assets/event1.jpg';
 import slogan2 from '../assets/event2.jpg';
 import slogan3 from '../assets/event3-1.JPG';
 import slogan4 from '../assets/event4.JPG';
-import banner1 from '../assets/banner-01.jpg';
+import banner1 from '../assets/xiaogui_01.jpg';
 import banner2 from '../assets/banner-02.jpg';
 import banner3 from '../assets/banner-03.jpg';
 import cruxCat from '../assets/crux-category.jpg';
@@ -35,7 +35,7 @@ import { getLandingNewArrivals } from '../api/productApi';
 const categories = [
     { title: 'CRUX', value: 'CRUX', img: cruxCat },
     { title: 'Xiao Kou', value: 'XIAO_KOU', img: xiaokouMain },
-    { title: 'Blind Box', value: 'BBQ', img: bbqcat},
+    { title: 'Blind Box', value: 'BBQ', img: hotpotcat},
     { title: 'ALL', value: 'ALL', img: catAll },
 ];
 
