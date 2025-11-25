@@ -223,12 +223,13 @@ export default function ProductPage() {
                             No related products found.
                         </p>
                     ) : (
-                        <div className="relative max-w-7xl mx-auto">
+                        <div className="relative w-full">
                             <Swiper
                                 modules={[Navigation]}
                                 navigation
                                 spaceBetween={20}
                                 slidesPerView={1}
+                                className="related-swiper"
                                 breakpoints={{
                                     640: { slidesPerView: 2 },
                                     1024: { slidesPerView: 4 }, // 4 visible, up to 8 total with arrows
@@ -236,7 +237,6 @@ export default function ProductPage() {
                             >
                                 {related.map((p) => (
                                     <SwiperSlide key={p.id} className="!h-auto flex">
-                                        {/* wrapper so card fills the slide height like New Arrivals */}
                                         <div className="w-full h-full">
                                             <ProductCard
                                                 product={p}
