@@ -7,6 +7,11 @@ import ProductCard from '../components/ProductCard';
 import Footer from '../components/Footer';
 import { CustomerContext } from '../components/CustomerContext';
 import useWishlist from '../hook/useWishlist';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+
 
 
 
@@ -41,7 +46,7 @@ export default function ProductPage() {
                     if (!cancelled) {
                         const list = (arr ?? [])
                             .filter(x => String(x.id) !== String(p.id))
-                            .slice(0, 8);                         
+                            .slice(0, 8);
                         setRelated(list);
                     }
                 } else {
@@ -218,15 +223,25 @@ export default function ProductPage() {
                             No related products found.
                         </p>
                     ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                            {related.map(p => (
-                                <ProductCard
-                                    key={p.id}
-                                    product={p}
-                                    onAddToCart={() => addToCart({ productId: p.id, quantity: 1 })}
-                                />
+                        <Swiper
+                            modules={[Navigation]}
+                            navigation      // ← shows < and > arrows
+                            spaceBetween={24}
+                            slidesPerView={1}
+                            breakpoints={{
+                                640: { slidesPerView: 2 },  // tablet
+                                1024: { slidesPerView: 4 }, // desktop: show 4 at a time
+                            }}
+                        >
+                            {related.map((p) => (
+                                <SwiperSlide key={p.id}>
+                                    <ProductCard
+                                        product={p}
+                                        onAddToCart={() => addToCart({ productId: p.id, quantity: 1 })}
+                                    />
+                                </SwiperSlide>
                             ))}
-                        </div>
+                        </Swiper>
                     )}
                 </section>
             </main>
