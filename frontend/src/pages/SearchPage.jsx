@@ -55,7 +55,7 @@ export default function SearchPage() {
                     <div
                         key={p.id}
                         className="border rounded-lg p-3 shadow-sm hover:shadow-md transition cursor-pointer"
-                        onClick={() => navigate(`/products/${p.id}`)}
+                        onClick={() => navigate(`/product/${p.id}`)}
                     >
                         <img
                             src={p.imageUrls?.[0]}

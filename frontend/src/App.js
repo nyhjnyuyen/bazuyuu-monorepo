@@ -54,6 +54,7 @@ function AppShell() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/new" element={<NewArrivalsPage />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -63,7 +64,6 @@ function AppShell() {
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/shop" element={<ShopPage />} />
-                <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route
                     path="/profile"
