@@ -6,21 +6,21 @@ import Footer from '../components/Footer';
 import { addToCart } from '../api/cartApi';
 import { CustomerContext } from '../components/CustomerContext';
 import useWishlist from '../hook/useWishlist';
-import xiaogui1 from '../assets/xiaogui_01.png';
-import xiaogui2 from '../assets/xiaogui_02.png';
-import xiaogui3 from '../assets/xiaogui_03.png';
-import xiaogui4 from '../assets/xiaogui_04.png';
-import xiaogui5 from '../assets/xiaogui_05.png';
-import xiaogui6 from '../assets/xiaogui_06.png';
-import xiaogui7 from '../assets/xiaogui_07.png';
-import xiaogui8 from '../assets/xiaogui_08.png';
-import xiaogui9 from '../assets/xiaogui_09.png';
-import xiaogui10 from '../assets/xiaogui_10.png';
-import xiaogui11 from '../assets/xiaogui_11.png';
+import xiaogui1 from '../assets/xiaogui_01.jpg';
+import xiaogui2 from '../assets/xiaogui_02.jpg';
+import xiaogui3 from '../assets/xiaogui_03.jpg';
+import xiaogui4 from '../assets/xiaogui_04.jpg';
+import xiaogui5 from '../assets/xiaogui_05.jpg';
+import xiaogui6 from '../assets/xiaogui_06.jpg';
+import xiaogui7 from '../assets/xiaogui_07.jpg';
+import xiaogui8 from '../assets/xiaogui_08.jpg';
+import xiaogui9 from '../assets/xiaogui_09.jpg';
+import xiaogui10 from '../assets/xiaogui_10.jpg';
+import xiaogui11 from '../assets/xiaogui_11.jpg';
 const PAGE_SIZE = 24;
 
 // ALL = “haven’t chosen family yet”
-const CATEGORIES = ['ALL', '', 'XIAO_KOU', 'VEGETABLE'];
+const CATEGORIES = ['ALL', 'CRUX', 'XIAO_KOU', 'VEGETABLE'];
 
 const FAMILY_DEFS = [
     {
