@@ -130,7 +130,7 @@ export default function Navbar() {
                     {/* Desktop links hidden when compact */}
                     <nav className={`${compact ? 'hidden' : 'hidden md:flex'} items-center gap-10 text-violet-925 font-brand lg:text-xl font-bold`}>
                         <Link to="/new" className="hover:underline">NEW</Link>
-                        <Link to="/shop" className="hover:underline">SHOP</Link>
+                        <Link to="/shop" className="hover:underline">OUR FAMILIES</Link>
                         <Link to="/about" className="hover:underline">OUR STORY</Link>
                         <Link to="/contact" className="hover:underline">CONTACT</Link>
                     </nav>

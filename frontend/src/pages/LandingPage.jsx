@@ -33,9 +33,9 @@ import useWishlist from '../hook/useWishlist';
 import { getLandingNewArrivals } from '../api/productApi';
 
 const categories = [
-    { title: 'CRUX', value: 'CRUX', img: cruxCat },
+    { title: 'Gia Đình U U', value: 'CRUX', img: cruxCat },
     { title: 'Xiao Kou', value: 'XIAO_KOU', img: xiaokouMain },
-    { title: 'Blind Box', value: 'BBQ', img: hotpotcat},
+    { title: 'KingKong', value: 'BBQ', img: hotpotcat},
     { title: 'ALL', value: 'ALL', img: catAll },
 ];
 
