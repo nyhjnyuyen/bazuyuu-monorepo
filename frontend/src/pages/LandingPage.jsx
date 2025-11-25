@@ -15,13 +15,13 @@ import slogan4 from '../assets/event4.JPG';
 import banner1 from '../assets/banner-01.jpg';
 import banner2 from '../assets/banner-02.jpg';
 import banner3 from '../assets/banner-03.jpg';
-import vegecat from '../assets/category1.jpg';
+import cruxCat from '../assets/crux-category.jpg';
 import octopus from '../assets/octopus.svg';
 import shoppingCart from '../assets/shopping-cart.svg';
 import { useNavigate } from 'react-router-dom';
 import { addToCart } from '../api/cartApi';
 import SloganGrid from "../components/SloganGrid";
-import bbqcat from '../assets/BBQcat.JPG';
+import xiaokouMain from '../assets/xiaokou-main.jpg';
 import hotpotcat from '../assets/Hotpotcat.jpg';
 import catAll from '../assets/catall.png';
 
@@ -33,9 +33,9 @@ import useWishlist from '../hook/useWishlist';
 import { getLandingNewArrivals } from '../api/productApi';
 
 const categories = [
-    { title: 'VEGETABLE', value: 'VEGETABLE', img: vegecat },
-    { title: 'HOT POT', value: 'HOTPOT', img: hotpotcat },
-    { title: 'BBQ', value: 'BBQ', img: bbqcat},
+    { title: 'CRUX', value: 'CRUX', img: cruxCat },
+    { title: 'Xiao Kou', value: 'XIAO_KOU', img: xiaokouMain },
+    { title: 'Blind Box', value: 'BBQ', img: bbqcat},
     { title: 'ALL', value: 'ALL', img: catAll },
 ];
 

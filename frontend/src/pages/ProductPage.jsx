@@ -284,7 +284,7 @@ export default function ProductPage() {
 
                     {/* RELATED PRODUCTS – responsive like New Arrivals */}
                     <section className="mt-16">
-                        <h2 className="mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-2xl sm:text-3xl md:text-display leading-tight mb-10">
+                        <h2 className="mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-l sm:text-3xl md:text-display leading-tight mb-10">
                             RELATED PRODUCTS
                         </h2>
 
