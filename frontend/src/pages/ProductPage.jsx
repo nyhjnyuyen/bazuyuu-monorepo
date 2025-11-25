@@ -37,16 +37,17 @@ export default function ProductPage() {
 
                 // fetch related by category
                 if (p?.category) {
-                    const rr = await getProductsByCategory(p.category);
+                    const arr = await getProductsByCategory(p.category);
                     if (!cancelled) {
-                        const list = (rr?.data ?? [])
+                        const list = (arr ?? [])
                             .filter(x => String(x.id) !== String(p.id))
-                            .slice(0, 8);
+                            .slice(0, 8);                         
                         setRelated(list);
                     }
                 } else {
                     setRelated([]);
                 }
+
             } catch (e) {
                 console.error('Failed to load product:', e);
                 if (!cancelled) {
