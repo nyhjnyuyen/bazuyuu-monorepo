@@ -91,6 +91,45 @@ public class VNPayService {
 
         return paymentUrl;
     }
+    /** Verify VNPay return/IPN signature and extract status. */
+    public VerifyResult verifyReturn(Map<String, String[]> requestParams) {
+        // Flatten multi-value map → single value
+        Map<String, String> flat = new HashMap<>();
+        requestParams.forEach((k, v) -> flat.put(k, (v != null && v.length > 0) ? v[0] : null));
+
+        String receivedHash = flat.get("vnp_SecureHash");
+        if (receivedHash == null) {
+            return new VerifyResult(false, "Missing vnp_SecureHash", null);
+        }
+
+        // Build data string without hash fields
+        Map<String, String> toSign = new HashMap<>(flat);
+        toSign.remove("vnp_SecureHashType");
+        toSign.remove("vnp_SecureHash");
+
+        List<String> keys = new ArrayList<>(toSign.keySet());
+        Collections.sort(keys);
+
+        StringBuilder hashData = new StringBuilder();
+        for (String k : keys) {
+            String v = toSign.get(k);
+            if (v == null || v.isEmpty()) continue;
+
+            if (hashData.length() > 0) hashData.append('&');
+            // Important: sign URL-encoded values, same as when creating the URL
+            hashData.append(k).append('=').append(urlEncodeUtf8(v));
+        }
+
+        String calc = cfg.hmacSHA512(cfg.getVnp_HashSecret(), hashData.toString());
+        boolean ok = calc.equalsIgnoreCase(receivedHash);
+
+        // VNPay can send either vnp_ResponseCode or vnp_TransactionStatus depending on flow
+        String code = flat.getOrDefault("vnp_ResponseCode", flat.get("vnp_TransactionStatus"));
+        String txnRef = flat.get("vnp_TxnRef");
+
+        return new VerifyResult(ok, code, txnRef);
+    }
+
 
     private static String urlEncodeUtf8(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
