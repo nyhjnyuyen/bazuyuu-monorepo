@@ -173,7 +173,7 @@ export default function ShopPage() {
         if (cat === 'ALL') return 'All';
         if (cat === 'CRUX') return 'Gia đình U U';
         if (cat === 'XIAO_KOU') return 'Ghost Xiao Kou';
-        if (cat === 'KINGKONG') return 'KINGKONG';
+        if (cat === 'KINGKONG') return 'KingKong';
         return cat;
     };
 

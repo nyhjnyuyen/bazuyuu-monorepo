@@ -21,16 +21,21 @@ public class VNPayService {
      * @param clientIp caller IP (store from request, e.g. X-Forwarded-For or remoteAddr)
      * @param returnUrlOverride if non-null, overrides vnp_return-url from properties
      */
-    public String createPaymentUrl(long totalVnd, String orderCode, String orderInfo, String clientIp, String returnUrlOverride) {
+    public String createPaymentUrl(long totalVnd,
+                                   String orderCode,
+                                   String orderInfo,
+                                   String clientIp,
+                                   String returnUrlOverride) {
+
         String vnpVersion = "2.1.0";
         String vnpCommand = "pay";
-        String vnpTxnRef  = orderCode;
+        // 🔴 IMPORTANT: ensure this is numeric-only and <= 20 chars
+        String vnpTxnRef  = orderCode; // e.g. String.valueOf(orderId)
         String vnpTmnCode = cfg.getVnp_TmnCode();
         String vnpLocale  = "vn";
         String vnpCurr    = "VND";
 
-        // times in GMT+7 formatted yyyyMMddHHmmss
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnpCreate = fmt.format(cld.getTime());
         cld.add(Calendar.MINUTE, 15);
@@ -40,7 +45,7 @@ public class VNPayService {
         params.put("vnp_Version",     vnpVersion);
         params.put("vnp_Command",     vnpCommand);
         params.put("vnp_TmnCode",     vnpTmnCode);
-        params.put("vnp_Amount",      String.valueOf(totalVnd * 100)); // *100 required
+        params.put("vnp_Amount",      String.valueOf(totalVnd * 100));
         params.put("vnp_CurrCode",    vnpCurr);
         params.put("vnp_TxnRef",      vnpTxnRef);
         params.put("vnp_OrderInfo",   orderInfo);
@@ -51,63 +56,44 @@ public class VNPayService {
         params.put("vnp_CreateDate",  vnpCreate);
         params.put("vnp_ExpireDate",  vnpExpire);
 
-        // sort keys and build hashData & query
         List<String> keys = new ArrayList<>(params.keySet());
         Collections.sort(keys);
 
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
+
         for (int i = 0; i < keys.size(); i++) {
             String k = keys.get(i);
             String v = params.get(k);
             if (v == null || v.isEmpty()) continue;
 
-            if (i > 0) { hashData.append('&'); query.append('&'); }
-            hashData.append(k).append('=').append(urlEncode(v));
-            query.append(urlEncode(k)).append('=').append(urlEncode(v));
+            // Append '&' only if this is NOT the first NON-EMPTY param
+            if (hashData.length() > 0) {
+                hashData.append('&');
+                query.append('&');
+            }
+
+            hashData.append(k)
+                    .append('=')
+                    .append(urlEncodeUtf8(v));
+
+            query.append(urlEncodeUtf8(k))
+                    .append('=')
+                    .append(urlEncodeUtf8(v));
         }
 
-        // sign
         String secureHash = cfg.hmacSHA512(cfg.getVnp_HashSecret(), hashData.toString());
         query.append("&vnp_SecureHash=").append(secureHash);
 
-        return cfg.getVnp_PayUrl() + "?" + query;
+        String paymentUrl = cfg.getVnp_PayUrl() + "?" + query;
+        // Log this once to see exactly what you're sending
+        System.out.println("VNPay URL = " + paymentUrl);
+
+        return paymentUrl;
     }
 
-    /** Verify VNPay return/IPN signature and status. */
-    public VerifyResult verifyReturn(Map<String, String[]> requestParams) {
-        // flatten multi-value map → single
-        Map<String, String> flat = new HashMap<>();
-        requestParams.forEach((k, v) -> flat.put(k, (v != null && v.length > 0) ? v[0] : null));
-
-        String receivedHash = flat.get("vnp_SecureHash");
-        if (receivedHash == null) return new VerifyResult(false, "Missing vnp_SecureHash", null);
-
-        // build data string without hash fields
-        Map<String, String> toSign = new HashMap<>(flat);
-        toSign.remove("vnp_SecureHashType");
-        toSign.remove("vnp_SecureHash");
-
-        List<String> keys = new ArrayList<>(toSign.keySet());
-        Collections.sort(keys);
-
-        StringBuilder hashData = new StringBuilder();
-        for (int i = 0; i < keys.size(); i++) {
-            String k = keys.get(i);
-            String v = toSign.get(k);
-            if (v == null || v.isEmpty()) continue;
-            if (i > 0) hashData.append('&');
-            hashData.append(k).append('=').append(v);
-        }
-
-        String calc = cfg.hmacSHA512(cfg.getVnp_HashSecret(), hashData.toString());
-        boolean ok = calc.equalsIgnoreCase(receivedHash);
-        String code = flat.getOrDefault("vnp_ResponseCode", flat.get("vnp_TransactionStatus"));
-        return new VerifyResult(ok, code, flat.get("vnp_TxnRef"));
-    }
-
-    private static String urlEncode(String s) {
-        return URLEncoder.encode(s, StandardCharsets.US_ASCII);
+    private static String urlEncodeUtf8(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
     // tiny DTO for verification outcome
