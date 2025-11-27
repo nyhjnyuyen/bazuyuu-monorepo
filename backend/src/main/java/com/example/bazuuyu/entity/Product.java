@@ -1,7 +1,10 @@
 package com.example.bazuuyu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -58,16 +61,23 @@ public class Product {
     @Column(name = "main_image_url")
     private String mainImageUrl;
 
-    @Column(name = "image_urls", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "image_urls")
     private List<String> imageUrls;
 
-    @Column(name = "story_image_urls", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "story_image_urls")
     private List<String> storyImageUrls;
 
     // ---------- OLD ProductImage relation (still used in code) ----------
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> productImages = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> variants = new ArrayList<>();
 
     public void addImage(ProductImage img) {
         if (img == null) return;
@@ -81,11 +91,6 @@ public class Product {
         }
         productImages.clear();
     }
-
-    // ---------- VARIANTS (Shopee-style) ----------
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductVariant> variants = new ArrayList<>();
 
     public void addVariant(ProductVariant variant) {
         if (variant == null) return;
