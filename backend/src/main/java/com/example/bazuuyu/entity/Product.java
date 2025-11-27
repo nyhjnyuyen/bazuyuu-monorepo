@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "products") // matches your table
+@Table(name = "products")
 @Getter
 @Setter
 @Builder
@@ -21,29 +21,25 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // columns: name, description, category, size, product_code
+    // basic info
     private String name;
-
     private String description;
 
-    // DB column "category" is text -> map enum as STRING
     @Enumerated(EnumType.STRING)
-    private Category category;  // column name "category"
+    private Category category;   // maps to "category" text column
 
-    // optional size column (e.g. "S/M/L" or "6cm")
+    // optional size column in DB
     private String size;
 
-    // SKU / product code
     @Column(name = "product_code")
     private String productCode;
 
-    // price, quantity
+    // price & quantity
     @Column(precision = 18, scale = 2, nullable = false)
     private BigDecimal price;
 
     private int quantity;
 
-    // created_at timestamptz
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -52,37 +48,47 @@ public class Product {
         this.createdAt = LocalDateTime.now();
     }
 
-    // flags
     @Column(name = "is_best_seller")
     private boolean isBestSeller;
 
     @Column(name = "is_new_arrival")
     private boolean isNewArrival;
 
-    // main_image_url, image_urls[], story_image_urls[]
+    // main + extra images stored directly on products table
     @Column(name = "main_image_url")
     private String mainImageUrl;
 
-    /**
-     * These map to Postgres text[] columns.
-     * Hibernate 6+ understands arrays if the dialect supports it.
-     * If not, you can switch these to JSON or a separate Image entity.
-     */
-    @Column(name = "image_urls", columnDefinition = "text[]")
-    private String[] imageUrls;
+    @Column(name = "image_urls", columnDefinition = "jsonb")
+    private List<String> imageUrls;
 
-    @Column(name = "story_image_urls", columnDefinition = "text[]")
-    private String[] storyImageUrls;
+    @Column(name = "story_image_urls", columnDefinition = "jsonb")
+    private List<String> storyImageUrls;
 
-    // ---------- VARIANTS (Shopee-style choices) ----------
+    // ---------- OLD ProductImage relation (still used in code) ----------
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImages = new ArrayList<>();
+
+    public void addImage(ProductImage img) {
+        if (img == null) return;
+        img.setProduct(this);
+        this.productImages.add(img);
+    }
+
+    public void clearImages() {
+        for (ProductImage img : new ArrayList<>(productImages)) {
+            img.setProduct(null);
+        }
+        productImages.clear();
+    }
+
+    // ---------- VARIANTS (Shopee-style) ----------
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariant> variants = new ArrayList<>();
 
-
-    // ---------- Helpers ----------
-
     public void addVariant(ProductVariant variant) {
+        if (variant == null) return;
         variant.setProduct(this);
         this.variants.add(variant);
     }
@@ -94,12 +100,12 @@ public class Product {
         variants.clear();
     }
 
-    /** true => treat like Shopee product (must choose variant) */
+    /** true => treat as product with variants (user must choose one) */
     public boolean hasVariants() {
         return variants != null && !variants.isEmpty();
     }
 
-    /** price shown on listing card */
+    /** price to display on listing card */
     public BigDecimal getDisplayPrice() {
         if (!hasVariants()) return price;
         return variants.stream()
