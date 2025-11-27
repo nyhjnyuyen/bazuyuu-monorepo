@@ -29,8 +29,10 @@ export default function ProductPage() {
 
     const { customer } = useContext(CustomerContext);
     const { isInWishlist, toggleWishlist } = useWishlist(customer);
+
     const [selectedVariantId, setSelectedVariantId] = useState(null);
 
+    // ---------- LOAD PRODUCT ----------
     useEffect(() => {
         let cancelled = false;
         setLoading(true);
@@ -49,7 +51,7 @@ export default function ProductPage() {
                     const arr = await getProductsByCategory(p.category);
                     if (!cancelled) {
                         const list = (arr ?? [])
-                            .filter(x => String(x.id) !== String(p.id))
+                            .filter((x) => String(x.id) !== String(p.id))
                             .slice(0, 8);
                         setRelated(list);
                     }
@@ -72,23 +74,70 @@ export default function ProductPage() {
             cancelled = true;
         };
     }, [id]);
-    
+
+    // images for gallery
+    const images = useMemo(() => normalizeImages(product), [product]);
+
+    // variants + flag
+    const variants = product?.variants ?? [];
+    const hasVariants = variants.length > 0;
+
+    // auto-select first variant when product changes
     useEffect(() => {
-        // when product or id changes, reset selected variant
-        if (product?.variants?.length) {
-            setSelectedVariantId(product.variants[0].id); // auto-select first
+        if (variants.length > 0) {
+            setSelectedVariantId(variants[0].id);
         } else {
             setSelectedVariantId(null);
         }
-    }, [product]);
+    }, [variants]);
 
+    // price based on selected variant (if any)
+    const displayPrice = useMemo(() => {
+        if (!product) return 0;
+        if (!hasVariants) return product.price;
+        const selected = variants.find((v) => v.id === selectedVariantId);
+        return selected?.price ?? product.price;
+    }, [product, hasVariants, variants, selectedVariantId]);
 
-    const images = useMemo(() => normalizeImages(product), [product]);
+    // ---------- EARLY RETURNS (NO HOOKS BELOW THIS LINE) ----------
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                Loading…
+            </div>
+        );
+    }
 
+    if (!product) {
+        return (
+            <div className="min-h-screen bg-white flex flex-col">
+                <main className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+                    <p className="text-violet-925 text-xl font-heading mb-6">
+                        Product not found.
+                    </p>
+                    <Link to="/shop" className="underline text-violet-925">
+                        Back to Shop
+                    </Link>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    const wishlisted = isInWishlist(product.id);
+    const categoryLink = `/shop?category=${encodeURIComponent(
+        product.category ?? ''
+    )}`;
+    const priceFormatted = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        maximumFractionDigits: 0,
+    }).format(Number(displayPrice ?? 0));
+
+    // ---------- HANDLERS ----------
     const handleAddToCart = async () => {
         if (!product) return;
 
-        // If this product has variants, require user to choose one
         if (hasVariants && !selectedVariantId) {
             alert('Vui lòng chọn sản phẩm trước khi thêm vào giỏ.');
             return;
@@ -112,7 +161,7 @@ export default function ProductPage() {
         setAddingId(item.id);
         try {
             await addToCart({ productId: item.id, quantity: 1 });
-            setInCartIds(prev => {
+            setInCartIds((prev) => {
                 const next = new Set(prev);
                 next.add(item.id);
                 return next;
@@ -127,55 +176,10 @@ export default function ProductPage() {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                Loading…
-            </div>
-        );
-    }
-
-    const variants = product?.variants ?? [];
-    const hasVariants = variants.length > 0;
-
-    if (!product) {
-        return (
-            <div className="min-h-screen bg-white flex flex-col">
-                <main className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-                    <p className="text-violet-925 text-xl font-heading mb-6">
-                        Product not found.
-                    </p>
-                    <Link to="/shop" className="underline text-violet-925">
-                        Back to Shop
-                    </Link>
-                </main>
-                <Footer />
-            </div>
-        );
-    }
-
-    const displayPrice = useMemo(() => {
-        if (!hasVariants) return product.price;
-        const selected = variants.find(v => v.id === selectedVariantId);
-        return selected?.price ?? product.price;
-    }, [hasVariants, product.price, selectedVariantId, variants]);
-
-    const wishlisted = isInWishlist(product.id);
-    const categoryLink = `/shop?category=${encodeURIComponent(product.category ?? '')}`;
-    const priceFormatted = new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        maximumFractionDigits: 0,
-    }).format(Number(displayPrice ?? 0));
-
-
-
-
-
+    // ---------- RENDER ----------
     return (
         <div className="flex flex-col min-h-screen bg-white">
             <main className="flex-grow bg-white">
-                {/* ✔ MAX WIDTH LIKE LANDING PAGE / JELLYCAT */}
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                     {/* Breadcrumb */}
                     <nav className="text-sm sm:text-base text-violet-925/70 mb-6">
@@ -191,14 +195,12 @@ export default function ProductPage() {
                                 <span className="mx-2">/</span>
                             </>
                         )}
-                        <span className="text-violet-925 font-heading">
-              {product.name}
-            </span>
+                        <span className="text-violet-925 font-heading">{product.name}</span>
                     </nav>
 
-                    {/* HERO: gallery + details */}
+                    {/* HERO */}
                     <div className="grid gap-8 lg:gap-12 lg:grid-cols-2 items-start">
-                        {/* Gallery column */}
+                        {/* Gallery */}
                         <div className="w-full">
                             <div className="w-full bg-white">
                                 <div className="aspect-square border border-violet-200 rounded-2xl flex items-center justify-center overflow-hidden">
@@ -237,7 +239,7 @@ export default function ProductPage() {
                             </div>
                         </div>
 
-                        {/* Details column */}
+                        {/* Details */}
                         <div className="flex flex-col">
                             <h1 className="font-heading text-violet-925 text-2xl sm:text-3xl md:text-4xl leading-tight">
                                 {product.name}
@@ -258,6 +260,7 @@ export default function ProductPage() {
                                     {product.shortDescription}
                                 </p>
                             )}
+
                             {/* Variant selector */}
                             {hasVariants && (
                                 <div className="mt-4">
@@ -265,13 +268,12 @@ export default function ProductPage() {
                                         Chọn phiên bản:
                                     </p>
                                     <div className="flex flex-wrap gap-2">
-                                        {variants.map(v => (
+                                        {variants.map((v) => (
                                             <button
                                                 key={v.id}
                                                 type="button"
                                                 onClick={() => setSelectedVariantId(v.id)}
-                                                className={`px-3 py-2 rounded-xl border text-sm sm:text-base
-                        ${
+                                                className={`px-3 py-2 rounded-xl border text-sm sm:text-base ${
                                                     selectedVariantId === v.id
                                                         ? 'border-violet-900 bg-violet-900 text-white'
                                                         : 'border-violet-300 text-violet-925 bg-white hover:bg-violet-50'
@@ -284,13 +286,11 @@ export default function ProductPage() {
                                 </div>
                             )}
 
-
-                            {/* Buttons row – full width on mobile, side-by-side on desktop */}
+                            {/* Buttons */}
                             <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
                                 <button
                                     onClick={() => toggleWishlist(product.id)}
-                                    className={`flex-1 px-6 py-3 rounded-2xl border font-semibold flex items-center justify-center gap-2
-                    ${
+                                    className={`flex-1 px-6 py-3 rounded-2xl border font-semibold flex items-center justify-center gap-2 ${
                                         wishlisted
                                             ? 'border-violet-900 bg-violet-100 text-violet-900'
                                             : 'border-violet-300 text-violet-925'
@@ -307,7 +307,7 @@ export default function ProductPage() {
                                 </button>
                             </div>
 
-                            {/* Jellycat-style accordions */}
+                            {/* Accordions */}
                             <section className="mt-8 border-t border-gray-200 divide-y divide-gray-200">
                                 <details className="group py-4">
                                     <summary className="flex items-center justify-between cursor-pointer list-none">
@@ -319,8 +319,9 @@ export default function ProductPage() {
                     </span>
                                     </summary>
                                     <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
-                                        {/* you can replace this with product.productDetails from backend */}
-                                        {product.productDetails || product.description || 'No additional details.'}
+                                        {product.productDetails ||
+                                            product.description ||
+                                            'No additional details.'}
                                     </div>
                                 </details>
 
@@ -334,7 +335,6 @@ export default function ProductPage() {
                     </span>
                                     </summary>
                                     <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
-                                        {/* replace with product.safetyCare if you have it */}
                                         {product.safetyCare ||
                                             'Surface clean only. Suitable for ages 3+. Do not tumble dry, dry clean or iron.'}
                                     </div>
@@ -343,7 +343,7 @@ export default function ProductPage() {
                         </div>
                     </div>
 
-                    {/* RELATED PRODUCTS – responsive like New Arrivals */}
+                    {/* RELATED PRODUCTS */}
                     <section className="mt-16">
                         <h2 className="mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-l sm:text-3xl md:text-display leading-tight mb-10">
                             RELATED PRODUCTS
@@ -379,7 +379,6 @@ export default function ProductPage() {
                                                         className="border border-violet-950 rounded-[20px] bg-[#F6F2FF] flex flex-col items-center overflow-hidden h-full cursor-pointer"
                                                         onClick={() => navigate(`/product/${item.id}`)}
                                                     >
-                                                        {/* image */}
                                                         <div className="w-full aspect-square bg-white flex items-center justify-center rounded-[20px] overflow-hidden">
                                                             {imgSrc ? (
                                                                 <img
@@ -394,7 +393,6 @@ export default function ProductPage() {
                                                             )}
                                                         </div>
 
-                                                        {/* text + actions */}
                                                         <div className="w-full px-4 py-4 flex flex-col flex-1">
                                                             <p
                                                                 className="text-left text-base sm:text-lg font-heading text-violet-950 overflow-hidden"
@@ -422,7 +420,11 @@ export default function ProductPage() {
                                                                     {/* Heart */}
                                                                     <button
                                                                         type="button"
-                                                                        aria-label={wish ? 'Remove from wishlist' : 'Add to wishlist'}
+                                                                        aria-label={
+                                                                            wish
+                                                                                ? 'Remove from wishlist'
+                                                                                : 'Add to wishlist'
+                                                                        }
                                                                         aria-pressed={wish}
                                                                         className={`w-9 h-9 rounded-full border transition flex items-center justify-center ${
                                                                             wish
@@ -439,7 +441,9 @@ export default function ProductPage() {
                                                                             src={heart}
                                                                             alt=""
                                                                             className={`w-5 h-5 ${
-                                                                                wish ? 'filter brightness-0 invert' : ''
+                                                                                wish
+                                                                                    ? 'filter brightness-0 invert'
+                                                                                    : ''
                                                                             }`}
                                                                         />
                                                                     </button>
@@ -447,7 +451,9 @@ export default function ProductPage() {
                                                                     {/* Cart */}
                                                                     <button
                                                                         type="button"
-                                                                        aria-label={inCart ? 'Added to cart' : 'Add to cart'}
+                                                                        aria-label={
+                                                                            inCart ? 'Added to cart' : 'Add to cart'
+                                                                        }
                                                                         disabled={addingId === item.id}
                                                                         className={`w-9 h-9 rounded-full border transition flex items-center justify-center ${
                                                                             inCart
@@ -468,7 +474,9 @@ export default function ProductPage() {
                                                                             src={shoppingCart}
                                                                             alt=""
                                                                             className={`w-5 h-5 ${
-                                                                                inCart ? 'filter brightness-0 invert' : ''
+                                                                                inCart
+                                                                                    ? 'filter brightness-0 invert'
+                                                                                    : ''
                                                                             }`}
                                                                         />
                                                                     </button>
