@@ -4,6 +4,8 @@ public enum Category {
     VEGETABLE,
     HOTPOT,
     BBQ,
-    XIAO_KOU, CRUX, KINGKONG
+    XIAO_KOU,
+    CRUX,
+    KINGKONG
 }
 
