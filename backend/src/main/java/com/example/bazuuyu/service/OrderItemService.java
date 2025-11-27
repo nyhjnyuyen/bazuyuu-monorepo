@@ -1,5 +1,7 @@
 package com.example.bazuuyu.service;
 
+import com.example.bazuuyu.entity.CartItem;
+import com.example.bazuuyu.entity.Order;
 import com.example.bazuuyu.entity.OrderItem;
 import com.example.bazuuyu.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +25,20 @@ public class OrderItemService {
     }
     public OrderItem save(OrderItem orderItem) {
         return orderItemRepository.save(orderItem);
+    }
+    public OrderItem createFromCartItem(CartItem cartItem, Order order) {
+        if (cartItem.getVariant() == null) {
+            return OrderItem.fromSimpleProduct(
+                    cartItem.getProduct(),
+                    order,
+                    cartItem.getQuantity()
+            );
+        } else {
+            return OrderItem.fromVariant(
+                    cartItem.getVariant(),
+                    order,
+                    cartItem.getQuantity()
+            );
+        }
     }
 }

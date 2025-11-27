@@ -21,9 +21,14 @@ public class CartItemService {
         return cartItemRepository.findByCartId(cart.getId());
     }
 
-    public Optional<CartItem> getCartItem(Long cartId, Long productId) {
-        return cartItemRepository.findByCartIdAndProductId(cartId, productId);
+    public Optional<CartItem> getCartItem(Long cartId, Long productId, Long variantId) {
+        if (variantId == null) {
+            return cartItemRepository.findByCartIdAndProductId(cartId, productId);
+        } else {
+            return cartItemRepository.findByCartIdAndProductIdAndVariantId(cartId, productId, variantId);
+        }
     }
+
     public Optional<CartItem> getCartItemById(Long id) {
         return cartItemRepository.findById(id);
     }

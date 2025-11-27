@@ -5,10 +5,7 @@ import com.example.bazuuyu.dto.request.CreateCartItemRequest;
 import com.example.bazuuyu.dto.response.CartResponse;
 import com.example.bazuuyu.entity.*;
 import com.example.bazuuyu.mapper.CartMapper;
-import com.example.bazuuyu.repository.CartItemRepository;
-import com.example.bazuuyu.repository.CartRepository;
-import com.example.bazuuyu.repository.CustomerRepository;
-import com.example.bazuuyu.repository.ProductRepository;
+import com.example.bazuuyu.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +21,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository; // 🔹 NEW
     private final CustomerRepository customerRepository;
 
     // ----------------- CRUD CART ITEM -----------------
@@ -31,14 +29,47 @@ public class CartService {
     public void addCartItem(CreateCartItemRequest request) {
         Cart cart = cartRepository.findById(request.getCartId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
+
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        CartItem item = CartItem.builder()
-                .cart(cart)
-                .product(product)
-                .quantity(request.getQuantity())
-                .build();
+        Long variantId = request.getVariantId();
+        Integer qty = request.getQuantity() == null || request.getQuantity() < 1
+                ? 1
+                : request.getQuantity();
+
+        ProductVariant variant = null;
+        if (variantId != null) {
+            variant = productVariantRepository.findById(variantId)
+                    .orElseThrow(() -> new RuntimeException("Variant not found"));
+            // safety: variant must belong to product
+            if (!variant.getProduct().getId().equals(product.getId())) {
+                throw new RuntimeException("Variant does not belong to product");
+            }
+        }
+
+        // 🔹 if variant == null → simple product
+        Optional<CartItem> existing;
+        if (variant == null) {
+            existing = cartItemRepository
+                    .findByCartIdAndProductId(cart.getId(), product.getId());
+        } else {
+            existing = cartItemRepository
+                    .findByCartIdAndProductIdAndVariantId(cart.getId(), product.getId(), variant.getId());
+        }
+
+        CartItem item;
+        if (existing.isPresent()) {
+            item = existing.get();
+            item.setQuantity(item.getQuantity() + qty);
+        } else {
+            item = CartItem.builder()
+                    .cart(cart)
+                    .product(product)
+                    .variant(variant) // null for simple product
+                    .quantity(qty)
+                    .build();
+        }
 
         cartItemRepository.save(item);
     }
@@ -72,7 +103,6 @@ public class CartService {
         return cartRepository.findByCustomerAndStatus(customer, "ACTIVE");
     }
 
-    // Helper dùng nội bộ
     private Cart getOrCreateActiveCartEntity(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
@@ -80,7 +110,6 @@ public class CartService {
         return getOrCreateActiveCartForCustomer(customer);
     }
 
-    // 👇 PUBLIC helper: dùng trong Checkout / Add-to-cart
     public Cart getOrCreateActiveCartForCustomer(Customer customer) {
         return cartRepository.findByCustomerAndStatus(customer, "ACTIVE")
                 .orElseGet(() -> cartRepository.save(
@@ -94,7 +123,6 @@ public class CartService {
 
     // ----------------- ACTIVE CART: GUEST -----------------
 
-    // 👇 NEW: lấy hoặc tạo cart cho guest (dựa trên guestId từ cookie/header)
     public Cart getOrCreateActiveCartForGuest(String guestId) {
         if (guestId == null || guestId.isBlank()) {
             throw new IllegalArgumentException("guestId is required");
@@ -127,12 +155,33 @@ public class CartService {
 
         for (CartMergeItem it : items) {
             if (it.getProductId() == null) continue;
-            int qty = (it.getQuantity() == null || it.getQuantity() < 1) ? 1 : it.getQuantity();
+
+            int qty = (it.getQuantity() == null || it.getQuantity() < 1)
+                    ? 1 : it.getQuantity();
 
             Product product = productRepository.findById(it.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found: " + it.getProductId()));
+                    .orElseThrow(() ->
+                            new RuntimeException("Product not found: " + it.getProductId()));
 
-            var existing = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
+            Long variantId = it.getVariantId();
+            ProductVariant variant = null;
+            if (variantId != null) {
+                variant = productVariantRepository.findById(variantId)
+                        .orElseThrow(() -> new RuntimeException("Variant not found: " + variantId));
+                if (!variant.getProduct().getId().equals(product.getId())) {
+                    throw new RuntimeException("Variant does not belong to product");
+                }
+            }
+
+            Optional<CartItem> existing;
+            if (variant == null) {
+                existing = cartItemRepository
+                        .findByCartIdAndProductId(cart.getId(), product.getId());
+            } else {
+                existing = cartItemRepository
+                        .findByCartIdAndProductIdAndVariantId(cart.getId(), product.getId(), variant.getId());
+            }
+
             if (existing.isPresent()) {
                 CartItem ci = existing.get();
                 ci.setQuantity(ci.getQuantity() + qty);
@@ -142,11 +191,11 @@ public class CartService {
                         CartItem.builder()
                                 .cart(cart)
                                 .product(product)
+                                .variant(variant)
                                 .quantity(qty)
                                 .build()
                 );
             }
         }
     }
-
 }

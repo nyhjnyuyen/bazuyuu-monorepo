@@ -1,7 +1,5 @@
 package com.example.bazuuyu.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,6 +43,9 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> productImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> variants = new ArrayList<>();
+
     public void addImage(ProductImage img) {
         img.setProduct(this);
         this.productImages.add(img);
@@ -54,6 +55,32 @@ public class Product {
             img.setProduct(null);
         }
         productImages.clear();
+    }
+    public void addVariant(ProductVariant variant) {
+        variant.setProduct(this);
+        this.variants.add(variant);
+    }
+
+    public void clearVariants() {
+        for (ProductVariant v : new ArrayList<>(variants)) {
+            v.setProduct(null);
+        }
+        variants.clear();
+    }
+
+    /** true => treat as Shopee-style product (must choose variant) */
+    public boolean hasVariants() {
+        return variants != null && !variants.isEmpty();
+    }
+
+    /** convenient for UI: price to show on listing (card) */
+    public BigDecimal getDisplayPrice() {
+        if (!hasVariants()) return price;
+        // if variants exist: show min price or default variant price
+        return variants.stream()
+                .map(ProductVariant::getPrice)
+                .min(BigDecimal::compareTo)
+                .orElse(price);
     }
 
 }

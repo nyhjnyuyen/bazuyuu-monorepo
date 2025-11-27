@@ -10,6 +10,8 @@ public class CartMergeItem {
     @NotNull
     private Long productId;
 
+    private Long variantId;
+
     @Min(1)
     private Integer quantity = 1;
 }
