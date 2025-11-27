@@ -37,5 +37,5 @@ public class ProductVariant {
     private int stock;
 
     @Column(name = "is_default")
-    private boolean defaultVariant;
+    private boolean isDefault;
 }

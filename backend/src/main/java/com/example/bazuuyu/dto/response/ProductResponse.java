@@ -23,4 +23,8 @@ public class ProductResponse {
     private boolean isNewArrival;
     private Category category;
     private LocalDateTime createdAt;
+    private String mainImageUrl;
+    private List<String> storyImageUrls;
+
+    private List<ProductVariantResponse> variants;
 }
