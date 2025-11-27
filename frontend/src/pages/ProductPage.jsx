@@ -29,6 +29,7 @@ export default function ProductPage() {
 
     const { customer } = useContext(CustomerContext);
     const { isInWishlist, toggleWishlist } = useWishlist(customer);
+    const [selectedVariantId, setSelectedVariantId] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -71,13 +72,34 @@ export default function ProductPage() {
             cancelled = true;
         };
     }, [id]);
+    
+    useEffect(() => {
+        // when product or id changes, reset selected variant
+        if (product?.variants?.length) {
+            setSelectedVariantId(product.variants[0].id); // auto-select first
+        } else {
+            setSelectedVariantId(null);
+        }
+    }, [product]);
+
 
     const images = useMemo(() => normalizeImages(product), [product]);
 
     const handleAddToCart = async () => {
         if (!product) return;
+
+        // If this product has variants, require user to choose one
+        if (hasVariants && !selectedVariantId) {
+            alert('Vui lòng chọn sản phẩm trước khi thêm vào giỏ.');
+            return;
+        }
+
+        const payload = hasVariants
+            ? { productId: product.id, variantId: selectedVariantId, quantity: 1 }
+            : { productId: product.id, quantity: 1 };
+
         try {
-            await addToCart({ productId: product.id, quantity: 1 });
+            await addToCart(payload);
             window.dispatchEvent(new Event('cart-updated'));
             alert(` ${product.name} đã được thêm vào giỏ hàng!`);
         } catch (e) {
@@ -113,6 +135,9 @@ export default function ProductPage() {
         );
     }
 
+    const variants = product?.variants ?? [];
+    const hasVariants = variants.length > 0;
+
     if (!product) {
         return (
             <div className="min-h-screen bg-white flex flex-col">
@@ -129,13 +154,23 @@ export default function ProductPage() {
         );
     }
 
+    const displayPrice = useMemo(() => {
+        if (!hasVariants) return product.price;
+        const selected = variants.find(v => v.id === selectedVariantId);
+        return selected?.price ?? product.price;
+    }, [hasVariants, product.price, selectedVariantId, variants]);
+
     const wishlisted = isInWishlist(product.id);
     const categoryLink = `/shop?category=${encodeURIComponent(product.category ?? '')}`;
     const priceFormatted = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND',
         maximumFractionDigits: 0,
-    }).format(Number(product.price ?? 0));
+    }).format(Number(displayPrice ?? 0));
+
+
+
+
 
     return (
         <div className="flex flex-col min-h-screen bg-white">
@@ -223,6 +258,32 @@ export default function ProductPage() {
                                     {product.shortDescription}
                                 </p>
                             )}
+                            {/* Variant selector */}
+                            {hasVariants && (
+                                <div className="mt-4">
+                                    <p className="font-heading text-sm sm:text-base text-violet-950 mb-2">
+                                        Chọn phiên bản:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {variants.map(v => (
+                                            <button
+                                                key={v.id}
+                                                type="button"
+                                                onClick={() => setSelectedVariantId(v.id)}
+                                                className={`px-3 py-2 rounded-xl border text-sm sm:text-base
+                        ${
+                                                    selectedVariantId === v.id
+                                                        ? 'border-violet-900 bg-violet-900 text-white'
+                                                        : 'border-violet-300 text-violet-925 bg-white hover:bg-violet-50'
+                                                }`}
+                                            >
+                                                {v.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
 
                             {/* Buttons row – full width on mobile, side-by-side on desktop */}
                             <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
