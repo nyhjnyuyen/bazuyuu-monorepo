@@ -91,7 +91,15 @@ export default function ProductPage() {
         }
     }, [variants]);
 
-    // ---------- EARLY RETURNS (NO HOOKS BELOW THIS LINE) ----------
+    // price based on selected variant (MUST be before early returns)
+    const displayPrice = useMemo(() => {
+        if (!product) return 0;
+        if (!hasVariants) return product.price;
+        const selected = variants.find((v) => v.id === selectedVariantId);
+        return selected?.price ?? product.price;
+    }, [product, hasVariants, variants, selectedVariantId]);
+
+    // ---------- EARLY RETURNS (NO HOOKS AFTER THIS) ----------
     if (loading) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
@@ -120,14 +128,6 @@ export default function ProductPage() {
     const categoryLink = `/shop?category=${encodeURIComponent(
         product.category ?? ''
     )}`;
-
-    // price based on selected variant
-    const displayPrice = useMemo(() => {
-        if (!product) return 0;
-        if (!hasVariants) return product.price;
-        const selected = variants.find((v) => v.id === selectedVariantId);
-        return selected?.price ?? product.price;
-    }, [product, hasVariants, variants, selectedVariantId]);
 
     const priceFormatted = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
