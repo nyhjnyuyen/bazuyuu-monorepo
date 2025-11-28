@@ -99,6 +99,24 @@ export default function ProductPage() {
         return selected?.price ?? product.price;
     }, [product, hasVariants, variants, selectedVariantId]);
 
+    useEffect(() => {
+        if (!product) return;
+
+        const vs = product.variants || [];
+        if (vs.length === 0) return;
+
+        const def = vs.find(v => v.isDefault) || vs[0];
+        setSelectedVariantId(def.id);
+
+        if (def.imageUrl) {
+            setActiveImage(def.imageUrl);
+        } else {
+            // fallback to product-level images
+            const imgs = normalizeImages(product);
+            if (imgs[0]) setActiveImage(imgs[0]);
+        }
+    }, [product]);
+
     // ---------- EARLY RETURNS (NO HOOKS BELOW THIS LINE) ----------
     if (loading) {
         return (
@@ -139,7 +157,7 @@ export default function ProductPage() {
         if (!product) return;
 
         if (hasVariants && !selectedVariantId) {
-            alert('Vui lòng chọn sản phẩm trước khi thêm vào giỏ.');
+            alert('Vui lòng chọn phiên bản trước khi thêm vào giỏ.');
             return;
         }
 
@@ -156,6 +174,7 @@ export default function ProductPage() {
             alert('Thêm vào giỏ thất bại. Xin vui lòng thử lại.');
         }
     };
+
 
     const handleAddRelatedToCart = async (item) => {
         setAddingId(item.id);
@@ -268,12 +287,18 @@ export default function ProductPage() {
                                         Chọn phiên bản:
                                     </p>
                                     <div className="flex flex-wrap gap-2">
-                                        {variants.map((v) => (
+                                        {variants.map(v => (
                                             <button
                                                 key={v.id}
                                                 type="button"
-                                                onClick={() => setSelectedVariantId(v.id)}
-                                                className={`px-3 py-2 rounded-xl border text-sm sm:text-base ${
+                                                onClick={() => {
+                                                    setSelectedVariantId(v.id);
+                                                    if (v.imageUrl) {
+                                                        setActiveImage(v.imageUrl);      // ✅ swap main picture
+                                                    }
+                                                }}
+                                                className={`px-3 py-2 rounded-xl border text-sm sm:text-base
+            ${
                                                     selectedVariantId === v.id
                                                         ? 'border-violet-900 bg-violet-900 text-white'
                                                         : 'border-violet-300 text-violet-925 bg-white hover:bg-violet-50'

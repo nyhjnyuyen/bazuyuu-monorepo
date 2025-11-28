@@ -38,4 +38,8 @@ public class ProductVariant {
 
     @Column(name = "is_default")
     private boolean isDefault;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
 }
