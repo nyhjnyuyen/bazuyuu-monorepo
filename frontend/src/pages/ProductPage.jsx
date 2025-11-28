@@ -287,6 +287,7 @@ export default function ProductPage() {
                                         Chọn phiên bản:
                                     </p>
                                     <div className="flex flex-wrap gap-2">
+                                        // inside the variant map (unchanged except comment)
                                         {variants.map(v => (
                                             <button
                                                 key={v.id}
@@ -294,11 +295,11 @@ export default function ProductPage() {
                                                 onClick={() => {
                                                     setSelectedVariantId(v.id);
                                                     if (v.imageUrl) {
-                                                        setActiveImage(v.imageUrl);      // ✅ swap main picture
+                                                        setActiveImage(v.imageUrl);      // ✅ swap main picture on click
                                                     }
                                                 }}
                                                 className={`px-3 py-2 rounded-xl border text-sm sm:text-base
-            ${
+${
                                                     selectedVariantId === v.id
                                                         ? 'border-violet-900 bg-violet-900 text-white'
                                                         : 'border-violet-300 text-violet-925 bg-white hover:bg-violet-50'
@@ -527,8 +528,21 @@ export default function ProductPage() {
 
 function normalizeImages(p) {
     if (!p) return [];
-    if (Array.isArray(p.imageUrls) && p.imageUrls.length) return p.imageUrls;
-    if (Array.isArray(p.images) && p.images.length) return p.images;
-    const single = p.imageUrl || p.image;
-    return single ? [single] : [];
+
+    const list = [];
+
+    // 1. main image first
+    if (p.mainImageUrl) list.push(p.mainImageUrl);
+
+    // 2. product-level galleries
+    if (Array.isArray(p.imageUrls)) list.push(...p.imageUrls);
+    if (Array.isArray(p.storyImageUrls)) list.push(...p.storyImageUrls);
+    if (Array.isArray(p.images)) list.push(...p.images);
+
+    // 3. single fields as final fallback
+    if (p.imageUrl) list.push(p.imageUrl);
+    if (p.image) list.push(p.image);
+
+    // remove falsy + duplicates
+    return Array.from(new Set(list.filter(Boolean)));
 }
