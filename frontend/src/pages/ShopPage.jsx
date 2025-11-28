@@ -248,7 +248,6 @@ export default function ShopPage() {
                             <p className="text-violet-950 text-center text-lg font-heading">
                                 Showing {products.length} of {totalElements} total
                             </p>
-
                             <div className="w-80 h-2 bg-violet-950/10 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-violet-950 rounded-full"

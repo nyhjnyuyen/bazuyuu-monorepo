@@ -27,28 +27,32 @@ function getDisplayPrice(product) {
 function pickImage(p) {
     if (!p) return FALLBACK_IMG;
 
-    // 1. Variant image (default variant first)
-    let variantImg = null;
+    const candidates = [];
+
+    // 1️⃣ main product image (highest priority)
+    if (p.mainImageUrl) candidates.push(p.mainImageUrl);
+
+    // 2️⃣ gallery images from jsonb columns
+    if (Array.isArray(p.imageUrls)) candidates.push(...p.imageUrls);
+
+    // 3️⃣ default / first variant image (lower priority for the card)
     if (Array.isArray(p.variants) && p.variants.length > 0) {
         const def = p.variants.find(v => v.isDefault) || p.variants[0];
-        variantImg = def?.imageUrl || null;
+        if (def?.imageUrl) candidates.push(def.imageUrl);
     }
 
-    // 2. main_image_url column
-    const main = variantImg || p.mainImageUrl;
+    // 4️⃣ extra story / other images
+    if (Array.isArray(p.storyImageUrls)) candidates.push(...p.storyImageUrls);
+    if (Array.isArray(p.images)) candidates.push(...p.images);
 
-    // 3. any gallery image from jsonb columns
-    const gallery = [];
-    if (Array.isArray(p.imageUrls)) gallery.push(...p.imageUrls);
-    if (Array.isArray(p.storyImageUrls)) gallery.push(...p.storyImageUrls);
-    if (Array.isArray(p.images)) gallery.push(...p.images);
-    const firstGallery = gallery.find(Boolean);
+    // 5️⃣ single image fields
+    if (p.imageUrl) candidates.push(p.imageUrl);
+    if (p.image) candidates.push(p.image);
 
-    // 4. single image fields
-    const single = p.imageUrl || p.image;
-
-    return main || firstGallery || single || FALLBACK_IMG;
+    const first = candidates.find(Boolean);
+    return first || FALLBACK_IMG;
 }
+
 
 export default function ProductCard({
                                         product,
