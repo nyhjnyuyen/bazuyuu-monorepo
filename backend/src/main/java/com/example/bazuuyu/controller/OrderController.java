@@ -112,14 +112,23 @@ public class OrderController {
 
         return ResponseEntity.ok(resp);
     }
+    private String extractGuestIdFromCookies(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+
+        for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+            if ("GUEST_ID".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
     @PostMapping("/checkout")
     public ResponseEntity<OrderResponse> checkout(
             HttpServletRequest request,
             @RequestBody @jakarta.validation.Valid ShippingAddressRequest shipping
     ) {
         String token = jwtUtils.resolveToken(request);
-        Long customerId = null;
-        String guestId = (String) request.getAttribute("guestId");
 
         Cart cart;
         if (token != null) {
@@ -128,12 +137,18 @@ public class OrderController {
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
             cart = cartService.getOrCreateActiveCartForCustomer(customer);
         } else {
+            String guestId = extractGuestIdFromCookies(request); // lấy từ cookie
             cart = cartService.getOrCreateActiveCartForGuest(guestId);
+        }
+
+        if (cart == null) {
+            throw new RuntimeException("Cart not found for current user/guest");
         }
 
         Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
         return ResponseEntity.ok(OrderMapper.toResponse(order));
     }
+
 
 
 }
