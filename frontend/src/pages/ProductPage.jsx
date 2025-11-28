@@ -75,10 +75,10 @@ export default function ProductPage() {
         };
     }, [id]);
 
-    // images for gallery
+    // images for gallery (main + gallery + variants)
     const images = useMemo(() => normalizeImages(product), [product]);
 
-    // variants + flag
+    // variants
     const variants = product?.variants ?? [];
     const hasVariants = variants.length > 0;
 
@@ -90,32 +90,6 @@ export default function ProductPage() {
             setSelectedVariantId(null);
         }
     }, [variants]);
-
-    // price based on selected variant (if any)
-    const displayPrice = useMemo(() => {
-        if (!product) return 0;
-        if (!hasVariants) return product.price;
-        const selected = variants.find((v) => v.id === selectedVariantId);
-        return selected?.price ?? product.price;
-    }, [product, hasVariants, variants, selectedVariantId]);
-
-    useEffect(() => {
-        if (!product) return;
-
-        const vs = product.variants || [];
-        if (vs.length === 0) return;
-
-        const def = vs.find(v => v.isDefault) || vs[0];
-        setSelectedVariantId(def.id);
-
-        if (def.imageUrl) {
-            setActiveImage(def.imageUrl);
-        } else {
-            // fallback to product-level images
-            const imgs = normalizeImages(product);
-            if (imgs[0]) setActiveImage(imgs[0]);
-        }
-    }, [product]);
 
     // ---------- EARLY RETURNS (NO HOOKS BELOW THIS LINE) ----------
     if (loading) {
@@ -146,6 +120,15 @@ export default function ProductPage() {
     const categoryLink = `/shop?category=${encodeURIComponent(
         product.category ?? ''
     )}`;
+
+    // price based on selected variant
+    const displayPrice = useMemo(() => {
+        if (!product) return 0;
+        if (!hasVariants) return product.price;
+        const selected = variants.find((v) => v.id === selectedVariantId);
+        return selected?.price ?? product.price;
+    }, [product, hasVariants, variants, selectedVariantId]);
+
     const priceFormatted = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND',
@@ -174,7 +157,6 @@ export default function ProductPage() {
             alert('Thêm vào giỏ thất bại. Xin vui lòng thử lại.');
         }
     };
-
 
     const handleAddRelatedToCart = async (item) => {
         setAddingId(item.id);
@@ -287,19 +269,17 @@ export default function ProductPage() {
                                         Chọn phiên bản:
                                     </p>
                                     <div className="flex flex-wrap gap-2">
-                                        // inside the variant map (unchanged except comment)
-                                        {variants.map(v => (
+                                        {variants.map((v) => (
                                             <button
                                                 key={v.id}
                                                 type="button"
                                                 onClick={() => {
                                                     setSelectedVariantId(v.id);
                                                     if (v.imageUrl) {
-                                                        setActiveImage(v.imageUrl);      // ✅ swap main picture on click
+                                                        setActiveImage(v.imageUrl); // swap to variant image
                                                     }
                                                 }}
-                                                className={`px-3 py-2 rounded-xl border text-sm sm:text-base
-${
+                                                className={`px-3 py-2 rounded-xl border text-sm sm:text-base ${
                                                     selectedVariantId === v.id
                                                         ? 'border-violet-900 bg-violet-900 text-white'
                                                         : 'border-violet-300 text-violet-925 bg-white hover:bg-violet-50'
@@ -366,6 +346,22 @@ ${
                                     </div>
                                 </details>
                             </section>
+
+                            {/* STORY IMAGES – long description like Shopee */}
+                            {Array.isArray(product.storyImageUrls) &&
+                                product.storyImageUrls.length > 0 && (
+                                    <section className="mt-8 space-y-4">
+                                        {product.storyImageUrls.map((url, idx) => (
+                                            <div key={idx} className="w-full">
+                                                <img
+                                                    src={url}
+                                                    alt={`story-${idx}`}
+                                                    className="w-full h-auto object-contain rounded-xl"
+                                                />
+                                            </div>
+                                        ))}
+                                    </section>
+                                )}
                         </div>
                     </div>
 
@@ -526,23 +522,26 @@ ${
     );
 }
 
+// Shopee-style image priority:
+// 1) mainImageUrl, 2) gallery imageUrls, 3) variant images, 4) fallbacks
 function normalizeImages(p) {
     if (!p) return [];
 
     const list = [];
 
-    // 1. main image first
     if (p.mainImageUrl) list.push(p.mainImageUrl);
 
-    // 2. product-level galleries
     if (Array.isArray(p.imageUrls)) list.push(...p.imageUrls);
-    if (Array.isArray(p.storyImageUrls)) list.push(...p.storyImageUrls);
-    if (Array.isArray(p.images)) list.push(...p.images);
 
-    // 3. single fields as final fallback
+    if (Array.isArray(p.variants)) {
+        for (const v of p.variants) {
+            if (v.imageUrl) list.push(v.imageUrl);
+        }
+    }
+
+    if (Array.isArray(p.images)) list.push(...p.images);
     if (p.imageUrl) list.push(p.imageUrl);
     if (p.image) list.push(p.image);
 
-    // remove falsy + duplicates
     return Array.from(new Set(list.filter(Boolean)));
 }
