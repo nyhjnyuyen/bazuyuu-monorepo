@@ -144,79 +144,85 @@ public class OrderController {
         return null;
     }
 
-    // ----------------------------------------------------
-    // MAIN CHECKOUT ENDPOINT USED BY FRONTEND
-    // Supports:
-    //  - Logged in user (Authorization: Bearer <token>)
-    //  - Guest user (GUEST_ID cookie)
-    // ----------------------------------------------------
     @PostMapping("/checkout")
     public ResponseEntity<OrderResponse> checkout(
             HttpServletRequest request,
             @RequestBody ShippingAddressRequest shipping
     ) {
+        try {
+            // 1) đọc token
+            String authHeader = request.getHeader("Authorization");
+            String token = null;
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+            }
 
-        // 1) Read token safely – do NOT let this throw for guests
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-        }
+            log.info("Checkout called. Authorization header: {}, tokenPresent: {}, cookies: {}",
+                    authHeader,
+                    token != null,
+                    request.getHeader("Cookie"));
 
-        log.info("Checkout called. Authorization header: {}, tokenPresent: {}, guestCookie: {}",
-                authHeader,
-                token != null,
-                request.getHeader("Cookie"));
+            Cart cart;
+            String guestId = null;
 
-        Cart cart;
-        String guestId = null;
+            if (token != null) {
+                // logged-in flow
+                String username = jwtUtils.getUsernameFromToken(token);
+                log.info("Checkout as logged-in user: {}", username);
 
-        if (token != null) {
-            // Logged-in flow
-            String username = jwtUtils.getUsernameFromToken(token);
-            log.info("Checkout as logged-in user: {}", username);
+                Customer customer = customerService.findByUsername(username)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.UNAUTHORIZED, "Customer not found"
+                        ));
+                cart = cartService.getOrCreateActiveCartForCustomer(customer);
+            } else {
+                // guest flow
+                guestId = extractGuestIdFromCookies(request);
+                log.info("Checkout as guest. GUEST_ID = {}", guestId);
 
-            Customer customer = customerService.findByUsername(username)
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.UNAUTHORIZED, "Customer not found"
-                    ));
-            cart = cartService.getOrCreateActiveCartForCustomer(customer);
-        } else {
-            // Guest flow
-            guestId = extractGuestIdFromCookies(request);
-            log.info("Checkout as guest. GUEST_ID from cookie = {}", guestId);
+                if (guestId == null) {
+                    log.warn("Missing GUEST_ID cookie");
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "Missing guest identifier (GUEST_ID cookie)"
+                    );
+                }
 
-            if (guestId == null) {
-                // This means FE didn't send GUEST_ID correctly
+                cart = cartService.getOrCreateActiveCartForGuest(guestId);
+            }
+
+            if (cart == null) {
+                log.warn("Cart is null for token={} guestId={}", token, guestId);
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
-                        "Missing guest identifier (GUEST_ID cookie)"
+                        "Cart not found for current user/guest"
                 );
             }
 
-            cart = cartService.getOrCreateActiveCartForGuest(guestId);
+            log.info("Found cart id={}, itemsCount={}",
+                    cart.getId(),
+                    cart.getItems() == null ? null : cart.getItems().size());
+
+            if (cart.getItems() == null || cart.getItems().isEmpty()) {
+                log.warn("Attempt to checkout empty cart. cartId={}", cart.getId());
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Cannot checkout an empty cart"
+                );
+            }
+
+            log.info("Placing order from cartId={}, items={}",
+                    cart.getId(),
+                    cart.getItems().size());
+
+            Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
+            return ResponseEntity.ok(OrderMapper.toResponse(order));
+
+        } catch (Exception e) {
+            log.error("Checkout error", e);
+            throw e;
         }
-
-        if (cart == null) {
-            log.warn("Cart is null for token={} guestId={}", token, guestId);
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Cart not found for current user/guest"
-            );
-        }
-
-        if (cart.getItems() == null || cart.getItems().isEmpty()) {
-            log.warn("Attempt to checkout empty cart. cartId={}", cart.getId());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Cannot checkout an empty cart"
-            );
-        }
-
-        log.info("Placing order from cartId={}, items={}", cart.getId(), cart.getItems().size());
-
-        Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
-        return ResponseEntity.ok(OrderMapper.toResponse(order));
     }
+
 
 }

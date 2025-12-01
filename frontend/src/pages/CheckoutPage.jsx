@@ -112,7 +112,7 @@ export default function CheckoutPage() {
             note: form.note,
             country: 'VN',
         };
-
+        console.log('Checkout payload:', payload);
         const { data: order } = await apiClient.post('/orders/checkout', payload);
 
         const orderCode =
