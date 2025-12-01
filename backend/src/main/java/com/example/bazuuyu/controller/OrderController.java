@@ -163,7 +163,7 @@ public class OrderController {
 
         Cart cart;
         try {
-            // resolve cart from JWT or GUEST_ID cookie
+            // ✅ resolve cart (guest or logged-in) using cookie/JWT
             cart = cartService.getOrCreateActiveCartForRequest(request, jwtUtils, customerService);
         } catch (RuntimeException ex) {
             log.warn("Checkout – cannot resolve cart: {}", ex.getMessage());
@@ -173,20 +173,22 @@ public class OrderController {
         log.info("Using cart id={} for checkout", cart.getId());
 
         try {
-            // Let OrderService check for empty cart / cart not found, etc.
+            // ❌ DO NOT use cart.getItems() here
+            // ✅ Let OrderService handle: load CartItems from DB and validate
             Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
             log.info("Order placed successfully. orderId={}", order.getId());
             log.info("=== /api/orders/checkout END OK ===");
+
             return ResponseEntity.ok(OrderMapper.toResponse(order));
         } catch (IllegalStateException ex) {
-            // "Cart not found", "Cart is empty", ...
+            // "Cart not found", "Cart is empty", etc.
             log.warn("Business error during checkout: {}", ex.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exception ex) {
             log.error("Unexpected error during checkout", ex);
-            // you might want 500 here, but keep 400 if your global policy says so
-            throw ex;
+            throw ex; // will become 500
         }
     }
+
 
 }
