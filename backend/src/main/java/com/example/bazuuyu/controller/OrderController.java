@@ -13,8 +13,12 @@ import com.example.bazuuyu.service.CustomerService;
 import com.example.bazuuyu.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,12 +28,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+
     private final CartService cartService;
     private final OrderService orderService;
     private final CustomerService customerService;
     private final JwtUtils jwtUtils;
 
-
+    // ----------------------------------------------------
+    // SIMPLE CHECKOUT BY CUSTOMER ID (if you need it)
+    // ----------------------------------------------------
     @PostMapping("/checkout/{customerId}")
     public ResponseEntity<OrderResponse> placeOrder(@PathVariable Long customerId) {
         Customer customer = customerService.getCustomerById(customerId)
@@ -51,7 +59,10 @@ public class OrderController {
 
         return ResponseEntity.ok(responseList);
     }
-    // OrderController.java  (add this method)
+
+    // ----------------------------------------------------
+    // CHECKOUT BY CART ID (explicit)
+    // ----------------------------------------------------
     @PostMapping("/checkout/cart/{cartId}")
     public ResponseEntity<OrderResponse> checkoutCartWithShipping(
             @PathVariable Long cartId,
@@ -61,7 +72,9 @@ public class OrderController {
         return ResponseEntity.ok(OrderMapper.toResponse(order));
     }
 
-
+    // ----------------------------------------------------
+    // SINGLE ORDER BY ID
+    // ----------------------------------------------------
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
         return orderService.getOrderById(orderId)
@@ -69,16 +82,20 @@ public class OrderController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    // ----------------------------------------------------
+    // "MY ORDERS" – requires JWT
+    // ----------------------------------------------------
     @GetMapping("/my")
     public ResponseEntity<List<OrderResponse>> getMyOrders(HttpServletRequest request) {
-        String token = jwtUtils.resolveToken(request);
+        String token = jwtUtils.resolveToken(request); // here you expect JWT to always exist
+        log.info("Authorization: {}", request.getHeader("Authorization"));
+
         String username = jwtUtils.getUsernameFromToken(token);
 
         Customer customer = customerService.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        // Make sure this method name matches your repository/entity field:
-        // findByCustomerIdOrderByOrderDateDesc
         List<Order> orders = orderService.findByCustomerIdOrderByOrderDateDesc(customer.getId());
 
         List<OrderResponse> resp = orders.stream().map(o -> {
@@ -96,14 +113,14 @@ public class OrderController {
                     ir.setId(it.getId());
                     ir.setProductName(
                             it.getProduct() != null ? it.getProduct().getName() : "Item"
-                    );                                  // productName (not name)
+                    );
                     ir.setQuantity(it.getQuantity());
                     BigDecimal unit = it.getPrice() == null
-                            ? java.math.BigDecimal.ZERO
-                            : it.getPrice(); // BigDecimal
+                            ? BigDecimal.ZERO
+                            : it.getPrice();
                     int qty = it.getQuantity() == null ? 0 : it.getQuantity();
                     ir.setPrice(unit);
-                    ir.setTotalPrice(unit.multiply(java.math.BigDecimal.valueOf(qty))); //  totalPrice
+                    ir.setTotalPrice(unit.multiply(BigDecimal.valueOf(qty)));
                     return ir;
                 }).toList());
             }
@@ -112,6 +129,10 @@ public class OrderController {
 
         return ResponseEntity.ok(resp);
     }
+
+    // ----------------------------------------------------
+    // UTIL: GET GUEST_ID FROM COOKIE
+    // ----------------------------------------------------
     private String extractGuestIdFromCookies(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
 
@@ -123,32 +144,79 @@ public class OrderController {
         return null;
     }
 
+    // ----------------------------------------------------
+    // MAIN CHECKOUT ENDPOINT USED BY FRONTEND
+    // Supports:
+    //  - Logged in user (Authorization: Bearer <token>)
+    //  - Guest user (GUEST_ID cookie)
+    // ----------------------------------------------------
     @PostMapping("/checkout")
     public ResponseEntity<OrderResponse> checkout(
             HttpServletRequest request,
             @RequestBody @jakarta.validation.Valid ShippingAddressRequest shipping
     ) {
-        String token = jwtUtils.resolveToken(request);
+
+        // 1) Read token safely – do NOT let this throw for guests
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        log.info("Checkout called. Authorization header: {}, tokenPresent: {}, guestCookie: {}",
+                authHeader,
+                token != null,
+                request.getHeader("Cookie"));
 
         Cart cart;
+        String guestId = null;
+
         if (token != null) {
+            // Logged-in flow
             String username = jwtUtils.getUsernameFromToken(token);
+            log.info("Checkout as logged-in user: {}", username);
+
             Customer customer = customerService.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.UNAUTHORIZED, "Customer not found"
+                    ));
             cart = cartService.getOrCreateActiveCartForCustomer(customer);
         } else {
-            String guestId = extractGuestIdFromCookies(request); // lấy từ cookie
+            // Guest flow
+            guestId = extractGuestIdFromCookies(request);
+            log.info("Checkout as guest. GUEST_ID from cookie = {}", guestId);
+
+            if (guestId == null) {
+                // This means FE didn't send GUEST_ID correctly
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Missing guest identifier (GUEST_ID cookie)"
+                );
+            }
+
             cart = cartService.getOrCreateActiveCartForGuest(guestId);
         }
 
         if (cart == null) {
-            throw new RuntimeException("Cart not found for current user/guest");
+            log.warn("Cart is null for token={} guestId={}", token, guestId);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cart not found for current user/guest"
+            );
         }
+
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            log.warn("Attempt to checkout empty cart. cartId={}", cart.getId());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot checkout an empty cart"
+            );
+        }
+
+        log.info("Placing order from cartId={}, items={}", cart.getId(), cart.getItems().size());
 
         Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
         return ResponseEntity.ok(OrderMapper.toResponse(order));
     }
-
-
 
 }
