@@ -132,17 +132,31 @@ export default function CartPage() {
         if (!Number.isNaN(n) && !busy) { setBusy(true); try { await syncQuantity(g, Math.max(0, Math.floor(n))); } finally { setBusy(false); } }
     };
 
-    const goToCheckout = () => {
-        if (authed && !cartId) {
-            alert('Cart chưa sẵn sàng, vui lòng tải lại trang.');
+    const goToCheckout = async () => {
+        if (authed) {
+            if (!cartId) {
+                alert('Cart chưa sẵn sàng, vui lòng tải lại trang.');
+                return;
+            }
+            navigate('/checkout', { state: { cartId } });
             return;
         }
 
-        // Ai cũng được chuyển sang /checkout,
-        // user login thì truyền cartId, guest thì không cần
-        navigate('/checkout', {
-            state: authed && cartId ? { cartId } : undefined,
-        });
+        // --- guest flow using localStorage ---
+        const local = getLocalCart(); // [{productId, quantity, variantId?}]
+        if (!local || local.length === 0) {
+            alert('Giỏ hàng đang trống.');
+            return;
+        }
+
+        try {
+            // push local cart to server cart for this GUEST_ID
+            await apiClient.post('/cart/guest/load', local);
+            navigate('/checkout');   // checkout will now see a non-empty cart
+        } catch (e) {
+            console.error('Sync guest cart failed', e);
+            alert('Không thể đồng bộ giỏ hàng để thanh toán. Vui lòng thử lại.');
+        }
     };
 
     return (

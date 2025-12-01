@@ -2,10 +2,12 @@ package com.example.bazuuyu.controller;
 
 import com.example.bazuuyu.dto.request.CartMergeRequest;
 import com.example.bazuuyu.dto.request.CreateCartItemRequest;
+import com.example.bazuuyu.dto.request.GuestCartItem;
 import com.example.bazuuyu.dto.response.CartResponse;
 import com.example.bazuuyu.entity.Cart;
 import com.example.bazuuyu.entity.CartItem;
 import com.example.bazuuyu.security.JwtUtils;
+import com.example.bazuuyu.service.CartItemService;
 import com.example.bazuuyu.service.CartService;
 import com.example.bazuuyu.service.CustomerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +28,7 @@ public class CartController {
     private final CartService cartService;
     private final JwtUtils jwtUtils;
     private final CustomerService customerService;
+    private final CartItemService cartItemService;
 
     // ----------------------------------------------------
     // ADD ITEM TO CART (guest or logged-in)
@@ -96,4 +99,32 @@ public class CartController {
         cartService.merge(customerId, body.getItems());
         return ResponseEntity.ok().build();
     }
+    // CartController.java
+    @PostMapping("/guest/load")
+    public ResponseEntity<Void> loadGuestCart(
+            HttpServletRequest request,
+            @RequestBody List<GuestCartItem> items
+    ) {
+        // resolve (or create) guest cart using GUEST_ID cookie
+        Cart cart = cartService.getOrCreateActiveCartForRequest(request, jwtUtils, customerService);
+
+        // clear old items (optional but usually what we want)
+        cartItemService.clearItemsByCart(cart);
+
+        if (items != null) {
+            for (GuestCartItem gi : items) {
+                if (gi.getProductId() == null || gi.getQuantity() == null || gi.getQuantity() <= 0) continue;
+
+                CreateCartItemRequest req = new CreateCartItemRequest();
+                req.setCartId(cart.getId());
+                req.setProductId(gi.getProductId());
+                req.setVariantId(gi.getVariantId());
+                req.setQuantity(gi.getQuantity());
+                cartService.addCartItem(req);
+            }
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
 }
