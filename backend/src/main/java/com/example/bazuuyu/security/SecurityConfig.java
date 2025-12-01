@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/orders/checkout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/cart/guest/load").permitAll()
                         .requestMatchers("/api/payments/**").permitAll()
                         .requestMatchers("/api/vn/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
