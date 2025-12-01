@@ -360,8 +360,8 @@ export default function ProductPage() {
                                                     +
                                                 </span>
                                             </summary>
-                                            <div className="mt-3 space-y-4">
-                                                {product.storyImageUrls.map((url, idx) => (
+                                            <div className="mt-3 space-y-0">
+                                            {product.storyImageUrls.map((url, idx) => (
                                                     <div key={idx} className="w-full">
                                                         <img
                                                             src={url}
