@@ -149,80 +149,30 @@ public class OrderController {
             HttpServletRequest request,
             @RequestBody ShippingAddressRequest shipping
     ) {
+        log.info("=== /api/orders/checkout START ===");
+
+        Cart cart;
         try {
-            // 1) đọc token
-            String authHeader = request.getHeader("Authorization");
-            String token = null;
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-            }
-
-            log.info("Checkout called. Authorization header: {}, tokenPresent: {}, cookies: {}",
-                    authHeader,
-                    token != null,
-                    request.getHeader("Cookie"));
-
-            Cart cart;
-            String guestId = null;
-
-            if (token != null) {
-                // logged-in flow
-                String username = jwtUtils.getUsernameFromToken(token);
-                log.info("Checkout as logged-in user: {}", username);
-
-                Customer customer = customerService.findByUsername(username)
-                        .orElseThrow(() -> new ResponseStatusException(
-                                HttpStatus.UNAUTHORIZED, "Customer not found"
-                        ));
-                cart = cartService.getOrCreateActiveCartForCustomer(customer);
-            } else {
-                // guest flow
-                guestId = extractGuestIdFromCookies(request);
-                log.info("Checkout as guest. GUEST_ID = {}", guestId);
-
-                if (guestId == null) {
-                    log.warn("Missing GUEST_ID cookie");
-                    throw new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST,
-                            "Missing guest identifier (GUEST_ID cookie)"
-                    );
-                }
-
-                cart = cartService.getOrCreateActiveCartForGuest(guestId);
-            }
-
-            if (cart == null) {
-                log.warn("Cart is null for token={} guestId={}", token, guestId);
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Cart not found for current user/guest"
-                );
-            }
-
-            log.info("Found cart id={}, itemsCount={}",
-                    cart.getId(),
-                    cart.getItems() == null ? null : cart.getItems().size());
-
-            if (cart.getItems() == null || cart.getItems().isEmpty()) {
-                log.warn("Attempt to checkout empty cart. cartId={}", cart.getId());
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Cannot checkout an empty cart"
-                );
-            }
-
-            log.info("Placing order from cartId={}, items={}",
-                    cart.getId(),
-                    cart.getItems().size());
-
-            Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
-            return ResponseEntity.ok(OrderMapper.toResponse(order));
-
-        } catch (Exception e) {
-            log.error("Checkout error", e);
-            throw e;
+            cart = cartService.getOrCreateActiveCartForRequest(request, jwtUtils, customerService);
+        } catch (RuntimeException ex) {
+            log.warn("Checkout – cannot resolve cart: {}", ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
+
+        int itemsCount = (cart.getItems() == null) ? 0 : cart.getItems().size();
+        log.info("Found cart id={}, itemsCount={}", cart.getId(), itemsCount);
+
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            log.warn("Attempt to checkout EMPTY cart. cartId={}", cart.getId());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot checkout an empty cart"
+            );
+        }
+
+        Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
+        log.info("Order placed successfully. orderId={}", order.getId());
+
+        return ResponseEntity.ok(OrderMapper.toResponse(order));
     }
-
-
 }

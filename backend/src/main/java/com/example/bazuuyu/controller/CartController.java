@@ -3,8 +3,12 @@ package com.example.bazuuyu.controller;
 import com.example.bazuuyu.dto.request.CartMergeRequest;
 import com.example.bazuuyu.dto.request.CreateCartItemRequest;
 import com.example.bazuuyu.dto.response.CartResponse;
+import com.example.bazuuyu.entity.Cart;
 import com.example.bazuuyu.entity.CartItem;
+import com.example.bazuuyu.security.JwtUtils;
 import com.example.bazuuyu.service.CartService;
+import com.example.bazuuyu.service.CustomerService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,43 +17,54 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
-/**
- * xu ly cac API lien quan den cart
- */
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
 public class CartController {
 
     private final CartService cartService;
+    private final JwtUtils jwtUtils;
+    private final CustomerService customerService;
 
-
-    // them san pham vao cart
+    // ----------------------------------------------------
+    // ADD ITEM TO CART (guest or logged-in)
+    // ----------------------------------------------------
     @PostMapping("/items")
-    public ResponseEntity<Void> addItem(
-            @RequestBody CreateCartItemRequest request,
-            @AuthenticationPrincipal(expression = "id") Long customerId
+    public ResponseEntity<Void> addToCart(
+            HttpServletRequest request,
+            @RequestBody @Valid CreateCartItemRequest body
     ) {
-        // ✅ Get the active cart automatically
-        Long cartId = cartService.getActiveCart(customerId).getId();
-        request.setCartId(cartId);
+        // resolve current cart (by JWT or GUEST_ID cookie)
+        Cart cart = cartService.getOrCreateActiveCartForRequest(request, jwtUtils, customerService);
 
-        cartService.addCartItem(request);
+        // attach cartId for service
+        body.setCartId(cart.getId());
+
+        cartService.addCartItem(body);
         return ResponseEntity.ok().build();
     }
 
+    // ----------------------------------------------------
+    // GET CURRENT CART ITEMS (guest or logged-in)
+    // ----------------------------------------------------
+    @GetMapping("/items/current")
+    public ResponseEntity<List<CartItem>> getCurrentCartItems(HttpServletRequest request) {
+        Cart cart = cartService.getOrCreateActiveCartForRequest(request, jwtUtils, customerService);
+        return ResponseEntity.ok(cartService.getCartItems(cart.getId()));
+    }
 
-    // lay danh sach san pham trong gio hang theo ID cart
+    // ---------------- OLD CUSTOMER-SPECIFIC ENDPOINTS (optional) ----------------
+
+    // keep this if you still want "customer-only" cart via principal id
     @GetMapping("/items")
-    public ResponseEntity<List<CartItem>> getItems(@AuthenticationPrincipal(expression = "id") Long customerId) {
+    public ResponseEntity<List<CartItem>> getItems(
+            @AuthenticationPrincipal(expression = "id") Long customerId
+    ) {
         Long cartId = cartService.getActiveCart(customerId).getId();
         return ResponseEntity.ok(cartService.getCartItems(cartId));
     }
 
-
-    // cap nhat so luong cua mot san pham trong cart
     @PutMapping("/items/{itemId}")
     public ResponseEntity<Void> updateQuantity(
             @PathVariable Long itemId,
@@ -59,19 +74,18 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    // xoa 1 item khoi cart
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long itemId) {
         cartService.removeCartItem(itemId);
         return ResponseEntity.noContent().build();
     }
 
-    // lay go hang dang hoat dong cua khach hang
     @GetMapping("/customer")
-    public ResponseEntity<CartResponse> getActiveCart(@AuthenticationPrincipal(expression = "id") Long customerId) {
+    public ResponseEntity<CartResponse> getActiveCart(
+            @AuthenticationPrincipal(expression = "id") Long customerId
+    ) {
         return ResponseEntity.ok(cartService.getActiveCart(customerId));
     }
-
 
     @PostMapping("/merge")
     @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
@@ -82,5 +96,4 @@ public class CartController {
         cartService.merge(customerId, body.getItems());
         return ResponseEntity.ok().build();
     }
-
 }

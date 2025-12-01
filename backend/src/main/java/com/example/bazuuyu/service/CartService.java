@@ -6,6 +6,8 @@ import com.example.bazuuyu.dto.response.CartResponse;
 import com.example.bazuuyu.entity.*;
 import com.example.bazuuyu.mapper.CartMapper;
 import com.example.bazuuyu.repository.*;
+import com.example.bazuuyu.security.JwtUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -146,6 +148,36 @@ public class CartService {
         cart.setStatus(status);
         cartRepository.save(cart);
     }
+    // CartService.java
+    public Cart getOrCreateActiveCartForRequest(HttpServletRequest request, JwtUtils jwtUtils, CustomerService customerService) {
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        if (token != null) {
+            String username = jwtUtils.getUsernameFromToken(token);
+            Customer customer = customerService.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            return getOrCreateActiveCartForCustomer(customer);
+        } else {
+            String guestId = null;
+            if (request.getCookies() != null) {
+                for (jakarta.servlet.http.Cookie c : request.getCookies()) {
+                    if ("GUEST_ID".equals(c.getName())) {
+                        guestId = c.getValue();
+                    }
+                }
+            }
+            if (guestId == null || guestId.isBlank()) {
+                throw new RuntimeException("Missing guest identifier (GUEST_ID cookie)");
+            }
+            return getOrCreateActiveCartForGuest(guestId);
+        }
+    }
+
 
     @Transactional
     public void merge(Long customerId, List<CartMergeItem> items) {
