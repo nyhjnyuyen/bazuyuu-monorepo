@@ -315,14 +315,15 @@ export default function ProductPage() {
 
                             {/* Accordions */}
                             <section className="mt-8 border-t border-gray-200 divide-y divide-gray-200">
+                                {/* PRODUCT DETAILS */}
                                 <details className="group py-4">
                                     <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-heading text-sm sm:text-base text-violet-950">
-                      PRODUCT DETAILS
-                    </span>
+                                        <span className="font-heading text-sm sm:text-base text-violet-950">
+                                            PRODUCT DETAILS
+                                        </span>
                                         <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
-                      +
-                    </span>
+                                            +
+                                        </span>
                                     </summary>
                                     <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
                                         {product.productDetails ||
@@ -331,37 +332,48 @@ export default function ProductPage() {
                                     </div>
                                 </details>
 
+                                {/* SAFETY & CARE */}
                                 <details className="group py-4">
                                     <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-heading text-sm sm:text-base text-violet-950">
-                      SAFETY &amp; CARE
-                    </span>
+                                        <span className="font-heading text-sm sm:text-base text-violet-950">
+                                            SAFETY &amp; CARE
+                                        </span>
                                         <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
-                      +
-                    </span>
+                                            +
+                                        </span>
                                     </summary>
                                     <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
                                         {product.safetyCare ||
                                             'Surface clean only. Suitable for ages 3+. Do not tumble dry, dry clean or iron.'}
                                     </div>
                                 </details>
-                            </section>
 
-                            {/* STORY IMAGES – long description like Shopee */}
-                            {Array.isArray(product.storyImageUrls) &&
-                                product.storyImageUrls.length > 0 && (
-                                    <section className="mt-8 space-y-4">
-                                        {product.storyImageUrls.map((url, idx) => (
-                                            <div key={idx} className="w-full">
-                                                <img
-                                                    src={url}
-                                                    alt={`story-${idx}`}
-                                                    className="w-full h-auto object-contain rounded-xl"
-                                                />
+                                {/* PRODUCT STORY */}
+                                {Array.isArray(product.storyImageUrls) &&
+                                    product.storyImageUrls.length > 0 && (
+                                        <details className="group py-4">
+                                            <summary className="flex items-center justify-between cursor-pointer list-none">
+                                                <span className="font-heading text-sm sm:text-base text-violet-950">
+                                                    PRODUCT STORY
+                                                </span>
+                                                <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
+                                                    +
+                                                </span>
+                                            </summary>
+                                            <div className="mt-3 space-y-4">
+                                                {product.storyImageUrls.map((url, idx) => (
+                                                    <div key={idx} className="w-full">
+                                                        <img
+                                                            src={url}
+                                                            alt={`story-${idx}`}
+                                                            className="w-full h-auto object-contain rounded-xl"
+                                                        />
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
-                                    </section>
-                                )}
+                                        </details>
+                                    )}
+                            </section>
                         </div>
                     </div>
 
@@ -410,8 +422,8 @@ export default function ProductPage() {
                                                                 />
                                                             ) : (
                                                                 <span className="text-violet-300 text-sm">
-                                  No image
-                                </span>
+                                                                    No image
+                                                                </span>
                                                             )}
                                                         </div>
 
