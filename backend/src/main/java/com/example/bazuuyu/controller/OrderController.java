@@ -153,7 +153,7 @@ public class OrderController {
     @PostMapping("/checkout")
     public ResponseEntity<OrderResponse> checkout(
             HttpServletRequest request,
-            @RequestBody @jakarta.validation.Valid ShippingAddressRequest shipping
+            @RequestBody ShippingAddressRequest shipping
     ) {
 
         // 1) Read token safely – do NOT let this throw for guests
