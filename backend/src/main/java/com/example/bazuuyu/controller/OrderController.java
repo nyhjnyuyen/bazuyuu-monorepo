@@ -150,29 +150,43 @@ public class OrderController {
             @RequestBody ShippingAddressRequest shipping
     ) {
         log.info("=== /api/orders/checkout START ===");
+        log.info("ShippingAddressRequest = fullName={}, phone={}, province={}, district={}, ward={}, addressLine={}, note={}, country={}",
+                shipping.getFullName(),
+                shipping.getPhone(),
+                shipping.getProvince(),
+                shipping.getDistrict(),
+                shipping.getWard(),
+                shipping.getAddressLine(),
+                shipping.getNote(),
+                shipping.getCountry()
+        );
 
         Cart cart;
         try {
+            // resolve cart from JWT or GUEST_ID cookie
             cart = cartService.getOrCreateActiveCartForRequest(request, jwtUtils, customerService);
         } catch (RuntimeException ex) {
             log.warn("Checkout – cannot resolve cart: {}", ex.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
 
-        int itemsCount = (cart.getItems() == null) ? 0 : cart.getItems().size();
-        log.info("Found cart id={}, itemsCount={}", cart.getId(), itemsCount);
+        log.info("Using cart id={} for checkout", cart.getId());
 
-        if (cart.getItems() == null || cart.getItems().isEmpty()) {
-            log.warn("Attempt to checkout EMPTY cart. cartId={}", cart.getId());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Cannot checkout an empty cart"
-            );
+        try {
+            // Let OrderService check for empty cart / cart not found, etc.
+            Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
+            log.info("Order placed successfully. orderId={}", order.getId());
+            log.info("=== /api/orders/checkout END OK ===");
+            return ResponseEntity.ok(OrderMapper.toResponse(order));
+        } catch (IllegalStateException ex) {
+            // "Cart not found", "Cart is empty", ...
+            log.warn("Business error during checkout: {}", ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Unexpected error during checkout", ex);
+            // you might want 500 here, but keep 400 if your global policy says so
+            throw ex;
         }
-
-        Order order = orderService.placeOrderByCartId(cart.getId(), shipping);
-        log.info("Order placed successfully. orderId={}", order.getId());
-
-        return ResponseEntity.ok(OrderMapper.toResponse(order));
     }
+
 }
