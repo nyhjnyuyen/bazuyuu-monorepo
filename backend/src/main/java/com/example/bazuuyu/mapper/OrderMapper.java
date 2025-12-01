@@ -44,30 +44,21 @@ public class OrderMapper {
                 : null;
         response.setCustomerName(customerName);
 
+        response.setOrderCode(order.getOrderCode());
+        response.setStatus(order.getStatus() != null ? order.getStatus().name() : null);
+
         response.setOrderDate(order.getOrderDate());
         response.setTotalAmount(order.getTotalAmount());
 
-        // map items safely
         List<OrderItemResponse> items = (order.getItems() == null)
                 ? List.of()
                 : order.getItems().stream()
                 .map(OrderMapper::toItemResponse)
                 .toList();
-
         response.setItems(items);
-
-        // 👇 If your OrderResponse has extra fields like status, address, etc.
-        // response.setStatus(order.getStatus() != null ? order.getStatus().name() : null);
-        // response.setOrderCode(order.getOrderCode());
-        // response.setPaymentChannel(order.getPaymentChannel());
-        // response.setAddressLine(order.getAddressLine());
-        // response.setProvince(order.getProvince());
-        // response.setDistrict(order.getDistrict());
-        // response.setWard(order.getWard());
-        // response.setPhone(order.getPhone());
-        // response.setFullName(order.getFullName());
-        // response.setNote(order.getNote());
 
         return response;
     }
+
+
 }

@@ -115,13 +115,13 @@ export default function CheckoutPage() {
         console.log('Checkout payload:', payload);
         const { data: order } = await apiClient.post('/orders/checkout', payload);
 
-        const orderCode =
-            order?.orderCode ??
-            order?.code ??
-            order?.id ??
-            (typeof order === 'string' ? order : null);
+        console.log('order response from /orders/checkout:', order);
 
-        if (!orderCode) throw new Error('No orderCode returned from /orders/checkout');
+        const orderCode = order?.orderCode;
+
+        if (!orderCode) {
+            throw new Error('No orderCode returned from /orders/checkout');
+        }
 
         if (form.payment === 'COD') {
             await apiClient.post(`/payments/cod/${orderCode}`);
@@ -132,6 +132,7 @@ export default function CheckoutPage() {
             });
             window.location.href = payUrl;
         }
+
     };
 
 
