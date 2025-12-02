@@ -125,11 +125,20 @@ export default function CheckoutPage() {
 
         if (form.payment === 'COD') {
             await apiClient.post(`/payments/cod/${orderCode}`);
+
+            // CLEAR CART
+            localStorage.removeItem('cart');        // guest cart
+            window.dispatchEvent(new Event('cart-updated'));
+
             alert('Đặt hàng thành công (COD). Cám ơn bạn!');
-        } else {
+            return;
+        }
+        else {
             const { data: payUrl } = await apiClient.get(`/payments/vnpay/${orderCode}`, {
                 params: { channel: 'VNPAY_QR' },
             });
+            localStorage.removeItem('cart');
+            window.dispatchEvent(new Event('cart-updated'));
             window.location.href = payUrl;
         }
 
