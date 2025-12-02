@@ -6,6 +6,7 @@ import com.example.bazuuyu.service.EmailService;
 import com.example.bazuuyu.service.PasswordResetService;
 import com.example.bazuuyu.entity.PasswordResetToken;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,8 @@ public class PasswordResetController {
     @Qualifier("emailServiceImpl")
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     // gui email chua lien ket dat lai mat khau den khach hang
     @PostMapping("/send-reset-token")
@@ -42,12 +44,12 @@ public class PasswordResetController {
         Customer customer = customerOpt.get();
         PasswordResetToken token = passwordResetService.createResetTokenForCustomer(customer);
 
-        String resetUrl = "http://localhost:3001/reset-password?token=" + token.getToken(); // ← was 3000, use your frontend port
-        String emailContent = "Click the link to reset your password:\n\n" + resetUrl;
+        String resetUrl = frontendUrl + "/reset-password?token=" + token.getToken();
+        String emailContent = "Vui lòng nhấn vào đây để khôi phục mật khẩu:\n\n" + resetUrl;
 
-        emailService.sendEmail(customer.getEmail(), "Reset Your Password", emailContent);
+        emailService.sendEmail(customer.getEmail(), "Khôi phục mật khẩu", emailContent);
 
-        return ResponseEntity.ok("Password reset email sent.");
+        return ResponseEntity.ok("Email để khôi phục password đã được gửi đi.");
     }
 
     // dat lai mat khau cho khach hang dua tren token hop le

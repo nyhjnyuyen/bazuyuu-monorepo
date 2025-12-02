@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import apiClient from '../api/axiosInstance';
+
 
 export default function RequestResetPage() {
     const [email, setEmail] = useState("");
@@ -14,10 +15,10 @@ export default function RequestResetPage() {
 
         try {
             setLoading(true);
-            const res = await axios.post("http://localhost:8081/api/password/send-reset-token", { email });
-            setMessage("✅ " + res.data);
+            const res = await apiClient.post('/password/send-reset-token', { email });
+            setMessage(" " + res.data);
         } catch (err) {
-            setMessage("❌ " + (err.response?.data || "Something went wrong."));
+            setMessage("" + (err.response?.data || "Lỗi"));
         } finally {
             setLoading(false);
         }
@@ -27,7 +28,7 @@ export default function RequestResetPage() {
         <div className="min-h-screen flex items-center justify-center bg-[#f9f5ff] px-4 font-serif">
             <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full">
                 <h1 className="text-2xl font-bold text-center text-violet-950 mb-4">Forgot Password</h1>
-                <p className="text-sm text-gray-600 mb-6 text-center">Enter your email to receive a reset link.</p>
+                <p className="text-sm text-gray-600 mb-6 text-center">Xin vui lòng nhập email để nhận link khôi phục mât khẩu</p>
 
                 <input
                     type="email"
@@ -44,7 +45,7 @@ export default function RequestResetPage() {
                         loading ? "bg-gray-400" : "bg-violet-950 hover:bg-violet-800"
                     }`}
                 >
-                    {loading ? "Sending..." : "Send Reset Link"}
+                    {loading ? "Đang gửi..." : "Gửi đường link khôi phục"}
                 </button>
 
                 {message && <p className="mt-4 text-center text-sm text-red-500">{message}</p>}
