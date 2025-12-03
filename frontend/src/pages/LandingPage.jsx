@@ -192,11 +192,12 @@ export default function LandingPage() {
                                 }}
 
                             >
-                                <div className="w-full aspect-square rounded-[20px] bg-white flex items-center justify-center overflow-hidden">
+                                <div className="w-full aspect-[1/1] rounded-[20px] overflow-hidden bg-white">
                                     <img
                                         src={cat.img}
                                         alt={cat.title}
-                                        className="max-w-[70%] max-h-[70%] object-contain"
+                                        className="w-full h-full object-contain"
+                                        style={{ imageRendering: 'high-quality' }}
                                     />
                                 </div>
 
@@ -239,15 +240,27 @@ export default function LandingPage() {
 
                                     return (
                                         <SwiperSlide key={item.id} className="!h-auto flex">
-                                            {/* wrapper để card luôn đầy chiều cao slide */}
                                             <div className="w-full h-full">
-                                                <div className="border border-violet-950 rounded-[20px] bg-[#F6F2FF] flex flex-col items-center overflow-hidden h-full">
+                                                <div
+                                                    className="border border-violet-950 rounded-[20px] bg-[#F6F2FF] flex flex-col items-center overflow-hidden h-full cursor-pointer"
+                                                    onClick={() => navigate(`/product/${item.id}`)}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' || e.key === ' ') {
+                                                            e.preventDefault();
+                                                            navigate(`/product/${item.id}`);
+                                                        }
+                                                    }}
+                                                >
                                                     {/* hình */}
                                                     <div className="w-full aspect-square bg-white flex items-center justify-center rounded-[20px] overflow-hidden">
                                                         <img
-                                                            src={item.imageUrl || item.main_image_url ||        // tên cột trong Postgres
-                                                                item.mainImageUrl ||          // nếu backend trả camelCase
-                                                                (Array.isArray(item.image_urls) ? item.image_urls[0] : '') // fallback từ mảng
+                                                            src={
+                                                                item.imageUrl ||
+                                                                item.main_image_url ||
+                                                                item.mainImageUrl ||
+                                                                (Array.isArray(item.image_urls) ? item.image_urls[0] : '')
                                                             }
                                                             alt={item.name}
                                                             className="w-full h-full object-cover"
