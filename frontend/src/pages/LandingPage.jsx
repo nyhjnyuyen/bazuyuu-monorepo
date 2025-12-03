@@ -192,9 +192,14 @@ export default function LandingPage() {
                                 }}
 
                             >
-                                <div className="w-full aspect-[1/1] rounded-[20px] overflow-hidden">
-                                    <img src={cat.img} alt={cat.title} className="w-full h-full object-cover" />
+                                <div className="w-full aspect-square rounded-[20px] bg-white flex items-center justify-center overflow-hidden">
+                                    <img
+                                        src={cat.img}
+                                        alt={cat.title}
+                                        className="max-w-[70%] max-h-[70%] object-contain"
+                                    />
                                 </div>
+
                                 <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-b from-transparent to-white/80 rounded-b-[20px]" />
                                 <p className="absolute bottom-2 text-center text-violet-925 text-sm sm:text-base md:text-lg lg:text-l font-bold font-heading">
                                     {cat.title}
@@ -240,9 +245,12 @@ export default function LandingPage() {
                                                     {/* hình */}
                                                     <div className="w-full aspect-square bg-white flex items-center justify-center rounded-[20px] overflow-hidden">
                                                         <img
-                                                            src={item.imageUrl || item.image}
+                                                            src={item.imageUrl || item.main_image_url ||        // tên cột trong Postgres
+                                                                item.mainImageUrl ||          // nếu backend trả camelCase
+                                                                (Array.isArray(item.image_urls) ? item.image_urls[0] : '') // fallback từ mảng
+                                                            }
                                                             alt={item.name}
-                                                            className="object-contain h-4/5 w-4/5"
+                                                            className="w-full h-full object-cover"
                                                         />
                                                     </div>
 
