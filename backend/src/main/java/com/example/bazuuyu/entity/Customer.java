@@ -46,9 +46,6 @@ public class Customer implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    @Column(name = "payment_info", columnDefinition = "TEXT")
-    private String paymentInfo;
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

@@ -192,7 +192,7 @@ export default function LandingPage() {
                                 }}
 
                             >
-                                <div className="w-full aspect-[1/1] rounded-[20px] overflow-hidden bg-white">
+                                <div className="w-full aspect-[1/1] rounded-[20px] bg-white">
                                     <img
                                         src={cat.img}
                                         alt={cat.title}

@@ -26,5 +26,5 @@ public class RegisterCustomerRequest {
 
     // optional
     private String address;
-    private String paymentInfo;
+
 }
