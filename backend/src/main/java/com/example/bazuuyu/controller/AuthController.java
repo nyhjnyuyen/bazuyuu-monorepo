@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.bazuuyu.dto.request.ChangePasswordRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import java.util.Optional;
 
 @RestController
@@ -61,6 +63,36 @@ public class AuthController {
     ) {
         customerService.registerCustomer(request);
         return ResponseEntity.ok("Customer registered successfully");
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            HttpServletRequest request,
+            @RequestBody ChangePasswordRequest changeReq
+    ) {
+        // Lấy token từ header Authorization: Bearer xxx
+        String token = jwtUtils.resolveToken(request);
+        if (token == null || !jwtUtils.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid or missing token");
+        }
+
+        String username = jwtUtils.getUsernameFromToken(token);
+
+        Customer customer = customerService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        // Kiểm tra mật khẩu hiện tại
+        if (!passwordEncoder.matches(changeReq.getCurrentPassword(), customer.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Current password is incorrect");
+        }
+
+        // Cập nhật mật khẩu mới
+        customer.setPassword(passwordEncoder.encode(changeReq.getNewPassword()));
+        customerService.save(customer); // nhớ có hàm save trong service
+
+        return ResponseEntity.ok("Password changed successfully");
     }
 
 
