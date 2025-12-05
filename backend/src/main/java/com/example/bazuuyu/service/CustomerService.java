@@ -37,7 +37,6 @@ public class CustomerService {
                 .lastName(req.getLastName())
                 .phone(req.getPhone())
                 .address(req.getAddress())
-                .paymentInfo(req.getPaymentInfo())
                 .createdAt(LocalDateTime.now())
                 .build();
 

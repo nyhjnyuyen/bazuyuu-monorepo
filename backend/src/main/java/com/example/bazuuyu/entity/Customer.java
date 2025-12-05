@@ -49,6 +49,10 @@ public class Customer implements UserDetails {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "promotions_subscribed")
+    private Boolean promotionsSubscribed = false;
+
+
     @PrePersist
     void onCreate() {
         if (createdAt == null) createdAt = LocalDateTime.now();

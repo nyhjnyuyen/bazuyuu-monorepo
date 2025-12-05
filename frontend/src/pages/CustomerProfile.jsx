@@ -314,60 +314,26 @@ export default function CustomerProfile() {
                         </button>
                     </form>
                 </div>
-                
-
-                {/* Promotions */}
-                <div className="border rounded-xl shadow-sm overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 font-medium">Promotions & Offers</div>
-                    <form onSubmit={handlePrefsSubmit} className="p-4 space-y-2">
-                        <label className="inline-flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                className="h-4 w-4 rounded border-gray-300"
-                                checked={prefs.promotionsSubscribed}
-                                onChange={(e) =>
-                                    setPrefs({ promotionsSubscribed: e.target.checked })
-                                }
-                            />
-                            <span className="text-sm">
-                                <strong>
-                                    Sign up for promotions and special offers via email
-                                </strong>
-                            </span>
-                        </label>
-                        <p className="text-xs text-gray-500">
-                            Receive exclusive deals, promo codes, and new product announcements.
-                        </p>
-                        <button
-                            type="submit"
-                            className={`${buttonBase} bg-violet-900 text-white hover:bg-violet-800 mt-2`}
-                            disabled={saving.prefs}
-                        >
-                            {saving.prefs ? 'Saving…' : 'Update Preferences'}
-                        </button>
-                    </form>
-                </div>
 
                 {/* Order History */}
                 <div className="border rounded-xl shadow-sm overflow-hidden">
                     <div className="bg-gray-50 px-4 py-3 font-medium flex items-center gap-2">
-                        <span className="inline-block">Order History</span>
+                        <span className="inline-block">Lịch Sử Đơn Hàng</span>
                     </div>
 
                     <div className="p-4">
                         {orders.length === 0 ? (
                             <div className="text-center text-gray-500 py-10">
                                 <div className="text-3xl mb-2">🛍️</div>
-                                <h5 className="font-medium mb-1">No Orders Yet</h5>
+                                <h5 className="font-medium mb-1">Hiện tại chưa có hơn hàng</h5>
                                 <p className="text-sm mb-4">
-                                    You haven't placed any orders yet. Start shopping to see your
-                                    order history here!
+                                    Bạn chưa đặt đơn hàng nào. Bắt đầu mua sắm và xem lịch sử lại đây!
                                 </p>
                                 <a
                                     href="/"
                                     className="inline-block bg-violet-900 text-white px-4 py-2 rounded-md hover:bg-violet-800"
                                 >
-                                    Start Shopping
+                                    Mua sắm
                                 </a>
                             </div>
                         ) : (

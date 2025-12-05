@@ -1,6 +1,8 @@
 package com.example.bazuuyu.controller;
 
 import com.example.bazuuyu.dto.request.RegisterCustomerRequest;
+import com.example.bazuuyu.dto.request.UpdateAddressRequest;
+import com.example.bazuuyu.dto.request.UpdatePersonalRequest;
 import com.example.bazuuyu.dto.response.CustomerResponse;
 import com.example.bazuuyu.entity.Customer;
 import com.example.bazuuyu.security.CustomerDetails;
@@ -100,6 +102,47 @@ public class CustomerController {
         BeanUtils.copyProperties(customer, resp);
         return ResponseEntity.ok(resp);
     }
+    @PutMapping("/me")
+    public ResponseEntity<CustomerResponse> updateCurrentCustomer(
+            HttpServletRequest request,
+            @RequestBody UpdatePersonalRequest req
+    ) {
+        String token = jwtUtils.resolveToken(request);
+        String username = jwtUtils.getUsernameFromToken(token);
+
+        Customer customer = customerService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (req.getFirstName() != null) customer.setFirstName(req.getFirstName());
+        if (req.getLastName() != null)  customer.setLastName(req.getLastName());
+        if (req.getPhone() != null)     customer.setPhone(req.getPhone());
+
+        Customer saved = customerService.save(customer); // thêm hàm save nếu chưa có
+
+        CustomerResponse resp = new CustomerResponse();
+        BeanUtils.copyProperties(saved, resp);
+        return ResponseEntity.ok(resp);
+    }
+    @PutMapping("/me/address")
+    public ResponseEntity<CustomerResponse> updateAddress(
+            HttpServletRequest request,
+            @RequestBody UpdateAddressRequest req
+    ) {
+        String token = jwtUtils.resolveToken(request);
+        String username = jwtUtils.getUsernameFromToken(token);
+
+        Customer customer = customerService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        customer.setAddress(req.getAddress());
+
+        Customer saved = customerService.save(customer);
+        CustomerResponse resp = new CustomerResponse();
+        BeanUtils.copyProperties(saved, resp);
+        return ResponseEntity.ok(resp);
+    }
+
+
 
     // lay danh sach tat ca khach hang (cho admin)
     @GetMapping("/all")
