@@ -22,7 +22,7 @@ export default function ProductPage() {
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState(null);
     const [related, setRelated] = useState([]);
-    const [activeImage, setActiveImage] = useState(null);
+    const [activeIndex, setActiveIndex] = useState(0);
 
     const [addingId, setAddingId] = useState(null);
     const [inCartIds, setInCartIds] = useState(() => new Set());
@@ -43,9 +43,7 @@ export default function ProductPage() {
                 if (cancelled) return;
                 const p = res?.data ?? null;
                 setProduct(p);
-
-                const imgs = normalizeImages(p);
-                setActiveImage(imgs[0] ?? null);
+                setActiveIndex(0); // always start at first image
 
                 if (p?.category) {
                     const arr = await getProductsByCategory(p.category);
@@ -77,6 +75,7 @@ export default function ProductPage() {
 
     // images for gallery (main + gallery + variants)
     const images = useMemo(() => normalizeImages(product), [product]);
+    const activeImage = images[activeIndex] ?? null;
 
     // variants
     const variants = product?.variants ?? [];
@@ -204,7 +203,7 @@ export default function ProductPage() {
                         {/* Gallery */}
                         <div className="w-full">
                             <div className="w-full bg-white">
-                                <div className="aspect-square border border-violet-200 rounded-2xl flex items-center justify-center overflow-hidden">
+                                <div className="relative aspect-square border border-violet-200 rounded-2xl flex items-center justify-center overflow-hidden">
                                     {activeImage ? (
                                         <img
                                             src={activeImage}
@@ -214,29 +213,37 @@ export default function ProductPage() {
                                     ) : (
                                         <div className="text-violet-925/40">No image</div>
                                     )}
-                                </div>
 
-                                {images.length > 1 && (
-                                    <div className="mt-4 grid grid-cols-4 sm:grid-cols-5 gap-3">
-                                        {images.map((src, i) => (
+                                    {images.length > 1 && (
+                                        <>
+                                            {/* Left arrow */}
                                             <button
-                                                key={i}
-                                                onClick={() => setActiveImage(src)}
-                                                className={`aspect-square border rounded-xl overflow-hidden ${
-                                                    activeImage === src
-                                                        ? 'border-violet-900'
-                                                        : 'border-violet-200'
-                                                }`}
+                                                type="button"
+                                                onClick={() =>
+                                                    setActiveIndex((prev) =>
+                                                        prev === 0 ? images.length - 1 : prev - 1
+                                                    )
+                                                }
+                                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-9 h-9 flex items-center justify-center shadow"
                                             >
-                                                <img
-                                                    src={src}
-                                                    alt={`thumb-${i}`}
-                                                    className="object-cover w-full h-full"
-                                                />
+                                                ‹
                                             </button>
-                                        ))}
-                                    </div>
-                                )}
+
+                                            {/* Right arrow */}
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setActiveIndex((prev) =>
+                                                        prev === images.length - 1 ? 0 : prev + 1
+                                                    )
+                                                }
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-9 h-9 flex items-center justify-center shadow"
+                                            >
+                                                ›
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -276,7 +283,10 @@ export default function ProductPage() {
                                                 onClick={() => {
                                                     setSelectedVariantId(v.id);
                                                     if (v.imageUrl) {
-                                                        setActiveImage(v.imageUrl); // swap to variant image
+                                                        const idx = images.indexOf(v.imageUrl);
+                                                        if (idx !== -1) {
+                                                            setActiveIndex(idx); // jump slider to that image
+                                                        }
                                                     }
                                                 }}
                                                 className={`px-3 py-2 rounded-xl border text-sm sm:text-base ${
@@ -361,7 +371,7 @@ export default function ProductPage() {
                                                 </span>
                                             </summary>
                                             <div className="mt-3 space-y-0">
-                                            {product.storyImageUrls.map((url, idx) => (
+                                                {product.storyImageUrls.map((url, idx) => (
                                                     <div key={idx} className="w-full">
                                                         <img
                                                             src={url}
