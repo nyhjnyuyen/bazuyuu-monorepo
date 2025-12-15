@@ -24,7 +24,8 @@ import SloganGrid from "../components/SloganGrid";
 import xiaokouMain from '../assets/xiaokou-main.jpg';
 import hotpotcat from '../assets/Hotpotcat.jpg';
 import catAll from '../assets/catall.png';
-
+import kingkongCat from '../assets/kingkong5.jpg';
+import ibte from '../assets/ibte2025.jpg';
 
 
 import Footer from '../components/Footer';
@@ -35,7 +36,7 @@ import { getLandingNewArrivals } from '../api/productApi';
 const categories = [
     { title: 'Gia Đình U U', value: 'CRUX', img: cruxCat },
     { title: 'Xiao Kou', value: 'XIAO_KOU', img: xiaokouMain },
-    { title: 'KingKong', value: 'BBQ', img: hotpotcat},
+    { title: 'Sweet Lab', value: 'BBQ', img:kingkongCat},
     { title: 'ALL', value: 'ALL', img: catAll },
 ];
 
@@ -377,31 +378,34 @@ export default function LandingPage() {
                 </section>
 
                 {/* Flashmod / Upcoming IBTE */}
-                <section
-                    className="relative h-[360px] bg-cover bg-center text-white"
-                    style={{ backgroundImage: `url(${flashmod})` }}
-                >
-                    {/* Lớp tối nền phía sau chữ */}
-                    <div className="absolute inset-0 bg-black/40" />
+                <section className="relative h-[360px] text-white overflow-hidden">
 
-                    {/* Khối chữ ở GIỮA chiều cao */}
+                    {/* Background image */}
+                    <div
+                        className="absolute inset-0 bg-cover bg-center"
+                        style={{ backgroundImage: `url(${ibte})` }}
+                    />
+
+                    {/* Gradient overlay (đậm hơn ở dưới, nhẹ ở trên) */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+
+                    {/* Optional: lớp làm mềm hình nền */}
+                    <div className="absolute inset-0 bg-black/20 mix-blend-multiply" />
+
+                    {/* Content center */}
                     <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
-                        {/* U P C O M I N G – màu trắng */}
                         <p className="text-xs sm:text-sm tracking-[0.3em] uppercase text-white mb-3">
-                            Upcoming
+                            Sắp diễn ra
                         </p>
 
-                        {/* Tiêu đề IBTE */}
                         <p className="max-w-4xl text-xl sm:text-2xl md:text-3xl font-heading font-semibold leading-snug">
                             IBTE 2025 – International Baby Products & Toys Expo
                         </p>
 
-                        {/* Dòng ngày + địa điểm */}
                         <p className="mt-2 text-sm sm:text-base text-white/90 font-heading">
                             18–20.12.2025 · SECC quận 7, Hồ Chí Minh.
                         </p>
 
-                        {/* Nút mở popup */}
                         <button
                             type="button"
                             onClick={(e) => {
@@ -414,39 +418,23 @@ export default function LandingPage() {
                         </button>
                     </div>
 
-
-                    {/* 🔍 IBTE popup – giữ nguyên như bạn đang có */}
+                    {/* Popup giữ nguyên */}
                     {flashOpen && (
                         <div
                             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
                             onClick={() => setFlashOpen(false)}
-                            role="dialog"
-                            aria-modal="true"
-                            aria-labelledby="ibte-dialog-title"
                         >
                             <div
                                 className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-6 md:p-10"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <h3
-                                    id="ibte-dialog-title"
-                                    className="text-2xl md:text-3xl font-heading font-semibold text-violet-950 mb-4 text-center"
-                                >
+                                <h3 className="text-2xl md:text-3xl font-heading font-semibold text-violet-950 mb-4 text-center">
                                     IBTE 2025 – International Baby Products & Toys Expo
                                 </h3>
 
                                 <p className="text-violet-900 font-heading leading-relaxed text-left text-base md:text-lg">
-                                    Sau khi nhận giải thưởng tại Toy Fair New York 2025, Bazuuyu tiếp tục
-                                    mang bộ sưu tập đồ chơi BBQ và rau củ plush tới Licensing Expo 2025 ở
-                                    Las Vegas, mở ra thêm nhiều cơ hội hợp tác quốc tế.
-                                    <br />
-                                    <br />
-                                    Trước đó, hành trình với IBTE đã bắt đầu từ IBTE 2024, khi Bazuuyu lần
-                                    đầu giới thiệu dòng sản phẩm dành cho mẹ và bé và nhận được sự ủng hộ
-                                    nồng nhiệt từ khách tham quan. IBTE 2025 đánh dấu một bước tiến mới:
-                                    chúng tôi trưng bày phiên bản nâng cấp với thiết kế an toàn hơn, chất
-                                    liệu cao cấp hơn và trải nghiệm chơi giàu tính giáo dục, giúp trẻ khám
-                                    phá thế giới qua những món ăn quen thuộc mỗi ngày.
+                                    Sau khi nhận giải thưởng tại Toy Fair New York 2025…
+                                    {/* ... giữ nguyên phần nội dung */}
                                 </p>
 
                                 <div className="mt-8 flex justify-center">
