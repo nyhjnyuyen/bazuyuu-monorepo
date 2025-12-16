@@ -224,7 +224,7 @@ export default function LandingPage() {
                     />
 
                     {/* Swiper for New Arrivals */}
-                    <div className="relative  max-w-7xl mx-auto px-4 pb-20">
+                    <div className="relative  max-w-7xl mx-auto px-4 pb-10">
                                 {loading ? (
                                     <p className="text-center">Đang tải sản phẩm mới...</p>
                                 ) : newArrivals.length === 0 ? (
@@ -360,8 +360,8 @@ export default function LandingPage() {
                 </section>
 
                 {/* Slogan Section */}
-                <section className="py-20 bg-white">
-                    <div className="mt-12">
+                <section className="py-10 bg-white">
+                    <div className="mt-4">
                         <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight  mb-12 md:mb-16 lg:mb-8">
                             TẠO XU HƯỚNG – LAN TỎA VẺ ĐẸP
                         </h2>
@@ -416,7 +416,7 @@ export default function LandingPage() {
 
 
                 {/* Flashmod / Upcoming IBTE */}
-                <section className="relative h-[360px] text-white overflow-hidden">
+                <section className="relative h-[360px] text-white overflow-hidden mt-[120px]">
 
                     {/* Background image */}
                     <div
@@ -472,7 +472,7 @@ export default function LandingPage() {
 
                                 <p className="text-violet-900 font-heading leading-relaxed text-left text-base md:text-lg">
                                     Sau khi nhận giải thưởng tại Toy Fair New York 2025…
-                                    {/* ... giữ nguyên phần nội dung */}
+
                                 </p>
 
                                 <div className="mt-8 flex justify-center">

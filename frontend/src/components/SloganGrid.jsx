@@ -25,9 +25,7 @@ export default function SloganGrid({ items, onItemClick }) {
                         <p className="text-sm font-heading text-white font-semibold line-clamp-2">
                             {item.label}
                         </p>
-                        <p className="mt-1 text-xs text-white/80 line-clamp-3 text-left">
-                            {item.desc}
-                        </p>
+
                     </div>
                 </button>
             ))}
