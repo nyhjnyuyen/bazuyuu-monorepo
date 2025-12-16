@@ -67,7 +67,7 @@ public class VNPayService {
             String v = params.get(k);
             if (v == null || v.isEmpty()) continue;
 
-            // Append '&' only if this is NOT the first NON-EMPTY param
+            // Với hashData: dùng GIÁ TRỊ GỐC, không encode
             if (hashData.length() > 0) {
                 hashData.append('&');
                 query.append('&');
@@ -75,8 +75,9 @@ public class VNPayService {
 
             hashData.append(k)
                     .append('=')
-                    .append(urlEncodeUtf8(v));
+                    .append(v);  // ✅ KHÔNG encode
 
+            // Với query: vẫn phải encode như cũ
             query.append(urlEncodeUtf8(k))
                     .append('=')
                     .append(urlEncodeUtf8(v));
@@ -86,9 +87,7 @@ public class VNPayService {
         query.append("&vnp_SecureHash=").append(secureHash);
 
         String paymentUrl = cfg.getVnp_PayUrl() + "?" + query;
-        // Log this once to see exactly what you're sending
         System.out.println("VNPay URL = " + paymentUrl);
-
         return paymentUrl;
     }
     /** Verify VNPay return/IPN signature and extract status. */
@@ -116,8 +115,8 @@ public class VNPayService {
             if (v == null || v.isEmpty()) continue;
 
             if (hashData.length() > 0) hashData.append('&');
-            // Important: sign URL-encoded values, same as when creating the URL
-            hashData.append(k).append('=').append(urlEncodeUtf8(v));
+            // DÙNG GIÁ TRỊ GỐC, KHÔNG encode
+            hashData.append(k).append('=').append(v);
         }
 
         String calc = cfg.hmacSHA512(cfg.getVnp_HashSecret(), hashData.toString());

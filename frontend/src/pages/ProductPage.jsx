@@ -112,10 +112,10 @@ export default function ProductPage() {
             <div className="min-h-screen bg-white flex flex-col">
                 <main className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
                     <p className="text-violet-925 text-xl font-heading mb-6">
-                        Product not found.
+                        Không tìm thấy sản phẩm.
                     </p>
                     <Link to="/shop" className="underline text-violet-925">
-                        Back to Shop
+                        Quay về shop
                     </Link>
                 </main>
                 <Footer />
@@ -152,7 +152,6 @@ export default function ProductPage() {
             window.dispatchEvent(new Event('cart-updated'));
             alert(` ${product.name} đã được thêm vào giỏ hàng!`);
         } catch (e) {
-            console.error('Add to cart failed', e);
             alert('Thêm vào giỏ thất bại. Xin vui lòng thử lại.');
         }
     };
@@ -312,59 +311,26 @@ export default function ProductPage() {
                                             : 'border-violet-300 text-violet-925'
                                     }`}
                                 >
-                                    {wishlisted ? '♥ In Wishlist' : '♡ Add to Wishlist'}
+                                    {wishlisted ? '♥ Trong wishlist' : '♡ Thêm vào wishlist'}
                                 </button>
 
                                 <button
                                     onClick={handleAddToCart}
                                     className="flex-1 px-6 py-3 bg-violet-950 text-white rounded-2xl font-semibold hover:bg-violet-900"
                                 >
-                                    Add to Bag
+                                    Thêm vào giỏ hàng
                                 </button>
                             </div>
 
                             {/* Accordions */}
                             <section className="mt-8 border-t border-gray-200 divide-y divide-gray-200">
-                                {/* PRODUCT DETAILS */}
-                                <details className="group py-4">
-                                    <summary className="flex items-center justify-between cursor-pointer list-none">
-                                        <span className="font-heading text-sm sm:text-base text-violet-950">
-                                            PRODUCT DETAILS
-                                        </span>
-                                        <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
-                                            +
-                                        </span>
-                                    </summary>
-                                    <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
-                                        {product.productDetails ||
-                                            product.description ||
-                                            'No additional details.'}
-                                    </div>
-                                </details>
-
-                                {/* SAFETY & CARE */}
-                                <details className="group py-4">
-                                    <summary className="flex items-center justify-between cursor-pointer list-none">
-                                        <span className="font-heading text-sm sm:text-base text-violet-950">
-                                            SAFETY &amp; CARE
-                                        </span>
-                                        <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
-                                            +
-                                        </span>
-                                    </summary>
-                                    <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
-                                        {product.safetyCare ||
-                                            'Surface clean only. Suitable for ages 3+. Do not tumble dry, dry clean or iron.'}
-                                    </div>
-                                </details>
-
                                 {/* PRODUCT STORY */}
                                 {Array.isArray(product.storyImageUrls) &&
                                     product.storyImageUrls.length > 0 && (
                                         <details className="group py-4">
                                             <summary className="flex items-center justify-between cursor-pointer list-none">
                                                 <span className="font-heading text-sm sm:text-base text-violet-950">
-                                                    PRODUCT STORY
+                                                    Câu chuyện sản phẩm
                                                 </span>
                                                 <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
                                                     +
@@ -383,6 +349,45 @@ export default function ProductPage() {
                                             </div>
                                         </details>
                                     )}
+                                {/* PRODUCT DETAILS */}
+                                <details className="group py-4">
+                                    <summary className="flex items-center justify-between cursor-pointer list-none">
+                                        <span className="font-heading text-sm sm:text-base text-violet-950">
+                                            Chi tiết sản phẩm
+                                        </span>
+                                        <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
+                                            +
+                                        </span>
+                                    </summary>
+                                    <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
+                                        {product.productDetails ||
+                                            product.description ||
+                                            'Chưa có thông tin.'}
+                                    </div>
+                                </details>
+
+                                {/* SAFETY & CARE */}
+                                <details className="group py-4">
+                                    <summary className="flex items-center justify-between cursor-pointer list-none">
+        <span className="font-heading text-sm sm:text-base text-violet-950">
+            Hướng dẫn sử dụng & Bảo quản
+        </span>
+                                        <span className="text-xl text-gray-500 group-open:rotate-45 transition-transform">
+            +
+        </span>
+                                    </summary>
+
+                                    <div className="mt-3 text-sm text-violet-900 font-heading leading-relaxed">
+                                        {product.safetyCare || (
+                                            <>
+                                                Chỉ vệ sinh bề mặt bằng khăn ẩm. <br />
+                                                Sản phẩm phù hợp cho trẻ từ 3 tuổi trở lên. <br />
+                                                Không sấy khô, không giặt khô và không ủi. <br />
+                                                Tránh tiếp xúc trực tiếp với nguồn nhiệt cao.
+                                            </>
+                                        )}
+                                    </div>
+                                </details>
                             </section>
                         </div>
                     </div>
@@ -390,12 +395,12 @@ export default function ProductPage() {
                     {/* RELATED PRODUCTS */}
                     <section className="mt-16">
                         <h2 className="mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-l sm:text-3xl md:text-display leading-tight mb-10">
-                            RELATED PRODUCTS
+                            SẢN PHẨM LIÊN QUAN
                         </h2>
 
                         {related.length === 0 ? (
                             <p className="text-center text-violet-925/70">
-                                No related products found.
+                                Không tìm thấy sản phẩm.
                             </p>
                         ) : (
                             <div className="relative w-full">
@@ -466,8 +471,8 @@ export default function ProductPage() {
                                                                         type="button"
                                                                         aria-label={
                                                                             wish
-                                                                                ? 'Remove from wishlist'
-                                                                                : 'Add to wishlist'
+                                                                                ? 'Xoá khỏi wishlist'
+                                                                                : 'Thêm vào wishlist'
                                                                         }
                                                                         aria-pressed={wish}
                                                                         className={`w-9 h-9 rounded-full border transition flex items-center justify-center ${
@@ -496,7 +501,7 @@ export default function ProductPage() {
                                                                     <button
                                                                         type="button"
                                                                         aria-label={
-                                                                            inCart ? 'Added to cart' : 'Add to cart'
+                                                                            inCart ? 'Đã thêm vào giỏ' : 'Thêm vào giỏ'
                                                                         }
                                                                         disabled={addingId === item.id}
                                                                         className={`w-9 h-9 rounded-full border transition flex items-center justify-center ${
