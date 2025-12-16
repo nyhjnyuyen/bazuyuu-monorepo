@@ -98,6 +98,8 @@ export default function LandingPage() {
     const [addingId, setAddingId] = useState(null);
     const [flashOpen, setFlashOpen] = useState(false);
     const [inCartIds, setInCartIds] = useState(() => new Set());
+    const [activeSlogan, setActiveSlogan] = useState(null);   // {label, desc}
+    const [sloganOpen, setSloganOpen] = useState(false);
 
     const handleAddToCart = async (product) => {
         setAddingId(product.id);
@@ -164,7 +166,7 @@ export default function LandingPage() {
                 {/* Categories & New Arrivals */}
                 <section className="relative pt-40 pb-20 bg-white-950/10 rounded-t-[60px]">
                     <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight -mt-24 mb-12 md:mb-16 lg:mb-16">
-                        BAZUUYU'S  FAMILIES
+                        CÁC GIA ĐÌNH BAZUUYU
                     </h2>
 
                     <div className="relative grid grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto px-4">
@@ -299,7 +301,7 @@ export default function LandingPage() {
                                                                 {/* Heart button */}
                                                                 <button
                                                                     type="button"
-                                                                    aria-label={wish ? 'Remove from wishlist' : 'Add to wishlist'}
+                                                                    aria-label={wish ? 'Xoá khỏi wishlist' : 'Thêm vào wishlist'}
                                                                     aria-pressed={wish}
                                                                     className={`w-9 h-9 rounded-full border transition flex items-center justify-center
                       ${
@@ -323,7 +325,7 @@ export default function LandingPage() {
                                                                 {/* Add to cart button */}
                                                                 <button
                                                                     type="button"
-                                                                    aria-label={inCart ? 'Added to cart' : 'Add to cart'}
+                                                                    aria-label={inCart ? 'Đã thêm vào giỏ' : 'Thêm vào giỏ'}
                                                                     disabled={addingId === item.id}
                                                                     className={`w-9 h-9 rounded-full border transition flex items-center justify-center
                       ${
@@ -361,21 +363,57 @@ export default function LandingPage() {
                 <section className="py-20 bg-white">
                     <div className="mt-12">
                         <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-display leading-tight  mb-12 md:mb-16 lg:mb-8">
-                            CREATE TRENDS SHARE BEAUTY
+                            TẠO XU HƯỚNG – LAN TỎA VẺ ĐẸP
                         </h2>
                         <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-h2 leading-tight  ">
-                            BAZUUYU with innovative design
+                            BAZUUYU với thiết kế sáng tạo,
                         </h2>
                         <h2 className=" mx-auto text-center font-heading text-violet-925 tracking-[0.08em] text-h2 ">
-                            High quality, safety, and warm companionship as its core.
-                        </h2>
+                            lấy chất lượng cao, an toàn và sự đồng hành ấm áp làm cốt lõi.                        </h2>
                     </div>
                 </section>
 
                 {/* Slogan Images */}
                 <section className="bg-white py-2">
-                    <SloganGrid items={sloganItems} />
+                    <SloganGrid
+                        items={sloganItems}
+                        onItemClick={(item) => {
+                            setActiveSlogan(item);
+                            setSloganOpen(true);
+                        }}
+                    />
+
+                    {/* Popup chỉ hiện chữ */}
+                    {sloganOpen && activeSlogan && (
+                        <div
+                            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                            onClick={() => setSloganOpen(false)}
+                        >
+                            <div
+                                className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-6 md:p-8"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <h3 className="text-2xl md:text-3xl font-heading font-semibold text-violet-950 mb-4 text-center">
+                                    {activeSlogan.label}
+                                </h3>
+
+                                <p className="text-violet-900 font-heading leading-relaxed text-left text-base md:text-lg whitespace-pre-line">
+                                    {activeSlogan.desc}
+                                </p>
+
+                                <div className="mt-8 flex justify-center">
+                                    <button
+                                        className="px-6 py-2 rounded-xl bg-violet-900 text-white hover:bg-violet-800 font-heading"
+                                        onClick={() => setSloganOpen(false)}
+                                    >
+                                        Đóng
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </section>
+
 
                 {/* Flashmod / Upcoming IBTE */}
                 <section className="relative h-[360px] text-white overflow-hidden">

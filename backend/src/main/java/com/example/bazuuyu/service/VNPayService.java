@@ -87,7 +87,9 @@ public class VNPayService {
         query.append("&vnp_SecureHash=").append(secureHash);
 
         String paymentUrl = cfg.getVnp_PayUrl() + "?" + query;
-        System.out.println("VNPay URL = " + paymentUrl);
+        System.out.println("[VNPay] URL = " + paymentUrl);
+        System.out.println("[VNPay] HASH DATA = " + hashData);
+
         return paymentUrl;
     }
     /** Verify VNPay return/IPN signature and extract status. */
