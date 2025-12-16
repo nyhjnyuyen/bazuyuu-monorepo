@@ -129,10 +129,10 @@ export default function Navbar() {
 
                     {/* Desktop links hidden when compact */}
                     <nav className={`${compact ? 'hidden' : 'hidden md:flex'} items-center gap-10 text-violet-925 font-brand lg:text-xl font-bold`}>
-                        <Link to="/new" className="hover:underline">NEW</Link>
-                        <Link to="/shop" className="hover:underline">OUR FAMILIES</Link>
-                        <Link to="/about" className="hover:underline">OUR STORY</Link>
-                        <Link to="/contact" className="hover:underline">CONTACT</Link>
+                        <Link to="/new" className="hover:underline">SẢN PHẨM MỚI</Link>
+                        <Link to="/shop" className="hover:underline">CÁC GIA ĐÌNH BAZUUYU</Link>
+                        <Link to="/about" className="hover:underline">CÂU CHUYỆN THƯƠNG HIỆU</Link>
+                        <Link to="/contact" className="hover:underline">LIÊN HỆ</Link>
                     </nav>
                 </div>
 
@@ -149,8 +149,8 @@ export default function Navbar() {
                     <div className={`${compact ? 'hidden' : 'hidden md:flex'} items-center h-10 rounded-full pl-3 pr-2 bg-gray-100/80 ring-1 ring-black/5 focus-within:ring-[#3d177d]/30 transition`}>
                         <input
                             type="search"
-                            aria-label="Search our collection"
-                            placeholder="Search our collection"
+                            aria-label="Tìm kiếm sản phẩm"
+                            placeholder="Tìm kiếm sản phẩm..."
                             className="bg-transparent text-violet-950 placeholder-violet-950/40 font-heading border-r-0 px-3 leading-5 w-48 lg:w-64 outline-none"
                             value={searchTerm}
                             onChange={(e)=>setSearchTerm(e.target.value)}
@@ -173,15 +173,14 @@ export default function Navbar() {
                         />
                         {showDropdown && customer && (
                             <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-md w-40 text-sm">
-                                <div className="px-4 py-2 border-b">👋 {customer.username}</div>
+                                <div className="px-4 py-2 border-b">Xin chào, {customer.username}</div>
                                 <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">
-                                    Profile
+                                    Tài khoản của tôi
                                 </Link>
                                 <button
-                                    onClick={() => { logout(); navigate('/login'); }}
                                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
                                 >
-                                    Logout
+                                    Đăng xuất
                                 </button>
                             </div>
                         )}
@@ -199,7 +198,7 @@ export default function Navbar() {
 
                     {/* Cart */}
                     <div className="relative cursor-pointer" onClick={() => setDrawerOpen(true)}>
-                        <img src={shoppingCart} alt="Cart" className="h-6 w-6" />
+                        <img src={shoppingCart} alt="Giỏ hàng" className="h-6 w-6" />
                         {cartCount > 0 && (
                             <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5">
                 {cartCount}
@@ -212,15 +211,15 @@ export default function Navbar() {
             {/* Mobile menu */}
             {(compact || isOpen) && (
                 <div className="md:hidden flex flex-col bg-white px-6 py-2 space-y-2 text-violet-925">
-                    <Link to="/new">NEW</Link>
-                    <Link to="/shop">SHOP</Link>
-                    <Link to="/about">OUR STORY</Link>
-                    <Link to="/contact">CONTACT</Link>
+                    <Link to="/new">SẢN PHẨM MỚI</Link>
+                    <Link to="/shop">CÁC GIA ĐÌNH BAZUUYU</Link>
+                    <Link to="/about">CÂU CHUYỆN THƯƠNG HIỆU</Link>
+                    <Link to="/contact">LIÊN HỆ</Link>
                     <div className="flex items-center h-10 rounded-full pl-3 pr-2 bg-gray-100/80 ring-1 ring-black/5 focus-within:ring-[#3d177d]/30 transition">
                         <input
                             type="search"
-                            aria-label="Search our collection"
-                            placeholder="Search our collection"
+                            aria-label="Tìm kiếm sản phẩm"
+                            placeholder="Tìm kiếm sản phẩm..."
                             className="bg-transparent font-sans placeholder:font-sans placeholder:text-black/40 text-[#3d177d] text-[16px] leading-5 w-full outline-none"
                             value={searchTerm}
                             onChange={(e)=>setSearchTerm(e.target.value)}
